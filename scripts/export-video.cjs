@@ -66,7 +66,7 @@ document.fonts.ready.then(() => {
   console.log(`Capturando ${Math.round(duration * fps)} quadros a ${fps}fps (${Math.round(w * 2.4)}×${Math.round(h * 2.4)})…`);
   const ff = spawn("ffmpeg", [
     "-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", String(fps), "-c:v", "mjpeg", "-i", "-", "-i", wav,
-    "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p", "-profile:v", "high", "-r", String(fps),
+    "-vf", "scale=trunc(iw/2)*2:trunc(ih/2)*2", "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p", "-profile:v", "high", "-r", String(fps),
     "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "-shortest", out,
   ], { stdio: ["pipe", "inherit", "inherit"] });
   const N = Math.round(duration * fps);
