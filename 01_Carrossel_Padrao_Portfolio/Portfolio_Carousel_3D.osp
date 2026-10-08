@@ -1,0 +1,928 @@
+{
+  "version": {
+    "openshot-qt": "3.4.0",
+    "libopenshot": "0.4.0"
+  },
+  "width": 1080,
+  "height": 1350,
+  "fps": {
+    "num": 60,
+    "den": 1
+  },
+  "display_ratio": {
+    "num": 4,
+    "den": 5
+  },
+  "pixel_ratio": {
+    "num": 1,
+    "den": 1
+  },
+  "duration": 9.0,
+  "scale": 16,
+  "tick_pixels": 100,
+  "playhead_position": 1,
+  "profile": "Custom 1080x1350 60 fps",
+  "layers": [
+    {
+      "id": "L1",
+      "label": "Trilha 1 - Áudio Soundscape",
+      "number": 1000000,
+      "y": 0,
+      "lock": false
+    },
+    {
+      "id": "L2",
+      "label": "Trilha 2 - Badges dos Clientes (Órbita 3D)",
+      "number": 2000000,
+      "y": 0,
+      "lock": false
+    },
+    {
+      "id": "L3",
+      "label": "Trilha 3 - Sombras & Iluminação",
+      "number": 3000000,
+      "y": 0,
+      "lock": false
+    },
+    {
+      "id": "L4",
+      "label": "Trilha 4 - Cubo 3D Central Fixo",
+      "number": 4000000,
+      "y": 0,
+      "lock": false
+    },
+    {
+      "id": "L5",
+      "label": "Trilha 5 - Master Vídeo 3D Loop",
+      "number": 5000000,
+      "y": 0,
+      "lock": false
+    }
+  ],
+  "files": [
+    {
+      "id": "F1_VIDEO_4x5",
+      "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\Portfolio_Carousel_3D_4x5.mp4",
+      "name": "Portfolio 3D Carousel (Master 4x5 60FPS).mp4",
+      "media_type": "video",
+      "duration": 9.0,
+      "width": 1080,
+      "height": 1350,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": true,
+      "has_audio": true,
+      "has_single_image": false,
+      "audio_bit_rate": 256000,
+      "sample_rate": 48000,
+      "channels": 2,
+      "channel_layout": 3,
+      "acodec": "aac",
+      "vcodec": "h264"
+    },
+    {
+      "id": "F2_VIDEO_9x16",
+      "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\Portfolio_Carousel_3D_9x16.mp4",
+      "name": "Portfolio 3D Carousel (Master 9x16 60FPS).mp4",
+      "media_type": "video",
+      "duration": 9.0,
+      "width": 1080,
+      "height": 1920,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": true,
+      "has_audio": true,
+      "has_single_image": false,
+      "audio_bit_rate": 256000,
+      "sample_rate": 48000,
+      "channels": 2,
+      "channel_layout": 3,
+      "acodec": "aac",
+      "vcodec": "h264"
+    },
+    {
+      "id": "F3_AUDIO",
+      "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\portfolio_carousel_audio.wav",
+      "name": "Trilha Sonora Corporativa Minimalista (48kHz Stereo Loop).wav",
+      "media_type": "audio",
+      "duration": 9.0,
+      "width": 0,
+      "height": 0,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": false,
+      "has_audio": true,
+      "has_single_image": false,
+      "audio_bit_rate": 256000,
+      "sample_rate": 48000,
+      "channels": 2,
+      "channel_layout": 3,
+      "acodec": "aac",
+      "vcodec": ""
+    },
+    {
+      "id": "F4_CENTER_CUBE",
+      "path": "C:\\Users\\xavie\\Downloads\\icon-cubo.png",
+      "name": "Logo Central Fixo - Cubo de Cristal 3D Estoke.png",
+      "media_type": "image",
+      "duration": 300.0,
+      "width": 395,
+      "height": 395,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": true,
+      "has_audio": false,
+      "has_single_image": true,
+      "audio_bit_rate": 0,
+      "sample_rate": 0,
+      "channels": 0,
+      "channel_layout": 0,
+      "acodec": "",
+      "vcodec": ""
+    },
+    {
+      "id": "F_BADGE_2",
+      "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\assets_carousel\\badge_2.png",
+      "name": "Badge 2. Ruppel Streetwear.png",
+      "media_type": "image",
+      "duration": 300.0,
+      "width": 800,
+      "height": 800,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": true,
+      "has_audio": false,
+      "has_single_image": true,
+      "audio_bit_rate": 0,
+      "sample_rate": 0,
+      "channels": 0,
+      "channel_layout": 0,
+      "acodec": "",
+      "vcodec": ""
+    },
+    {
+      "id": "F_BADGE_3",
+      "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\assets_carousel\\badge_3.png",
+      "name": "Badge 3. Loja Arteiro.png",
+      "media_type": "image",
+      "duration": 300.0,
+      "width": 800,
+      "height": 800,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": true,
+      "has_audio": false,
+      "has_single_image": true,
+      "audio_bit_rate": 0,
+      "sample_rate": 0,
+      "channels": 0,
+      "channel_layout": 0,
+      "acodec": "",
+      "vcodec": ""
+    },
+    {
+      "id": "F_BADGE_4",
+      "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\assets_carousel\\badge_4.png",
+      "name": "Badge 4. Dizzy House Studio.png",
+      "media_type": "image",
+      "duration": 300.0,
+      "width": 800,
+      "height": 800,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": true,
+      "has_audio": false,
+      "has_single_image": true,
+      "audio_bit_rate": 0,
+      "sample_rate": 0,
+      "channels": 0,
+      "channel_layout": 0,
+      "acodec": "",
+      "vcodec": ""
+    },
+    {
+      "id": "F_BADGE_5",
+      "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\assets_carousel\\badge_5.png",
+      "name": "Badge 5. Kaiirós.png",
+      "media_type": "image",
+      "duration": 300.0,
+      "width": 800,
+      "height": 800,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": true,
+      "has_audio": false,
+      "has_single_image": true,
+      "audio_bit_rate": 0,
+      "sample_rate": 0,
+      "channels": 0,
+      "channel_layout": 0,
+      "acodec": "",
+      "vcodec": ""
+    },
+    {
+      "id": "F_BADGE_6",
+      "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\assets_carousel\\badge_6.png",
+      "name": "Badge 6. K DUST.png",
+      "media_type": "image",
+      "duration": 300.0,
+      "width": 800,
+      "height": 800,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": true,
+      "has_audio": false,
+      "has_single_image": true,
+      "audio_bit_rate": 0,
+      "sample_rate": 0,
+      "channels": 0,
+      "channel_layout": 0,
+      "acodec": "",
+      "vcodec": ""
+    },
+    {
+      "id": "F_BADGE_7",
+      "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\assets_carousel\\badge_7.png",
+      "name": "Badge 7. LCS Transporte Turismo.png",
+      "media_type": "image",
+      "duration": 300.0,
+      "width": 800,
+      "height": 800,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": true,
+      "has_audio": false,
+      "has_single_image": true,
+      "audio_bit_rate": 0,
+      "sample_rate": 0,
+      "channels": 0,
+      "channel_layout": 0,
+      "acodec": "",
+      "vcodec": ""
+    },
+    {
+      "id": "F_BADGE_8",
+      "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\assets_carousel\\badge_8.png",
+      "name": "Badge 8. Vicente Auto Center.png",
+      "media_type": "image",
+      "duration": 300.0,
+      "width": 800,
+      "height": 800,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": true,
+      "has_audio": false,
+      "has_single_image": true,
+      "audio_bit_rate": 0,
+      "sample_rate": 0,
+      "channels": 0,
+      "channel_layout": 0,
+      "acodec": "",
+      "vcodec": ""
+    },
+    {
+      "id": "F_BADGE_9",
+      "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\assets_carousel\\badge_9.png",
+      "name": "Badge 9. Yuri Miguez Coquetelaria.png",
+      "media_type": "image",
+      "duration": 300.0,
+      "width": 800,
+      "height": 800,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": true,
+      "has_audio": false,
+      "has_single_image": true,
+      "audio_bit_rate": 0,
+      "sample_rate": 0,
+      "channels": 0,
+      "channel_layout": 0,
+      "acodec": "",
+      "vcodec": ""
+    },
+    {
+      "id": "F_BADGE_10",
+      "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\assets_carousel\\badge_10.png",
+      "name": "Badge 10. OP Studio's.png",
+      "media_type": "image",
+      "duration": 300.0,
+      "width": 800,
+      "height": 800,
+      "fps": {
+        "num": 60,
+        "den": 1
+      },
+      "display_ratio": {
+        "num": 4,
+        "den": 5
+      },
+      "pixel_ratio": {
+        "num": 1,
+        "den": 1
+      },
+      "has_video": true,
+      "has_audio": false,
+      "has_single_image": true,
+      "audio_bit_rate": 0,
+      "sample_rate": 0,
+      "channels": 0,
+      "channel_layout": 0,
+      "acodec": "",
+      "vcodec": ""
+    }
+  ],
+  "clips": [
+    {
+      "id": "C1_MASTER_VIDEO",
+      "file_id": "F1_VIDEO_4x5",
+      "title": "Render Master 3D Carousel 60FPS",
+      "position": 0.0,
+      "start": 0.0,
+      "end": 9.0,
+      "duration": 9.0,
+      "layer": 5000000,
+      "scale": 1,
+      "gravity": 4,
+      "reader": {
+        "id": "F1_VIDEO_4x5",
+        "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\Portfolio_Carousel_3D_4x5.mp4",
+        "name": "Portfolio 3D Carousel (Master 4x5 60FPS).mp4",
+        "media_type": "video",
+        "duration": 9.0,
+        "width": 1080,
+        "height": 1350,
+        "fps": {
+          "num": 60,
+          "den": 1
+        },
+        "display_ratio": {
+          "num": 4,
+          "den": 5
+        },
+        "pixel_ratio": {
+          "num": 1,
+          "den": 1
+        },
+        "has_video": true,
+        "has_audio": true,
+        "has_single_image": false,
+        "audio_bit_rate": 256000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "channel_layout": 3,
+        "acodec": "aac",
+        "vcodec": "h264"
+      },
+      "alpha": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "volume": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "location_x": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 0.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "location_y": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 0.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "scale_x": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "scale_y": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "rotation": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 0.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "time": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "waveform": false,
+      "channel_filter": {
+        "Points": []
+      },
+      "channel_mapping": {
+        "Points": []
+      },
+      "effects": []
+    },
+    {
+      "id": "C2_CENTER_CUBE",
+      "file_id": "F4_CENTER_CUBE",
+      "title": "Logo Central Fixo: Cubo de Cristal 3D",
+      "position": 0.0,
+      "start": 0.0,
+      "end": 9.0,
+      "duration": 9.0,
+      "layer": 4000000,
+      "scale": 1,
+      "gravity": 4,
+      "reader": {
+        "id": "F4_CENTER_CUBE",
+        "path": "C:\\Users\\xavie\\Downloads\\icon-cubo.png",
+        "name": "Logo Central Fixo - Cubo de Cristal 3D Estoke.png",
+        "media_type": "image",
+        "duration": 300.0,
+        "width": 395,
+        "height": 395,
+        "fps": {
+          "num": 60,
+          "den": 1
+        },
+        "display_ratio": {
+          "num": 4,
+          "den": 5
+        },
+        "pixel_ratio": {
+          "num": 1,
+          "den": 1
+        },
+        "has_video": true,
+        "has_audio": false,
+        "has_single_image": true,
+        "audio_bit_rate": 0,
+        "sample_rate": 0,
+        "channels": 0,
+        "channel_layout": 0,
+        "acodec": "",
+        "vcodec": ""
+      },
+      "alpha": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "volume": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 0.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "location_x": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 0.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "location_y": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 0.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "scale_x": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "scale_y": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "rotation": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 0.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "time": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "waveform": false,
+      "channel_filter": {
+        "Points": []
+      },
+      "channel_mapping": {
+        "Points": []
+      },
+      "effects": []
+    },
+    {
+      "id": "C3_AUDIO_TRACK",
+      "file_id": "F3_AUDIO",
+      "title": "Soundscape Corporativo Loop 48kHz",
+      "position": 0.0,
+      "start": 0.0,
+      "end": 9.0,
+      "duration": 9.0,
+      "layer": 1000000,
+      "scale": 1,
+      "gravity": 4,
+      "reader": {
+        "id": "F3_AUDIO",
+        "path": "c:\\Users\\xavie\\Desktop\\openshot\\01_Carrossel_Padrao_Portfolio\\portfolio_carousel_audio.wav",
+        "name": "Trilha Sonora Corporativa Minimalista (48kHz Stereo Loop).wav",
+        "media_type": "audio",
+        "duration": 9.0,
+        "width": 0,
+        "height": 0,
+        "fps": {
+          "num": 60,
+          "den": 1
+        },
+        "display_ratio": {
+          "num": 4,
+          "den": 5
+        },
+        "pixel_ratio": {
+          "num": 1,
+          "den": 1
+        },
+        "has_video": false,
+        "has_audio": true,
+        "has_single_image": false,
+        "audio_bit_rate": 256000,
+        "sample_rate": 48000,
+        "channels": 2,
+        "channel_layout": 3,
+        "acodec": "aac",
+        "vcodec": ""
+      },
+      "alpha": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "volume": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "location_x": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 0.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "location_y": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 0.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "scale_x": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "scale_y": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "rotation": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 0.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "time": {
+        "Points": [
+          {
+            "co": {
+              "X": 1.0,
+              "Y": 1.0
+            },
+            "interpolation": 0
+          }
+        ]
+      },
+      "waveform": false,
+      "channel_filter": {
+        "Points": []
+      },
+      "channel_mapping": {
+        "Points": []
+      },
+      "effects": []
+    }
+  ],
+  "effects": [],
+  "markers": [
+    {
+      "icon": "",
+      "position": 1.0,
+      "text": "1. Ruppel Streetwear (Ápice Frontal)"
+    },
+    {
+      "icon": "",
+      "position": 61.0,
+      "text": "2. Loja Arteiro (Ápice Frontal)"
+    },
+    {
+      "icon": "",
+      "position": 121.0,
+      "text": "3. Dizzy House Studio (Ápice Frontal)"
+    },
+    {
+      "icon": "",
+      "position": 181.0,
+      "text": "4. Kaiirós (Ápice Frontal)"
+    },
+    {
+      "icon": "",
+      "position": 241.0,
+      "text": "5. K DUST (Ápice Frontal)"
+    },
+    {
+      "icon": "",
+      "position": 301.0,
+      "text": "6. LCS Transporte (Ápice Frontal)"
+    },
+    {
+      "icon": "",
+      "position": 361.0,
+      "text": "7. Vicente Auto Center (Ápice Frontal)"
+    },
+    {
+      "icon": "",
+      "position": 421.0,
+      "text": "8. Yuri Miguez (Ápice Frontal)"
+    },
+    {
+      "icon": "",
+      "position": 481.0,
+      "text": "9. OP Studio's (Ápice Frontal)"
+    },
+    {
+      "icon": "",
+      "position": 540.0,
+      "text": "Loop Complete (360°)"
+    }
+  ],
+  "progress": [],
+  "history": {
+    "undo": [],
+    "redo": []
+  }
+}
