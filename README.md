@@ -8,7 +8,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
-| SaaS Gestão de Estoque | 35s | 9:16 e 4:5 | `src/InventorySaaS.jsx` | `dist/saas-estoque-9x16.mp4`, `dist/saas-estoque-4x5.mp4` |
+| SaaS Gestão de Estoque | 39,5s + corte de 16s | 9:16 e 4:5 | `src/InventorySaaS.jsx` + `src/saas/` | `dist/saas-estoque-9x16.mp4`, `dist/saas-estoque-4x5.mp4`, `dist/saas-estoque-curto-9x16.mp4`, `dist/saas-estoque-curto-4x5.mp4` |
 | Pasta "Nossos clientes" | 5,2s, loop | 9:16 e 4:5 | `src/FolderReveal.jsx` | `dist/pasta-clientes-9x16.mp4`, `dist/pasta-clientes-4x5.mp4` |
 | Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/misu.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
 | Apresentação de site: LCS | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/lcs.js` | `dist/lcs-apresentacao-9x16.mp4`, `dist/lcs-apresentacao-4x5.mp4` |
@@ -19,15 +19,22 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 
 ## SaaS Gestão de Estoque (InventorySaaS)
 
-Motion de produto (prompt mestre "Vídeo Motion Graphics SaaS - Sistema de Gestão de Estoque"), estética Apple/Linear com a identidade da Estoke ao Cubo: ícones 3D soft-matte desenhados em SVG (extrusão + luz especular), UI em glassmorphism, fundos alternando navy/preto e claro, feixes de luz azul e ciano, grão, títulos em Monument e textos em Open Sauce (sem o verde do prompt original).
+Motion de produto (prompt mestre "Vídeo Motion Graphics SaaS - Sistema de Gestão de Estoque"), estética Apple/Linear com a identidade da Estoke ao Cubo: ícones 3D soft-matte desenhados em SVG (extrusão + luz especular), UI em glassmorphism, fundos alternando navy/preto e claro, feixes de luz azul e ciano, grão, títulos em Monument e textos em Open Sauce.
 
-- **0–5s Do caos ao controle**: planilhas, caixas, códigos de barras e notas flutuam em profundidade (desfoque nos mais distantes) e são sugados em espiral até virar um anel ciano pulsante. Texto: "Transforme o estoque bagunçado em um sistema fluido."
-- **5–12s Módulos**: o anel abre como portal para o fundo claro; 4 cards 3D (Entradas, Rastreio, Logística, Relatórios) saem do centro e giram em carrossel com paradas elásticas. Texto: "Compras, Armazém, Vendas e Logística. Tudo em um só lugar."
-- **12–20s Dashboard**: zoom no card de Relatórios vira a tela do monitor; a câmera recua com mola, o painel "Nível de Estoque e Giro em Tempo Real" se descola do dashboard com gráfico subindo e contador; flutuam "✦ Controle", "✦ Previsão", "✦ Escala".
-- **20–28s Automação**: o card branco atravessa a câmera e vira o fundo claro; linha conecta Compras → Armazém → Vendas → Logística, mão 3D liga "Reposição Automática" e arrasta o pedido para o card; em sequência: estoque baixo → NF-e emitida → equipe atualizada. Texto: "Zere as rupturas. Automatize pedidos e acompanhe cada item em tempo real."
-- **28–35s Segurança e logo**: o fundo escuro abre a partir do check da equipe; cadeado fecha com ondas de segurança e se divide em barras de crescimento; corte para o fundo claro com a logo e digitação de "Estoke ao Cubo" e "Transforme complexidade em controle."
-- Som: 120 BPM em Dó (I–V–vi–IV), pad no caos, batida entra no portal, arpejo nas cenas de produto, pausa no cadeado e acorde final; cada ação tem efeito (pops, swipes dos giros, tiques do contador, clique da mão, clack do cadeado, teclas da digitação).
-- Exportado em 60fps.
+Duas versões do mesmo código (`src/saas/variant.js` escolhe):
+- **Completa (39,5s)**: `dist/saas-estoque.html`.
+- **Corte curto (16s)** para Reels/anúncios: `dist/saas-estoque-curto.html`, montado com trechos da timeline completa listados em `src/saas/cut.js` (gancho, cubo, dashboard, automação, logo + CTA), todos em tempo de batida; a trilha é a da versão completa recortada nos mesmos pontos.
+
+Roteiro (versão completa):
+- **0–2s Gancho**: alerta e contador "−R$ 18.240 em vendas perdidas por falta de estoque" + "Cada ruptura é uma venda perdida."
+- **2–7s Do caos ao cubo**: planilhas, caixas, códigos de barras e notas flutuam inclinando em 3D e são sugados em espiral para dentro do cubo de vidro da logo, que pulsa e abre como portal. Texto: "Transforme o estoque bagunçado em um sistema fluido."
+- **7–14s Módulos**: o cubo vira um prisma 3D com a logo no topo; cada face é um módulo (Compras, Armazém, Vendas, Logística), com paradas elásticas, brilho de vidro na face ativa e rastro de movimento no giro. Texto: "Compras, Armazém, Vendas e Logística. Tudo em um só lugar."
+- **14–22s Dashboard**: zoom na face vira a tela do monitor; o painel "Nível de Estoque e Giro em Tempo Real" se descola com gráfico e contador; flutuam "✦ Controle", "✦ Previsão", "✦ Escala"; no 9:16, notificações sobem embaixo do monitor.
+- **22–30s Automação**: linha liga os processos, mão 3D liga "Reposição Automática" e arrasta o pedido; estoque baixo → NF-e emitida → equipe atualizada. Texto: "Zere as rupturas. Automatize pedidos e acompanhe cada item em tempo real." Sai em persianas no ritmo.
+- **30–34s Segurança**: cadeado fecha com ondas e se divide em barras de crescimento.
+- **34–39,5s Logo + CTA**: digitação de "Estoke ao Cubo" e "Transforme complexidade em controle.", botão "Agende uma demonstração" tocado pela mão 3D.
+- Som: 120 BPM em Dó (I–V–vi–IV); assinatura sonora do cubo ("plim" de vidro) sempre que ele aparece; cada ação tem efeito próprio.
+- Exportado em 60fps, trilha normalizada em -14 LUFS.
 
 ## Pasta "Nossos clientes" (FolderReveal)
 
@@ -161,9 +168,11 @@ node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-9x16.
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-4x5.mp4 60 4x5
 node scripts/export-video.cjs dist/saas-estoque.html dist/saas-estoque-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/saas-estoque.html dist/saas-estoque-4x5.mp4 60 4x5
+node scripts/export-video.cjs dist/saas-estoque-curto.html dist/saas-estoque-curto-9x16.mp4 60 9x16
+node scripts/export-video.cjs dist/saas-estoque-curto.html dist/saas-estoque-curto-4x5.mp4 60 4x5
 ```
 
-O script captura cada quadro seguindo a timeline (1080 de largura) e junta com a trilha renderizada offline.
+O script captura cada quadro seguindo a timeline (1080 de largura) e junta com a trilha renderizada offline, normalizada em -14 LUFS / -1,5 dBTP (padrão de Instagram, TikTok e YouTube).
 
 ## Roteiro
 

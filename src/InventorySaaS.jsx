@@ -1,8 +1,9 @@
 import React from "react";
 import {
-  C, FONT, DISP, clamp, lerp, prog, easeOut, easeIn, easeInOut, rnd, spring, hexA, midi, tone, hiss,
+  C, FONT, DISP, clamp, lerp, prog, easeOut, easeIn, easeInOut, rnd, spring, vel, hexA, midi, tone, hiss,
   GRAD, GRAD_LIGHT, Beam, Grain, CubeLogo, SND, renderEventsWav, MotionPlayer,
 } from "./motionKit";
+import { VARIANT } from "./saas/variant";
 
 /* =============================================================================
    Estoke ao Cubo — Sistema de Gestão de Estoque (motion SaaS, 35s)
@@ -13,15 +14,16 @@ import {
    tela do monitor (2→3), o card flutuante branco vira o fundo claro (3→4), o check da
    equipe abre o fundo escuro (4→5) e as barras sobem para o fundo final com a logo.
 ============================================================================= */
-const DURATION = 35;
+const HOOK = 2.0; // gancho antes da cena 1: as cenas abaixo usam tempo local (t - HOOK)
+const FULL_DURATION = HOOK + 37.5;
 const FORMATS = {
   "9x16": { w: 450, h: 800, label: "9:16" },
   "4x5": { w: 450, h: 562.5, label: "4:5" },
 };
 // cy: centro do palco visual · ty: topo do bloco de texto · k: escala dos objetos · lineY: linha de processos (cena 4)
 const LAYOUTS = {
-  "9x16": { cy: 330, ty: 596, k: 1, txt: 1, lineY: 132, monY: 372 },
-  "4x5": { cy: 214, ty: 420, k: 0.72, txt: 0.86, lineY: 58, monY: 226 },
+  "9x16": { cy: 330, ty: 596, k: 1, txt: 1, lineY: 132, monY: 352, toasts: true },
+  "4x5": { cy: 214, ty: 420, k: 0.72, txt: 0.86, lineY: 58, monY: 226, toasts: false },
 };
 // Paleta da marca (motionKit C): navy/preto, azul e ciano
 const P = {
@@ -34,7 +36,7 @@ const P = {
   dash: "#001A3A",
 };
 const T = { s2: 5, s3: 12, s4: 20, s5: 28, fin: 31.6 };
-const STEPS = [7.0, 8.6, 10.2]; // giros do carrossel (cena 2)
+const STEPS = [6.9, 8.3, 9.7]; // giros do prisma (cena 2)
 
 const expoIn = (p) => (p <= 0 ? 0 : Math.pow(2, 10 * p - 10));
 const expoInOut = (p) => (p <= 0 ? 0 : p >= 1 ? 1 : p < 0.5 ? Math.pow(2, 20 * p - 10) / 2 : (2 - Math.pow(2, -20 * p + 10)) / 2);
@@ -257,12 +259,12 @@ const CHAOS = Array.from({ length: 12 }, (_, i) => {
   const r = 118 + rnd(i, 2) * 80;
   return { kind: ["sheet", "box", "barcode", "invoice"][i % 4], x: Math.cos(a) * r, y: Math.sin(a) * r * 1.3, z: 0.62 + rnd(i, 3) * 0.6, rot: (rnd(i, 4) - 0.5) * 56, d: rnd(i, 5) * 0.55 };
 });
-// raio do anel: nasce com mola elástica, pulsa e depois abre como portal para a cena 2
+// raio do halo: nasce com o cubo, pulsa e depois abre como portal para a cena 2
 function ringRadius(t, L, W, H) {
   const form = spring(t - 3.72, { stiffness: 200, damping: 9 });
   const pulse = 1 + 0.05 * Math.sin((t - 3.8) * Math.PI * 2 * 1.1) * clamp((t - 3.9) * 3);
   const ex = expoIn(prog(t, 4.45, 5.15));
-  return { r: lerp(64 * L.k * form * pulse, Math.hypot(W, H) * 0.8, ex), ex, form };
+  return { r: lerp(84 * L.k * form * pulse, Math.hypot(W, H) * 0.8, ex), ex, form, pulse };
 }
 function Scene1({ t, W, H, L }) {
   const cx = W / 2;
@@ -288,11 +290,16 @@ function Scene1({ t, W, H, L }) {
           const sc = clamp(app, 0, 1.3) * (1 - pull * 0.9) * c.z;
           const o = clamp(app * 2) * (1 - prog(pull, 0.75, 1));
           if (o <= 0) return null;
-          const blur = (c.z < 0.82 ? (0.82 - c.z) * 9 : 0) + pull * 2.5;
+          // rastro de movimento: o desfoque cresce com a velocidade da sucção
+          const blur = (c.z < 0.82 ? (0.82 - c.z) * 9 : 0) + pull * 4;
+          // inclinação 3D contínua: os ícones giram no espaço, não só no plano
+          const tx = Math.sin(t * 1.1 + i * 2.1) * 26;
+          const ty = Math.cos(t * 0.9 + i * 1.3) * 30;
           return (
             <div key={i} style={{
               position: "absolute", left: x - size / 2, top: y - size / 2, width: size, height: size, opacity: o, zIndex: Math.round(c.z * 10),
-              transform: `scale(${sc}) rotate(${c.rot + Math.sin(t * 0.9 + i) * 8 + pull * 220}deg)`, filter: blur > 0.3 ? `blur(${blur}px)` : "none",
+              transform: `perspective(${420 * k}px) rotateX(${tx}deg) rotateY(${ty}deg) scale(${sc}) rotate(${c.rot + Math.sin(t * 0.9 + i) * 8 + pull * 220}deg)`,
+              filter: blur > 0.3 ? `blur(${blur}px)` : "none",
             }}>
               <Icon3D kind={c.kind} size={size} shadow={0.45} />
             </div>
@@ -307,7 +314,7 @@ function Scene1({ t, W, H, L }) {
           return <div key={j} style={{ position: "absolute", left: cx + Math.cos(a) * r - 2, top: cy + Math.sin(a) * r * 1.2 - 2, width: 4, height: 4, borderRadius: 4, background: P.neon, opacity: o, boxShadow: `0 0 8px ${P.neon}` }} />;
         })}
       </div>
-      {/* clarão no nascimento do anel */}
+      {/* clarão no nascimento do cubo */}
       {t > 3.72 && t < 4.6 && <Glow x={cx} y={cy} r={190 * k} color="#E6F7FF" a={0.75 * Math.exp(-(t - 3.72) * 5)} />}
       <TextBlock L={L}>
         <Words disp text="Transforme o estoque bagunçado em um sistema fluido." t={t} t0={0.55} t1={4.15} size={23 * L.txt} color="#EAF4FC" hl={[6, 7]} />
@@ -315,12 +322,28 @@ function Scene1({ t, W, H, L }) {
     </div>
   );
 }
+// O cubo da marca: recebe o caos, pulsa e se dissolve na luz do portal (fica acima da cena 2)
+function CubeOverlay({ t, W, H, L }) {
+  if (t < 3.6 || t > 5.2) return null;
+  const { form, pulse, ex } = ringRadius(t, L, W, H);
+  const size = 122 * L.k;
+  const o = clamp(form * 3) * (1 - prog(ex, 0.25, 0.75));
+  const sc = clamp(form, 0, 1.3) * pulse * lerp(1, 2.4, ex);
+  return (
+    <div style={{
+      position: "absolute", left: W / 2, top: L.cy, zIndex: 41, opacity: o, pointerEvents: "none",
+      transform: `translate(-50%, -50%) scale(${sc}) rotate(${(1 - clamp(form)) * -70}deg)`,
+    }}>
+      <CubeLogo size={size} glow={1.3 + 0.4 * Math.sin(t * 7)} />
+    </div>
+  );
+}
 function RingOverlay({ t, W, H, L }) {
   if (t < 3.72 || t > 5.3) return null;
   const cx = W / 2;
   const { r, ex } = ringRadius(t, L, W, H);
-  const o = 1 - prog(ex, 0.55, 1);
-  const bw = lerp(4, 10, ex);
+  const o = lerp(0.45, 1, prog(t, 4.3, 4.45)) * (1 - prog(ex, 0.55, 1));
+  const bw = lerp(2, 10, ex);
   return (
     <div style={{
       position: "absolute", left: cx - r, top: L.cy - r, width: r * 2, height: r * 2, borderRadius: "50%", zIndex: 40, opacity: o, pointerEvents: "none",
@@ -330,73 +353,86 @@ function RingOverlay({ t, W, H, L }) {
 }
 
 /* =============================================================================
-   Cena 2 — Módulos em carrossel 3D (5–12s)
+   Cena 2 — O cubo vira um prisma 3D: cada face é um módulo, a logo fica no topo (5–12s)
 ============================================================================= */
-const CARDS = [
-  { kind: "box", title: "Entradas", sub: "Compras e notas" },
-  { kind: "scanner", title: "Rastreio", sub: "Armazém e lotes" },
+const MODULES = [
+  { kind: "box", title: "Compras", sub: "Entradas e notas" },
+  { kind: "scanner", title: "Armazém", sub: "Rastreio de lotes" },
+  { kind: "chart", title: "Vendas", sub: "Relatórios e giro" },
   { kind: "truck", title: "Logística", sub: "Rotas e entregas" },
-  { kind: "chart", title: "Relatórios", sub: "Vendas e giro" },
 ];
+// ângulo do prisma: entra girando e para em cada face com mola (overshoot elástico)
+const prismRot = (t) => (1 - spring(t - 5.0, { stiffness: 46, damping: 11 })) * 270
+  - STEPS.reduce((acc, s) => acc + 90 * spring(t - s, { stiffness: 150, damping: 13 }), 0);
 function Scene2({ t, W, H, L }) {
   const cx = W / 2;
   const { k } = L;
-  const ccy = L.cy - 10 * k;
+  const ccy = L.cy - 6 * k;
   const { r } = ringRadius(t, L, W, H);
   const enter = easeOut(prog(t, 4.45, 5.7));
   const zoom = expoIn(prog(t, 11.2, 12.0));
   const camS = lerp(1.22, 1, enter) * lerp(1, 7.2, zoom);
-  const R = 125 * k;
-  const cw = 150 * k;
-  const ch = 186 * k;
-  const spinIn = (1 - spring(t - 5.0, { stiffness: 46, damping: 11 })) * 270;
-  const stepRot = STEPS.reduce((acc, s) => acc + 90 * spring(t - s, { stiffness: 150, damping: 13 }), 0);
+  const cw = 158 * k;
+  const ch = 196 * k;
+  const rot = prismRot(t);
+  const em = spring(t - 5.0, { stiffness: 90, damping: 12 });
+  const omega = Math.abs(vel(prismRot, t));
+  const mblur = Math.min(1.6, omega / 320) * k + zoom * 6;
   const navy = prog(t, 11.3, 11.8);
+  const zoomFace = STEPS.length;
+  const bob = Math.sin(t * 1.3) * 5 * k;
   return (
     <div style={layer(2, { background: BG_LIGHT, opacity: prog(t, 4.3, 4.55), clipPath: t < 5.2 ? `circle(${r}px at ${cx}px ${L.cy}px)` : "none" })}>
       <Glow x={cx - 150} y={ccy - 200 * k} r={230} color={P.neon} a={0.22} />
       <Glow x={cx + 150} y={ccy + 120 * k} r={230} color={P.elec} a={0.16} />
-      <div style={{ position: "absolute", inset: 0, transform: `scale(${camS})`, transformOrigin: `${cx}px ${ccy}px` }}>
-        {/* trilho da órbita: o anel da cena 1 deitado sob o carrossel */}
+      <div style={{ position: "absolute", inset: 0, transform: `scale(${camS})`, transformOrigin: `${cx}px ${ccy}px`, filter: mblur > 0.2 ? `blur(${mblur}px)` : "none" }}>
+        {/* órbita e sombra no chão: o halo do cubo deitado sob o prisma */}
         <div style={{
-          position: "absolute", left: cx - R - 50 * k, top: ccy + 92 * k - 34 * k, width: (R + 50 * k) * 2, height: 68 * k, borderRadius: "50%",
-          border: `1.5px solid ${hexA(P.neonDeep, 0.45)}`, boxShadow: `0 0 24px ${hexA(P.neon, 0.35)}`, opacity: clamp((t - 5.1) * 2),
+          position: "absolute", left: cx - 150 * k, top: ccy + ch / 2 + 8 * k, width: 300 * k, height: 64 * k, borderRadius: "50%",
+          border: `1.5px solid ${hexA(P.elec, 0.4)}`, boxShadow: `0 0 24px ${hexA(P.neon, 0.35)}`, opacity: clamp((t - 5.1) * 2),
         }} />
-        <Glow x={cx} y={ccy + 104 * k} r={170 * k} color={P.neon} a={0.25 * clamp((t - 5.1) * 2)} />
-        {CARDS.map((c, i) => {
-          const em = spring(t - 5.1 - i * 0.1, { stiffness: 90, damping: 12 });
-          const th = ((i * 90 - stepRot + spinIn) * Math.PI) / 180;
-          const zf = Math.cos(th);
-          const dz = (zf + 1) / 2;
-          const x = cx + Math.sin(th) * R * em;
-          const y = ccy - (1 - zf) * 16 * k;
-          const sc = lerp(0.62, 1, dz) * lerp(0.2, 1, clamp(em));
-          const front = clamp((zf - 0.86) / 0.14);
-          const o = clamp(em * 2) * lerp(0.4, 1, dz);
-          const isZoom = i === 3;
-          return (
-            <div key={c.title} style={{
-              position: "absolute", left: x - cw / 2, top: y - ch / 2, width: cw, height: ch, zIndex: Math.round(dz * 50), opacity: o,
-              transform: `perspective(700px) rotateY(${Math.sin(th) * 55}deg) scale(${sc})`, filter: dz < 0.6 ? `blur(${(0.6 - dz) * 5}px)` : "none",
-              borderRadius: 26 * k, background: "linear-gradient(160deg, rgba(255,255,255,.92), rgba(255,255,255,.5))", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)",
-              border: "1px solid rgba(255,255,255,.95)",
-              boxShadow: `0 ${24 * k}px ${50 * k}px rgba(0,36,80,.16), inset 0 1px 0 #fff, 0 0 0 ${1.5 * front}px ${hexA(P.neonDeep, 0.8)}, 0 0 ${34 * front}px ${hexA(P.neon, 0.55 * front)}`,
-              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 * k, overflow: "hidden",
+        <div style={{ position: "absolute", left: cx - 100 * k, top: ccy + ch / 2 + 22 * k, width: 200 * k, height: 34 * k, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(0,36,80,.28), rgba(0,36,80,0) 70%)", opacity: clamp(em) }} />
+        <div style={{ position: "absolute", left: cx, top: ccy + bob, width: 0, height: 0, perspective: `${900 * k}px` }}>
+          <div style={{ position: "absolute", left: 0, top: 0, transformStyle: "preserve-3d", transform: `rotateX(-13deg) rotateY(${rot}deg) scale(${clamp(em, 0, 1.2)})` }}>
+            {MODULES.map((m, i) => {
+              const zf = Math.cos(((i * 90 + rot) * Math.PI) / 180);
+              const front = clamp((zf - 0.86) / 0.14);
+              return (
+                <div key={m.title} style={{
+                  position: "absolute", left: -cw / 2, top: -ch / 2, width: cw, height: ch, boxSizing: "border-box",
+                  transform: `rotateY(${i * 90}deg) translateZ(${cw / 2}px)`, backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden",
+                  borderRadius: 12 * k, background: "linear-gradient(160deg, #FFFFFF 0%, #EEF5FB 60%, #DDEAF6 100%)", border: "1px solid rgba(255,255,255,.95)",
+                  boxShadow: `inset 0 1px 0 #fff, inset 0 0 0 ${1.5 * front}px ${hexA(P.elec, 0.8)}, 0 0 ${34 * front}px ${hexA(P.neon, 0.5 * front)}`,
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 * k, overflow: "hidden",
+                }}>
+                  <div style={{ transform: `translateY(${Math.sin(t * 2 + i) * 3 * k}px) rotate(${Math.sin(t * 1.4 + i) * 4}deg) scale(${1 + front * 0.08})` }}>
+                    <Icon3D kind={m.kind} size={86 * k} shadow={0.22} />
+                  </div>
+                  <div style={{ ...DISP, fontSize: 15 * k, color: P.ink }}>{m.title}</div>
+                  <div style={{ fontFamily: FONT, fontWeight: 600, fontSize: 11.5 * k, color: P.inkSoft, marginTop: -5 * k }}>{m.sub}</div>
+                  {/* brilho de vidro que percorre a face ativa */}
+                  {front > 0 && <div style={{ position: "absolute", top: -40 * k, bottom: -40 * k, width: 40 * k, left: `${lerp(-30, 130, ((t * 0.55 + i * 0.3) % 1.6) / 1.6)}%`, transform: "rotate(18deg)", background: "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.75), rgba(255,255,255,0))", opacity: front * 0.8 }} />}
+                  {/* sombreamento: a face escurece ao virar de lado */}
+                  <div style={{ position: "absolute", inset: 0, background: P.ink, opacity: (1 - Math.max(0, zf)) * 0.22 }} />
+                  {i === zoomFace && navy > 0 && <div style={{ position: "absolute", inset: 0, background: P.dash, opacity: navy }} />}
+                </div>
+              );
+            })}
+            {/* topo do prisma: a marca */}
+            <div style={{
+              position: "absolute", left: -cw / 2, top: -cw / 2, width: cw, height: cw, transform: `rotateX(90deg) translateZ(${ch / 2}px)`,
+              borderRadius: 12 * k, background: `linear-gradient(135deg, ${C.deep}, ${C.ink} 60%, ${C.night})`, display: "grid", placeItems: "center",
+              boxShadow: `inset 0 0 0 1px ${hexA(C.cyan, 0.5)}, inset 0 0 30px ${hexA(C.cyan, 0.25)}`,
             }}>
-              <div style={{ transform: `translateY(${Math.sin(t * 2 + i) * 3 * k}px) rotate(${Math.sin(t * 1.4 + i) * 4}deg) scale(${1 + front * 0.08})` }}>
-                <Icon3D kind={c.kind} size={86 * k} shadow={0.22} />
-              </div>
-              <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 19 * k, letterSpacing: "-0.03em", color: P.ink }}>{c.title}</div>
-              <div style={{ fontFamily: FONT, fontWeight: 600, fontSize: 11.5 * k, color: P.inkSoft, marginTop: -6 * k }}>{c.sub}</div>
-              {isZoom && navy > 0 && <div style={{ position: "absolute", inset: 0, background: P.dash, opacity: navy }} />}
+              <div style={{ transform: `rotate(${-rot}deg)` }}><CubeLogo size={70 * k} glow={0.8} /></div>
             </div>
-          );
-        })}
+          </div>
+        </div>
       </div>
       <TextBlock L={L}>
-        <Words text="Compras, Armazém, Vendas e Logística." t={t} t0={5.75} t1={10.9} size={22 * L.txt} weight={700} color={P.ink} track="-0.025em" />
+        <Words text="Compras, Armazém, Vendas e Logística." t={t} t0={5.6} t1={10.9} size={22 * L.txt} weight={700} color={P.ink} track="-0.025em" />
         <div style={{ height: 8 * L.txt }} />
-        <Words disp text="Tudo em um só lugar." t={t} t0={7.3} t1={10.95} size={25 * L.txt} color={P.ink} hl={[0, 1, 2, 3, 4]} hlBg={HL_LIGHT} />
+        <Words disp text="Tudo em um só lugar." t={t} t0={7.2} t1={10.95} size={25 * L.txt} color={P.ink} hl={[0, 1, 2, 3, 4]} hlBg={HL_LIGHT} />
       </TextBlock>
     </div>
   );
@@ -517,6 +553,31 @@ function StockCard({ t, k }) {
     </div>
   );
 }
+const TOASTS = [
+  { t: 13.9, text: "Pedido #4822 recebido", kind: "file" },
+  { t: 15.7, text: "Lote 118 conferido no armazém", kind: "box" },
+  { t: 17.5, text: "NF-e 5531 emitida", kind: "invoice" },
+];
+function Toasts({ t, W, H }) {
+  return TOASTS.map((n, i) => {
+    const s = spring(t - n.t, { stiffness: 160, damping: 15 });
+    const out = easeIn(prog(t, n.t + 1.55, n.t + 1.85));
+    if (s <= 0 || out >= 1 || t > 19.3) return null;
+    return (
+      <div key={i} style={{
+        position: "absolute", left: W / 2, top: H - 118, zIndex: 25, transform: `translate(-50%, ${(1 - s) * 40 - out * 30}px) scale(${lerp(0.9, 1, clamp(s))})`,
+        opacity: clamp(s * 2) * (1 - out), filter: out > 0 ? `blur(${out * 6}px)` : "none",
+        display: "flex", alignItems: "center", gap: 10, padding: "9px 16px 9px 10px", borderRadius: 16, whiteSpace: "nowrap",
+        background: "rgba(255,255,255,.09)", border: "1px solid rgba(255,255,255,.22)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)",
+        boxShadow: `0 14px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.25)`, fontFamily: FONT, fontWeight: 700, fontSize: 13.5, color: "#FFFFFF",
+      }}>
+        <Icon3D kind={n.kind} size={26} shadow={0.25} />
+        {n.text}
+        <div style={{ width: 7, height: 7, borderRadius: 7, background: C.cyan, boxShadow: `0 0 10px ${C.cyan}` }} />
+      </div>
+    );
+  });
+}
 const PILLS = [
   { text: "Controle", t: 16.2, dx: -112, dy: -158, depth: 1.1 },
   { text: "Previsão", t: 16.6, dx: 108, dy: 152, depth: 0.95 },
@@ -549,7 +610,7 @@ function Scene3({ t, W, H, L }) {
       <Beam x={W * 0.1} y={H * 0.1} w={560} h={110} rot={-30} color={C.cyan} a={0.25} />
       <Glow x={cx - 160} y={my - 220 * k} r={260} color={P.elec} a={0.3} />
       <Glow x={cx + 170} y={my + 240 * k} r={240} color={P.neon} a={0.1} />
-      <div style={{ position: "absolute", inset: 0, transform: `scale(${thru})`, transformOrigin: `${fc.x}px ${fc.y}px` }}>
+      <div style={{ position: "absolute", inset: 0, transform: `scale(${thru})`, transformOrigin: `${fc.x}px ${fc.y}px`, filter: zt > 0.02 ? `blur(${zt * 7}px)` : "none" }}>
         <div style={{ position: "absolute", inset: 0, transform: `scale(${camA})`, transformOrigin: `${fc.x}px ${fc.y}px`, filter: ap > 0.02 ? `blur(${ap * 2.2}px) brightness(${dim})` : "none" }}>
           <div style={{ position: "absolute", inset: 0, transform: `scale(${camS})`, transformOrigin: `${cx}px ${my}px` }}>
             {/* reflexo/mesa */}
@@ -601,6 +662,7 @@ function Scene3({ t, W, H, L }) {
           );
         })}
       </div>
+      {L.toasts && <Toasts t={t} W={W} H={H} />}
     </div>
   );
 }
@@ -620,6 +682,7 @@ const SEQ = [
   { kind: "team", label: "Equipe atualizada", t: 25.95, dx: 128 },
 ];
 const TEAM_CHECK = 26.5;
+const BLINDS = 27.35; // persianas para a cena 5 (fecham em 28,15)
 // trajetória da mão: [tempo, x, y] em coordenadas relativas ao centro (×k)
 function handPath(t, cx, cy, k, W) {
   const sw = { x: cx + 128 * k, y: cy - 66 * k };
@@ -680,8 +743,6 @@ function Scene4({ t, W, H, L }) {
   const fileO = t < 24.0 ? clamp(fileApp * 2) : 1 - prog(t, 24.0, 24.15);
   const fileS = (t < 24.0 ? clamp(fileApp, 0, 1.2) : lerp(1, 0.4, prog(t, 24.0, 24.15))) * (grabbed ? 1.08 : 1);
   const ripple = t > 22.1 && t < 22.8 ? prog(t, 22.1, 22.8) : 0;
-  const circleR = easeInOut(prog(t, 27.45, 28.15));
-  const teamX = cx + SEQ[2].dx * k;
   return (
     <div style={layer(4, { background: BG_LIGHT })}>
       <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(rgba(0,36,80,.10) 1px, transparent 1.3px)", backgroundSize: "18px 18px", opacity: 0.8 }} />
@@ -786,8 +847,18 @@ function Scene4({ t, W, H, L }) {
         <Words text="Automatize pedidos e acompanhe cada item em tempo real." t={t} t0={21.25} t1={27.25} size={19 * L.txt} weight={600} color={P.inkSoft} stagger={0.04} maxW={360} track="-0.015em" lh={1.25} />
       </TextBlock>
       <div style={{ position: "absolute", inset: 0, background: "#FFFFFF", opacity: flash, zIndex: 90, pointerEvents: "none" }} />
-      {/* o fundo escuro da cena 5 abre a partir do check da equipe */}
-      {circleR > 0 && <div style={{ position: "absolute", inset: 0, zIndex: 95, background: BG_DARK, clipPath: `circle(${circleR * Math.hypot(W, H) * 1.05}px at ${teamX}px ${cy}px)` }} />}
+      {/* persianas: 6 faixas do fundo escuro da cena 5 descem/sobem alternadas, no ritmo */}
+      {t > BLINDS && Array.from({ length: 6 }, (_, j) => {
+        const p = expoInOut(prog(t, BLINDS + j * 0.05, BLINDS + 0.55 + j * 0.05));
+        if (p <= 0) return null;
+        const sw = W / 6;
+        return (
+          <div key={j} style={{
+            position: "absolute", left: j * sw, top: 0, width: sw + 1, height: H, zIndex: 95, background: BG_DARK, backgroundSize: `${W}px ${H}px`, backgroundPosition: `${-j * sw}px 0`,
+            transform: `translateY(${(1 - p) * (j % 2 ? H : -H)}px)`, boxShadow: p < 1 ? `0 0 30px ${hexA(C.cyan, 0.35)}` : "none",
+          }} />
+        );
+      })}
     </div>
   );
 }
@@ -895,6 +966,7 @@ const WORDMARK = "Estoke ao Cubo";
 const TAGLINE = "Transforme complexidade em controle.";
 const TYPE = { w0: 32.45, wd: 0.055, g0: 33.35, gd: 0.032 };
 const HL_FROM = TAGLINE.indexOf("controle");
+const CTA = { rise: 34.6, btn: 34.85, tap: 36.1 };
 function Typed({ text, n, style, caret, hlFrom = 99, hlColor }) {
   return (
     <div style={style}>
@@ -928,12 +1000,21 @@ function Final({ t, W, H, L }) {
   const doneG = t > TYPE.g0 + TAGLINE.length * TYPE.gd;
   const blink = doneG || t < TYPE.w0 ? (Math.floor(t * 2.2) % 2 === 0 ? 1 : 0) : 1;
   const ringT = t - 32.05;
-  const drift = lerp(1.04, 1, easeOut(prog(t, 32, 35)));
+  const drift = lerp(1.04, 1, easeOut(prog(t, 32, 37.5)));
+  const up = easeInOut(prog(t, CTA.rise, CTA.rise + 0.55)) * 46 * k;
+  const btn = spring(t - CTA.btn, { stiffness: 150, damping: 12 });
+  const press = t < CTA.tap - 0.05 || t > CTA.tap + 0.3 ? 0 : t < CTA.tap + 0.05 ? (t - CTA.tap + 0.05) / 0.1 : 1 - (t - CTA.tap - 0.05) / 0.25;
+  const tapT = t - CTA.tap;
+  const btnY = logoY - up + 196 * k;
+  const handIn = easeOut(prog(t, CTA.tap - 0.75, CTA.tap - 0.05));
+  const handOut = easeIn(prog(t, CTA.tap + 0.45, CTA.tap + 0.9));
+  const hx = lerp(W + 40, cx + 70 * k, handIn) + handOut * 140;
+  const hy = lerp(btnY + 170 * k, btnY + 4 * k, handIn) + handOut * 120;
   return (
     <div style={layer(6, { background: BG_LIGHT, clipPath: `inset(${(1 - wp) * 100}% 0 0 0)`, "--caret": blink })}>
       <Glow x={cx - 150 + Math.sin(t * 0.5) * 20} y={logoY - 120} r={240} color={P.neon} a={0.25} />
       <Glow x={cx + 160} y={logoY + 220 * k} r={240} color={P.elec} a={0.18} />
-      <div style={{ position: "absolute", inset: 0, transform: `scale(${drift})`, transformOrigin: `${cx}px ${logoY}px` }}>
+      <div style={{ position: "absolute", inset: 0, transform: `scale(${drift}) translateY(${-up}px)`, transformOrigin: `${cx}px ${logoY}px` }}>
         {ringT > 0 && ringT < 1.2 && (() => {
           const r = (50 + easeOut(ringT / 1.2) * 110) * k;
           return <div style={{ position: "absolute", left: cx - r, top: logoY - r, width: r * 2, height: r * 2, borderRadius: "50%", border: `3px solid ${P.neon}`, opacity: 1 - ringT / 1.2, boxShadow: `0 0 20px ${hexA(P.neon, 0.6)}` }} />;
@@ -949,25 +1030,85 @@ function Final({ t, W, H, L }) {
           letterSpacing: "-0.025em", color: P.ink, whiteSpace: "pre",
         }} />
       </div>
+      {/* chamada para ação: botão com brilho, tocado pela mão 3D */}
+      {btn > 0 && (
+        <div style={{
+          position: "absolute", left: cx, top: btnY, zIndex: 10, opacity: clamp(btn * 2),
+          transform: `translate(-50%, -50%) scale(${clamp(btn, 0, 1.25) * (1 - press * 0.06)})`,
+          display: "flex", alignItems: "center", gap: 10 * k, height: 50 * k, padding: `0 ${26 * k}px`, borderRadius: 99, overflow: "hidden",
+          background: GRAD, color: "#FFFFFF", fontFamily: FONT, fontWeight: 800, fontSize: 16 * L.txt, letterSpacing: "-0.02em", whiteSpace: "nowrap",
+          boxShadow: `0 ${16 * k}px ${34 * k}px ${hexA(C.blue, 0.38)}, inset 0 1px 0 rgba(255,255,255,.35), 0 0 ${tapT > 0 && tapT < 1 ? 40 * (1 - tapT) : 0}px ${hexA(C.cyan, 0.8)}`,
+        }}>
+          Agende uma demonstração
+          <svg width={16 * k} height={16 * k} viewBox="0 0 16 16"><path d="M3 8 H12 M8.5 4 L12.5 8 L8.5 12" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <div style={{ position: "absolute", top: -20, bottom: -20, width: 46 * k, left: `${lerp(-20, 120, ((t - CTA.btn) % 1.8) / 1.8)}%`, transform: "rotate(20deg)", background: "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0))" }} />
+        </div>
+      )}
+      {tapT > 0 && tapT < 0.8 && (() => {
+        const r = (20 + easeOut(tapT / 0.8) * 120) * k;
+        return <div style={{ position: "absolute", left: cx + 70 * k - r, top: btnY - r, width: r * 2, height: r * 2, borderRadius: "50%", zIndex: 9, border: `2px solid ${C.cyan}`, opacity: 1 - tapT / 0.8 }} />;
+      })()}
+      {handIn > 0 && handOut < 1 && <Hand x={hx} y={hy} size={52 * k} press={press} />}
     </div>
   );
 }
 
-function Frame({ t, format = "9x16" }) {
+/* =============================================================================
+   Gancho (0–2s, antes da cena 1): a dor em número, para segurar quem está rolando o feed
+============================================================================= */
+const LOSS = 18240;
+function Hook({ t, W, H, L }) {
+  const cx = W / 2;
+  const { cy, k } = L;
+  const out = easeIn(prog(t, 1.62, 2.0));
+  const ic = spring(t - 0.05, { stiffness: 200, damping: 11 });
+  const cnt = Math.round(LOSS * easeOut(prog(t, 0.3, 1.45)));
+  return (
+    <div style={{
+      position: "absolute", inset: 0, zIndex: 30, opacity: 1 - out, transform: `scale(${1 + out * 0.25})`, transformOrigin: `${cx}px ${cy}px`,
+      filter: out > 0 ? `blur(${out * 10}px)` : "none",
+    }}>
+      <Glow x={cx} y={cy - 40 * k} r={230 * k} color={TINT.amber[1]} a={0.16 + 0.06 * Math.sin(t * 14)} />
+      {[0, 1].map((j) => {
+        const tw = t - 0.15 - j * 0.35;
+        if (tw < 0 || tw > 0.9) return null;
+        const r = (50 + tw * 150) * k;
+        return <div key={j} style={{ position: "absolute", left: cx - r, top: cy - 90 * k - r, width: r * 2, height: r * 2, borderRadius: "50%", border: `2px solid ${TINT.amber[1]}`, opacity: (1 - tw / 0.9) * 0.7 }} />;
+      })}
+      <div style={{ position: "absolute", left: cx, top: cy - 90 * k, transform: `translate(-50%, -50%) scale(${clamp(ic, 0, 1.3)}) rotate(${Math.sin(t * 18) * 4 * (1 - prog(t, 0.2, 1.2))}deg)` }}>
+        <Icon3D kind="alert" size={92 * k} shadow={0.4} />
+      </div>
+      <div style={{ position: "absolute", left: 0, right: 0, top: cy + 10 * k, textAlign: "center", opacity: clamp((t - 0.25) * 5) }}>
+        <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 52 * k, letterSpacing: "-0.045em", color: "#FFFFFF", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+          <span style={{ color: TINT.amber[1] }}>−</span>R$ {cnt.toLocaleString("pt-BR")}
+        </div>
+        <div style={{ fontFamily: FONT, fontWeight: 600, fontSize: 13 * k, color: "rgba(234,244,252,.65)", marginTop: 8 * k }}>em vendas perdidas por falta de estoque</div>
+      </div>
+      <TextBlock L={L}>
+        <Words disp text="Cada ruptura é uma venda perdida." t={t} t0={0.15} size={25 * L.txt} color="#EAF4FC" hl={[3, 4]} hlBg={`linear-gradient(90deg, ${TINT.amber[0]}, ${TINT.amber[1]})`} stagger={0.07} />
+      </TextBlock>
+    </div>
+  );
+}
+
+function FullFrame({ t: tg, format = "9x16" }) {
   const F = FORMATS[format];
   const L = LAYOUTS[format];
+  const t = tg - HOOK;
   const p = { t, W: F.w, H: F.h, L };
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: C.night, fontFamily: FONT }}>
       <IconDefs />
       {t < 5.3 && <Scene1 {...p} />}
+      {tg < 2.05 && <Hook {...p} t={tg} />}
       {t >= 4.3 && t < 12.0 && <Scene2 {...p} />}
       <RingOverlay {...p} />
+      <CubeOverlay {...p} />
       {t >= 12.0 && t < 20.0 && <Scene3 {...p} />}
       {t >= 20.0 && t < 28.2 && <Scene4 {...p} />}
       {t >= 28.15 && t < 32.1 && <Scene5 {...p} />}
       {t >= T.fin && <Final {...p} />}
-      <Grain t={t} opacity={0.07} />
+      <Grain t={tg} opacity={0.07} />
     </div>
   );
 }
@@ -977,6 +1118,12 @@ function Frame({ t, format = "9x16" }) {
    arpejo nas cenas de produto, pausa no cadeado e acorde final com a logo.
    Cada movimento importante tem o seu efeito (pop, swipe, tique, clique, clack).
 ============================================================================= */
+// Assinatura sonora do cubo: "plim" de vidro (sino + harmônico agudo + brilho), sempre que o cubo aparece
+function cubeChime(A, w, v = 1) {
+  [84, 91, 96].forEach((n, i) => tone(A, w + i * 0.025, { f: midi(n), dur: 1.6 - i * 0.3, v: (0.08 - i * 0.02) * v, send: 0.7, pan: i - 1 }));
+  tone(A, w, { type: "triangle", f: midi(108), dur: 0.25, v: 0.02 * v, send: 0.5 });
+  SND.shimmer(A, w + 0.04, 0.6 * v);
+}
 function buildEvents() {
   const ev = [];
   const add = (t, fn) => ev.push({ t, fn });
@@ -1033,10 +1180,11 @@ function buildEvents() {
   CHAOS.forEach((c, i) => add(0.2 + c.d, (A, w) => SND.pop(A, w, 420 + i * 45, 0.05)));
   riser(2.6, 1.12, 0.14);
   hit(3.74, 1);
-  add(3.76, (A, w) => [72, 76, 79].forEach((n, i) => SND.bell(A, w + i * 0.02, n, 0.9, i - 1)));
+  add(3.76, (A, w) => cubeChime(A, w));
   add(4.45, (A, w) => SND.whoosh(A, w, { dur: 0.75, from: 200, to: 6000, v: 0.26, pan: 0, panTo: 0 }));
   // Cena 2: cartões saindo do anel e giros do carrossel
-  CARDS.forEach((_, i) => add(5.12 + i * 0.1, (A, w) => SND.pluck(A, w, [72, 76, 79, 84][i], 1.1, i / 1.5 - 1)));
+  add(5.05, (A, w) => cubeChime(A, w, 0.5));
+  MODULES.forEach((_, i) => add(5.12 + i * 0.1, (A, w) => SND.pluck(A, w, [72, 76, 79, 84][i], 1.1, i / 1.5 - 1)));
   STEPS.forEach((s, i) => {
     add(s, (A, w) => { SND.swipe(A, w, 1.2); SND.tick(A, w, 2600, 1); });
     add(s + 0.22, (A, w) => SND.pop(A, w, [660, 740, 880][i], 0.12));
@@ -1073,8 +1221,10 @@ function buildEvents() {
   add(25.75, (A, w) => SND.tick(A, w, 3400, 1));
   add(25.95, (A, w) => [76, 79, 83].forEach((n, i) => SND.bell(A, w + i * 0.03, n, 0.9, i - 1)));
   add(TEAM_CHECK, (A, w) => { SND.pluck(A, w, 84, 1.2); SND.pluck(A, w + 0.07, 88, 1.2); });
-  riser(27.45, 0.6, 0.12);
-  add(27.45, (A, w) => SND.whoosh(A, w, { dur: 0.7, from: 300, to: 3000, v: 0.16, pan: 0.5, panTo: -0.3 }));
+  riser(27.2, 0.6, 0.12);
+  // persianas: um "swipe" curto por faixa, alternando os lados
+  for (let j = 0; j < 6; j++) add(BLINDS + 0.2 + j * 0.05, (A, w) => hiss(A, w, { type: "highpass", f: 2500, f2: 6000, dur: 0.12, v: 0.06, shape: "swell", pan: j / 2.5 - 1 }));
+  add(BLINDS + 0.55, (A, w) => SND.kick(A, w, 0.7));
   // Cena 5: cadeado, ondas, barras
   add(28.05, (A, w) => tone(A, w, { f: 60, f2: 40, glide: 0.8, dur: 1.2, v: 0.4, send: 0.3 }));
   add(28.15, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 2000, to: 400, v: 0.12, pan: -0.4, panTo: 0 }));
@@ -1092,7 +1242,7 @@ function buildEvents() {
   // Final: corte claro, logo, digitação
   add(T.fin, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 300, to: 6000, v: 0.18, pan: 0, panTo: 0 }));
   hit(32.05, 1.1);
-  add(32.05, (A, w) => { SND.pad(A, w, [48, 52, 55, 59, 62], 2.95, 2600, 2.6); SND.sub(A, w, 36, 1.6, 1); SND.bell(A, w, 84, 1); });
+  add(32.05, (A, w) => { SND.pad(A, w, [48, 52, 55, 59, 62], 5.4, 2600, 2.6); SND.sub(A, w, 36, 1.6, 1); cubeChime(A, w); });
   [...WORDMARK].forEach((ch, i) => {
     if (ch !== " ") add(TYPE.w0 + i * TYPE.wd, (A, w) => { hiss(A, w, { type: "highpass", f: 5000, dur: 0.02, v: 0.09 }); tone(A, w, { type: "square", f: 1700 + (i % 4) * 140, dur: 0.008, v: 0.02 }); });
   });
@@ -1100,10 +1250,85 @@ function buildEvents() {
     if (ch !== " ") add(TYPE.g0 + i * TYPE.gd, (A, w) => hiss(A, w, { type: "highpass", f: 5500, dur: 0.016, v: 0.06, pan: (i % 5) / 5 - 0.4 }));
   });
   add(34.5, (A, w) => { SND.bell(A, w, 79, 0.8, -0.3); SND.bell(A, w + 0.08, 84, 0.8, 0.3); });
-  return ev.sort((a, b) => a.t - b.t);
+  // CTA: botão sobe, mão entra, toque e confirmação
+  add(CTA.rise, (A, w) => SND.swipe(A, w, 0.7));
+  add(CTA.btn, (A, w) => SND.pop(A, w, 640, 0.16));
+  add(CTA.tap - 0.75, (A, w) => SND.whoosh(A, w, { dur: 0.6, from: 600, to: 2500, v: 0.08, pan: 0.6, panTo: 0.1 }));
+  add(CTA.tap, (A, w) => { click(A, w); SND.kick(A, w, 0.6); });
+  add(CTA.tap + 0.04, (A, w) => [79, 84, 88, 91].forEach((n, i) => SND.bell(A, w + i * 0.05, n, 0.8, i / 1.5 - 1)));
+  add(CTA.tap + 0.05, (A, w) => SND.shimmer(A, w, 0.7));
+  // tudo acima é tempo local; o gancho vem antes
+  const out = ev.map((e) => ({ t: e.t + HOOK, fn: e.fn }));
+  const addG = (t, fn) => out.push({ t, fn });
+  addG(0, (A, w) => { tone(A, w, { f: 58, f2: 46, glide: 2, dur: 2.1, a: 0.25, v: 0.3, send: 0.3 }); hiss(A, w, { type: "lowpass", f: 600, dur: 2, v: 0.05, shape: "swell" }); SND.kick(A, w, 0.9); });
+  [0.15, 0.32, 0.5, 0.67].forEach((tt, i) => addG(tt, (A, w) => tone(A, w, { type: "square", f: i % 2 ? 784 : 988, dur: 0.09, v: 0.04, lp: 2600, pan: i % 2 ? 0.3 : -0.3 })));
+  for (let tt = 0.3, i = 0; tt < 1.45; tt += 0.05 + i * 0.002, i++) addG(tt, (A, w) => SND.tick(A, w, 3200 - i * 40, 0.8));
+  addG(0.2, (A, w) => SND.clap(A, w, 0.5));
+  // tensão contínua: pulso grave tipo batimento + riser até a virada para o caos
+  [0, 0.5, 1.0, 1.25, 1.5].forEach((tt, i) => addG(tt, (A, w) => { SND.kick(A, w, 0.55 + i * 0.08); SND.sub(A, w, 31, 0.35, 0.9); }));
+  addG(0.6, (A, w) => { hiss(A, w, { f: 300, f2: 5000, q: 1.2, dur: 1.0, v: 0.14, shape: "rise", send: 0.3 }); tone(A, w, { type: "sawtooth", f: 110, f2: 330, glide: 1.0, dur: 1.0, a: 0.9, v: 0.035, lp: 1400 }); });
+  addG(1.45, (A, w) => tone(A, w, { f: 300, f2: 110, glide: 0.4, dur: 0.5, v: 0.12 }));
+  addG(1.6, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 4000, to: 300, v: 0.16, pan: 0, panTo: 0 }));
+  return out.sort((a, b) => a.t - b.t);
 }
-const EVENTS = buildEvents();
-const renderWav = () => renderEventsWav(EVENTS, DURATION);
+const FULL_EVENTS = buildEvents();
+const FULL_SCENES = [
+  { name: "Gancho", from: 0 },
+  { name: "Caos → cubo", from: HOOK },
+  { name: "Módulos", from: HOOK + T.s2 },
+  { name: "Dashboard", from: HOOK + T.s3 },
+  { name: "Automação", from: HOOK + T.s4 },
+  { name: "Segurança", from: HOOK + T.s5 },
+  { name: "Logo + CTA", from: HOOK + T.fin },
+];
+
+/* ---------- Variante: completo ou corte curto (trechos da timeline completa) ---------- */
+const SEGS = VARIANT.segments;
+const OFFS = SEGS ? SEGS.reduce((acc, sg) => [...acc, acc[acc.length - 1] + sg.to - sg.from], [0]) : null;
+const DURATION = SEGS ? OFFS[OFFS.length - 1] : FULL_DURATION;
+const mapTime = (u) => {
+  for (let i = 0; i < SEGS.length; i++) if (u < OFFS[i + 1]) return SEGS[i].from + (u - OFFS[i]);
+  return SEGS[SEGS.length - 1].to;
+};
+const Frame = SEGS ? ({ t, format }) => <FullFrame t={mapTime(Math.min(t, DURATION - 1e-4))} format={format} /> : FullFrame;
+const EVENTS = SEGS
+  ? SEGS.flatMap((sg, i) => FULL_EVENTS.filter((e) => e.t >= sg.from && e.t < sg.to).map((e) => ({ t: OFFS[i] + e.t - sg.from, fn: e.fn })))
+  : FULL_EVENTS;
+const SCENES = SEGS ? SEGS.map((sg, i) => ({ name: sg.name, from: OFFS[i] })) : FULL_SCENES;
+// No corte, a trilha é a da versão completa recortada nos mesmos trechos (com micro-fades
+// de 6ms nas emendas), para notas e reverbs que atravessam o corte soarem inteiros.
+async function renderWav() {
+  const full = await renderEventsWav(FULL_EVENTS, FULL_DURATION);
+  if (!SEGS) return full;
+  const bin = atob(full);
+  const src = new Int16Array(new Uint8Array([...bin].map((c) => c.charCodeAt(0))).buffer, 44);
+  const SR = 48000;
+  const fade = Math.round(SR * 0.006);
+  const parts = SEGS.map((sg) => src.slice(Math.round(sg.from * SR) * 2, Math.round(sg.to * SR) * 2));
+  const n = parts.reduce((a, p) => a + p.length, 0);
+  const out = new Int16Array(n);
+  let o = 0;
+  parts.forEach((p) => {
+    const frames = p.length / 2;
+    for (let f = 0; f < frames; f++) {
+      const g = Math.min(1, f / fade, (frames - 1 - f) / fade);
+      out[o + f * 2] = p[f * 2] * g;
+      out[o + f * 2 + 1] = p[f * 2 + 1] * g;
+    }
+    o += p.length;
+  });
+  const hdr = new DataView(new ArrayBuffer(44));
+  const str = (off, x) => [...x].forEach((ch, i) => hdr.setUint8(off + i, ch.charCodeAt(0)));
+  str(0, "RIFF"); hdr.setUint32(4, 36 + n * 2, true); str(8, "WAVE"); str(12, "fmt ");
+  hdr.setUint32(16, 16, true); hdr.setUint16(20, 1, true); hdr.setUint16(22, 2, true); hdr.setUint32(24, SR, true);
+  hdr.setUint32(28, SR * 4, true); hdr.setUint16(32, 4, true); hdr.setUint16(34, 16, true); str(36, "data"); hdr.setUint32(40, n * 2, true);
+  const bytes = new Uint8Array(44 + n * 2);
+  bytes.set(new Uint8Array(hdr.buffer), 0);
+  bytes.set(new Uint8Array(out.buffer), 44);
+  let b = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) b += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(b);
+}
 
 // Usado pelo exportador de vídeo (scripts/export-video.cjs)
 const MOTION = { Frame, duration: DURATION, formats: FORMATS, renderWav };
@@ -1111,14 +1336,6 @@ const MOTION = { Frame, duration: DURATION, formats: FORMATS, renderWav };
 export default function InventorySaaS() {
   return (
     <MotionPlayer Frame={Frame} duration={DURATION} events={EVENTS} formats={FORMATS} defaultFormat="9x16" renderWav={renderWav}
-      fontsToLoad={[`800 16px "Open Sauce Sans"`]}
-      scenes={[
-        { name: "Caos → controle", from: 0 },
-        { name: "Módulos", from: T.s2 },
-        { name: "Dashboard", from: T.s3 },
-        { name: "Automação", from: T.s4 },
-        { name: "Segurança", from: T.s5 },
-        { name: "Logo", from: T.fin },
-      ]} />
+      fontsToLoad={[`800 16px "Open Sauce Sans"`]} scenes={SCENES} />
   );
 }

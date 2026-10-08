@@ -64,6 +64,7 @@ document.fonts.ready.then(() => {
   console.log("Renderizando trilha…");
   const wav = path.join(tmp, "trilha.wav");
   fs.writeFileSync(wav, Buffer.from(await page.evaluate(() => window.__cap.wav()), "base64"));
+  normalizeLoudness(wav);
 
   console.log(`Capturando ${Math.round(duration * fps)} quadros a ${fps}fps (${Math.round(w * 2.4)}×${Math.round(h * 2.4)})…`);
   // Tamanho final exato e par (yuv420p exige), ex.: 4:5 → 1080×1350
@@ -95,3 +96,21 @@ document.fonts.ready.then(() => {
   console.error(e);
   process.exit(1);
 });
+
+// Normaliza a trilha para -14 LUFS / -1,5 dBTP (padrão de Instagram, TikTok e YouTube), em duas passadas:
+// mede com loudnorm e aplica o ganho linear medido, sem comprimir a dinâmica da mixagem.
+function normalizeLoudness(wav) {
+  const { spawnSync } = require("child_process");
+  const target = "I=-14:TP=-1.5:LRA=11";
+  const m = spawnSync("ffmpeg", ["-hide_banner", "-i", wav, "-af", `loudnorm=${target}:print_format=json`, "-f", "null", "-"], { encoding: "utf8" });
+  const json = (m.stderr || "").match(/\{[\s\S]*?\}\s*$/);
+  if (!json) return console.log("(loudnorm: medição indisponível, trilha mantida)");
+  const v = JSON.parse(json[0]);
+  const tmpOut = wav.replace(/\.wav$/, ".norm.wav");
+  const r = spawnSync("ffmpeg", ["-y", "-loglevel", "error", "-i", wav, "-af",
+    `loudnorm=${target}:measured_I=${v.input_i}:measured_TP=${v.input_tp}:measured_LRA=${v.input_lra}:measured_thresh=${v.input_thresh}:offset=${v.target_offset}:linear=true`,
+    "-ar", "48000", tmpOut]);
+  if (r.status !== 0) return console.log("(loudnorm falhou, trilha mantida)");
+  fs.renameSync(tmpOut, wav);
+  console.log(`Trilha normalizada: ${v.input_i} LUFS → -14 LUFS`);
+}

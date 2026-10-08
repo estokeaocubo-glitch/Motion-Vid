@@ -14,6 +14,7 @@ const ENTRIES = [
   { src: "src/EditorialReel.jsx", name: "EditorialReel", slug: "reel-editorial", title: "Reel Editorial" },
   { src: "src/FolderReveal.jsx", name: "FolderReveal", slug: "pasta-clientes", title: "Pasta de Clientes" },
   { src: "src/InventorySaaS.jsx", name: "InventorySaaS", slug: "saas-estoque", title: "SaaS Gestão de Estoque" },
+  { src: "src/InventorySaaS.jsx", name: "InventorySaaS", slug: "saas-estoque-curto", title: "SaaS Estoque (corte curto)", alias: { "./saas/variant": "src/saas/cut.js" } },
   // Apresentações de site: o mesmo DeviceShowcase com "./sites/current" apontando para cada site
   { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "misu-apresentacao", title: "Misú Apresentação", alias: { "./sites/current": "src/sites/misu.js" } },
   { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "lcs-apresentacao", title: "LCS Apresentação", alias: { "./sites/current": "src/sites/lcs.js" } },
