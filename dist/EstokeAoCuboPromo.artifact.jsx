@@ -349,6 +349,7 @@ function Kinetic({ t, start, tokens, stagger = 0.07, size, color, weight = 800, 
       {tokens.map((tk, i) => {
         const o = typeof tk === "string" ? { w: tk } : tk;
         const s = spring(t - start - i * stagger, cfg);
+        if (display) return <MaskWord key={i} s={s} style={o.style}>{o.w}</MaskWord>;
         return (
           <span key={i} style={{ display: "inline-block", whiteSpace: "pre", ...popStyle(s, from), ...o.style }}>{o.w}</span>
         );
@@ -357,7 +358,26 @@ function Kinetic({ t, start, tokens, stagger = 0.07, size, color, weight = 800, 
   );
 }
 
+// Revelação por máscara: a palavra sobe de trás de uma linha invisível, com leve giro
+function MaskWord({ s, style, children }) {
+  return (
+    <span style={{ display: "inline-block", overflow: "hidden", padding: "0.2em 0.06em 0.12em", margin: "-0.2em -0.06em -0.12em", verticalAlign: "top" }}>
+      <span style={{
+        display: "inline-block", whiteSpace: "pre", opacity: clamp(s * 3),
+        transform: `translateY(${(1 - s) * 118}%) rotate(${(1 - clamp(s)) * 7}deg)`, transformOrigin: "0 100%", ...style,
+      }}>{children}</span>
+    </span>
+  );
+}
+
 function AbsWord({ x, y, size, s, children, style, display = true }) {
+  if (display) {
+    return (
+      <div style={{ position: "absolute", left: x, top: y, fontSize: size, lineHeight: 1, ...DISP }}>
+        <MaskWord s={s} style={style}>{children}</MaskWord>
+      </div>
+    );
+  }
   return (
     <div style={{
       position: "absolute", left: x, top: y, fontSize: size, fontWeight: 800, letterSpacing: "-0.02em",
@@ -522,6 +542,22 @@ function PhoneMockup({ dark = 0 }) {
   );
 }
 
+/* ---------- Motion blur direcional ---------- */
+// Filtro SVG cujo desvio acompanha a velocidade do elemento (px/s), só no eixo do movimento.
+function MotionBlur({ id, vx = 0, vy = 0 }) {
+  const bx = Math.min(16, Math.abs(vx) * 0.011);
+  const by = Math.min(16, Math.abs(vy) * 0.011);
+  return (
+    <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+      <filter id={id} x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation={`${bx.toFixed(2)} ${by.toFixed(2)}`} />
+      </filter>
+    </svg>
+  );
+}
+const blurOn = (id, v) => (Math.abs(v) * 0.011 > 0.35 ? `url(#${id})` : "none");
+const vel = (f, t, h = 0.008) => (f(t + h) - f(t - h)) / (2 * h);
+
 /* ---------- Fundos (feixes de luz azul + grão, como no manual) ---------- */
 // Feixe: elipse suave e rotacionada, como as faixas de luz azul das capas da marca
 function Beam({ x, y, w, h, rot, color, a }) {
@@ -545,18 +581,25 @@ function BgLight({ t }) {
 
 const DARK_SEGMENTS = [
   { a: 4.0, b: 10.85, cx: 300, cy: 520, pain: true },
-  { a: 26.0, b: 32.9, cx: 225, cy: 386, pain: false },
+  // entra coberto pela transição de pixels e sai com wipe diagonal
+  { a: 26.1, b: 32.7, cx: 225, cy: 386, pain: false, instant: true, wipe: true },
 ];
+const WIPE = { a: 32.7, b: 33.3 };
+const wipeEdge = (t) => lerp(-320, 760, easeInOut(prog(t, WIPE.a, WIPE.b)));
 function BgDark({ t }) {
   const s = DARK_SEGMENTS.find((d) => t >= d.a && t < d.b + 0.6);
   if (!s) return null;
-  const r = 150 * easeInOut(prog(t, s.a, s.a + 0.75));
-  const op = 1 - easeOut(prog(t, s.b, s.b + 0.5));
+  const r = s.instant ? 150 : 150 * easeInOut(prog(t, s.a, s.a + 0.75));
+  const op = s.wipe ? 1 : 1 - easeOut(prog(t, s.b, s.b + 0.5));
+  const e = wipeEdge(t);
+  const clip = s.wipe && t >= WIPE.a
+    ? `polygon(${e}px 0, 700px 0, 700px 900px, ${e - 300}px 900px)`
+    : `circle(${r}% at ${s.cx}px ${s.cy}px)`;
   // Na "dor" o feixe é contido e frio; no "diferencial" ele abre com força total
   const k = s.pain ? 0.55 : 1;
   const sweep = Math.sin(t * 0.35) * 30;
   return (
-    <div style={{ position: "absolute", inset: 0, background: C.night, clipPath: `circle(${r}% at ${s.cx}px ${s.cy}px)`, opacity: op, overflow: "hidden" }}>
+    <div style={{ position: "absolute", inset: 0, background: C.night, clipPath: clip, WebkitClipPath: clip, opacity: op, overflow: "hidden" }}>
       <Beam x={60 + sweep} y={560 - sweep} w={1000} h={420} rot={-30} color={C.blue} a={0.85 * k} />
       <Beam x={90 + sweep} y={540 - sweep} w={760} h={120} rot={-30} color={C.sky} a={0.4 * k} />
       <Beam x={430 - sweep} y={110} w={640} h={260} rot={-30} color={C.deep} a={0.7} />
@@ -582,12 +625,101 @@ function Grain({ t }) {
 function Flash({ t }) {
   if (t < 10.6 || t > 11.8) return null;
   const f = t < 11 ? easeIn(prog(t, 10.65, 11.0)) : 1 - easeOut(prog(t, 11.0, 11.75));
+  // Streak anamórfico: um risco de luz ciano atravessa o frame no ápice do flash
+  const st = prog(t, 10.75, 11.35);
+  const streak = Math.sin(st * Math.PI);
+  return (
+    <>
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 80, opacity: f, pointerEvents: "none",
+        background: `radial-gradient(circle at 50% 59%, #FFFFFF 0%, #F2FAFF 45%, ${C.ice} 100%)`,
+      }} />
+      {streak > 0 && (
+        <div style={{ position: "absolute", left: -100, right: -100, top: 470 - 40, height: 80, zIndex: 81, pointerEvents: "none", opacity: streak, transform: `scaleX(${0.2 + easeOut(st) * 1.3})` }}>
+          <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: `radial-gradient(ellipse at center, ${hexA(C.cyan, 0.55)}, transparent 70%)` }} />
+          <div style={{ position: "absolute", left: 0, right: 0, top: 38, height: 4, borderRadius: 4, background: `linear-gradient(90deg, transparent, ${C.cyan} 25%, #FFFFFF 50%, ${C.cyan} 75%, transparent)` }} />
+        </div>
+      )}
+    </>
+  );
+}
+
+// Anel de luz que acompanha a borda do círculo de revelação (cena 1 → 2)
+function RevealRing({ t }) {
+  if (t < 4.0 || t > 4.9) return null;
+  const p = easeInOut(prog(t, 4.0, 4.75));
+  const R0 = 6.49 * 150 * p; // circle(%) usa a diagonal normalizada do frame (≈649px)
   return (
     <div style={{
-      position: "absolute", inset: 0, zIndex: 80, opacity: f, pointerEvents: "none",
-      background: `radial-gradient(circle at 50% 59%, #FFFFFF 0%, #F2FAFF 45%, ${C.ice} 100%)`,
+      position: "absolute", left: 300 - R0, top: 520 - R0, width: R0 * 2, height: R0 * 2, borderRadius: "50%", zIndex: 70, pointerEvents: "none",
+      border: `3px solid ${hexA(C.cyan, 0.9)}`, boxShadow: `0 0 30px ${hexA(C.cyan, 0.7)}, inset 0 0 30px ${hexA(C.cyan, 0.45)}`,
+      opacity: 1 - prog(t, 4.35, 4.85),
     }} />
   );
+}
+
+// Transição de pixels/cubos (eco do cubo pixelado do manual): cena 4 → 5
+const PIX = { a: 25.5, b: 26.15, cols: 10, rows: 18 };
+function PixelWipe({ t }) {
+  if (t < PIX.a || t > PIX.b + 0.7) return null;
+  const cw = W / PIX.cols;
+  const ch = H / PIX.rows;
+  const maxD = PIX.cols - 1 + (PIX.rows - 1) * 0.55;
+  const tiles = [];
+  for (let r = 0; r < PIX.rows; r++) {
+    for (let c = 0; c < PIX.cols; c++) {
+      const i = r * PIX.cols + c;
+      const d = (c + (PIX.rows - 1 - r) * 0.55) / maxD;
+      const j = rnd(i) * 0.1;
+      const sIn = easeOut(prog(t, PIX.a + d * 0.3 + j, PIX.a + d * 0.3 + j + 0.16));
+      const sOut = easeIn(prog(t, PIX.b + d * 0.3 + j, PIX.b + d * 0.3 + j + 0.16));
+      const sc = sIn * (1 - sOut);
+      if (sc <= 0.001) continue;
+      const k = rnd(i, 3);
+      tiles.push(
+        <div key={i} style={{
+          position: "absolute", left: c * cw, top: r * ch, width: cw + 0.6, height: ch + 0.6,
+          background: k > 0.94 ? C.cyan : k > 0.85 ? C.blue : k > 0.72 ? C.deep : C.night,
+          transform: `scale(${sc}) rotate(${(1 - sc) * 90}deg)`, borderRadius: (1 - sc) * 8,
+        }} />,
+      );
+    }
+  }
+  return <div style={{ position: "absolute", inset: 0, zIndex: 72, pointerEvents: "none" }}>{tiles}</div>;
+}
+
+// Faixas de cor que viajam na borda do wipe diagonal (cena 5 → 6)
+function WipeBands({ t }) {
+  if (t < WIPE.a || t > WIPE.b + 0.05) return null;
+  const e = wipeEdge(t);
+  const band = (o1, o2, bg) => {
+    const poly = `polygon(${e - o2}px 0, ${e - o1}px 0, ${e - o1 - 300}px 900px, ${e - o2 - 300}px 900px)`;
+    return <div style={{ position: "absolute", inset: -50, background: bg, clipPath: poly, WebkitClipPath: poly }} />;
+  };
+  return (
+    <div style={{ position: "absolute", inset: 0, zIndex: 72, pointerEvents: "none" }}>
+      {band(0, 26, `linear-gradient(180deg, ${C.cyan}, #FFFFFF)`)}
+      {band(38, 74, `linear-gradient(180deg, ${C.blue}, ${C.sky})`)}
+      {band(86, 98, C.ink)}
+    </div>
+  );
+}
+
+// Tremor de câmera com decaimento nos impactos
+const SHAKES = [[4.02, 2.5], [11.0, 7], [12.5, 2.5], [26.1, 3], [28.0, 7], [33.6, 2], [37.0, 3]];
+function shakeAt(t) {
+  let x = 0;
+  let y = 0;
+  let r = 0;
+  for (const [t0, a] of SHAKES) {
+    const d = t - t0;
+    if (d < 0 || d > 0.8) continue;
+    const k = a * Math.exp(-d * 7);
+    x += k * Math.sin(d * 57);
+    y += k * Math.cos(d * 43) * 0.8;
+    r += k * 0.06 * Math.sin(d * 31);
+  }
+  return { x, y, r };
 }
 
 function EndFade({ t }) {
@@ -874,7 +1006,9 @@ function Scene3({ t }) {
   if (t < 10.9 || t > 16.15) return null;
   const ex = easeIn(prog(t, 15.55, 16.05));
   const logo = spring(t - 11.2, { stiffness: 160, damping: 12 });
-  const mk = spring(t - 12.15, { stiffness: 120, damping: 15 });
+  const mkF = (tt) => spring(tt - 12.15, { stiffness: 120, damping: 15 });
+  const mk = mkF(t);
+  const mkV = vel(mkF, t) * 380;
   const speed = spring(t - 13.2, { stiffness: 220, damping: 14 });
   const ps = spring(t - 13.45, { stiffness: 220, damping: 14 });
   const tag = layoutLine(["Sites", "pensados", "para", "vender."], 31, 225, false);
@@ -884,7 +1018,11 @@ function Scene3({ t }) {
   const cur = dragSel(t, { t0: 14.05, from: [470, 840], t1: 14.45, box, dur: 0.32, t2: 15.15, to: [470, 860] });
 
   return (
-    <div style={{ position: "absolute", inset: 0, ...exitStyle(ex, { y: -10, scale: 0.1, blur: 6 }) }}>
+    <div style={{
+      position: "absolute", inset: 0, opacity: 1 - easeIn(prog(t, 15.75, 16.05)), transformOrigin: "225px 470px",
+      transform: `scale(${1 + ex * 1.1})`, filter: ex > 0.02 ? `blur(${ex * 10}px)` : "none",
+    }}>
+      <MotionBlur id="eacMB3" vy={mkV} />
       <div style={{
         position: "absolute", left: 225 - 33, top: 58, opacity: clamp(logo * 2),
         transform: `scale(${logo}) rotate(${(1 - logo) * -180}deg) translateY(${Math.sin(t * 1.8) * 3}px)`,
@@ -898,7 +1036,7 @@ function Scene3({ t }) {
         tokens={[{ w: "ao", style: gradText }, { w: "Cubo", style: gradText }]} />
 
       <div style={{
-        position: "absolute", left: 30, top: 300, opacity: clamp(mk * 2),
+        position: "absolute", left: 30, top: 300, opacity: clamp(mk * 2), filter: blurOn("eacMB3", mkV),
         transform: `perspective(1200px) translateY(${(1 - mk) * 380 + Math.sin(t * 1.4) * 4}px) rotateX(${(1 - mk) * 28}deg) scale(${0.9 + 0.1 * mk})`,
       }}>
         <StoreMockup lt={t - 12.35} />
@@ -1270,11 +1408,15 @@ const BENEFITS = [
 
 function Scene4({ t }) {
   if (t < 15.6 || t > 26.05) return null;
-  const cam = -1 + [0, 1, 2, 3].reduce((a, i) => a + easeInOut(prog(t, 15.75 + i * 2.5, 16.35 + i * 2.5)), 0);
+  const camAt = (tt) => -1 + [0, 1, 2, 3].reduce((a, i) => a + easeInOut(prog(tt, 15.75 + i * 2.5, 16.35 + i * 2.5)), 0);
+  const cam = camAt(t);
+  const camV = vel(camAt, t) * 352;
+  const enter = spring(t - 15.7, { stiffness: 140, damping: 16 });
   const ex = easeIn(prog(t, 25.55, 26.0));
   const eyebrow = spring(t - 15.95);
   return (
-    <div style={{ position: "absolute", inset: 0, opacity: 1 - ex, transform: `scale(${1 - ex * 0.12})` }}>
+    <div style={{ position: "absolute", inset: 0, opacity: 1 - ex, transform: `scale(${(1 - ex * 0.12) * (0.82 + 0.18 * enter)})` }}>
+      <MotionBlur id="eacMB4" vx={camV} />
       <div style={{ position: "absolute", left: 0, right: 0, top: 58, display: "flex", justifyContent: "center", ...rise(eyebrow, 10) }}>
         <Wordmark size={12} inline />
       </div>
@@ -1290,7 +1432,7 @@ function Scene4({ t }) {
           </div>
         );
       })}
-      <div style={{ position: "absolute", left: 60, top: 200, width: 330, height: 470, perspective: 1100 }}>
+      <div style={{ position: "absolute", left: 60, top: 200, width: 330, height: 470, perspective: 1100, filter: blurOn("eacMB4", camV) }}>
         {BENEFITS.map((b, i) => {
           const d = i - cam;
           if (Math.abs(d) > 1.6) return null;
@@ -1407,8 +1549,12 @@ function Scene5({ t }) {
 function Scene6({ t }) {
   if (t < 32.9) return null;
   const logo = spring(t - 33.25);
-  const mk = spring(t - 33.5, { stiffness: 120, damping: 15 });
-  const ph = spring(t - 33.95, { stiffness: 140, damping: 13 });
+  const mkF = (tt) => spring(tt - 33.5, { stiffness: 120, damping: 15 });
+  const mk = mkF(t);
+  const mkV = vel(mkF, t) * 260;
+  const phF = (tt) => spring(tt - 33.95, { stiffness: 140, damping: 13 });
+  const ph = phF(t);
+  const phV = vel(phF, t) * 140;
   const btn = spring(t - 35.2, { stiffness: 200, damping: 11 });
   const sub = spring(t - 35.8);
   const [cx, cy] = path(t, [[35.9, 470, 830], [36.8, 318, 676], [37.5, 318, 676], [38.0, 372, 738]]);
@@ -1420,16 +1566,18 @@ function Scene6({ t }) {
 
   return (
     <div style={{ position: "absolute", inset: 0 }}>
+      <MotionBlur id="eacMB6" vy={mkV} />
+      <MotionBlur id="eacMB6p" vx={phV} />
       <div style={{ position: "absolute", left: 0, right: 0, top: 54, display: "flex", justifyContent: "center", ...popStyle(logo, 16) }}>
         <Wordmark size={19} />
       </div>
       <div style={{
-        position: "absolute", left: 45, top: 136, transformOrigin: "0 0", opacity: clamp(mk * 2),
+        position: "absolute", left: 45, top: 136, transformOrigin: "0 0", opacity: clamp(mk * 2), filter: blurOn("eacMB6", mkV),
         transform: `translateY(${(1 - mk) * 260 + Math.sin(t * 1.3) * 3}px) scale(${0.92 * (0.9 + 0.1 * mk)})`,
       }}>
         <StoreMockup lt={t - 33.6} />
       </div>
-      <div style={{ position: "absolute", left: 318, top: 296, opacity: clamp(ph * 2), transform: `translateX(${(1 - ph) * 140}px) rotate(${(1 - ph) * 12 + 4}deg) translateY(${Math.cos(t * 1.5) * 4}px)` }}>
+      <div style={{ position: "absolute", left: 318, top: 296, opacity: clamp(ph * 2), filter: blurOn("eacMB6p", phV), transform: `translateX(${(1 - ph) * 140}px) rotate(${(1 - ph) * 12 + 4}deg) translateY(${Math.cos(t * 1.5) * 4}px)` }}>
         <PhoneMockup />
       </div>
 
@@ -1494,16 +1642,22 @@ function Scene6({ t }) {
    Frame 9:16
 ============================================================================= */
 function Frame({ t }) {
+  const sh = shakeAt(t);
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", fontFamily: FONT, color: C.ink }}>
       <BgLight t={t} />
       <BgDark t={t} />
-      <Scene1 t={t} />
-      <Scene2 t={t} />
-      <Scene3 t={t} />
-      <Scene4 t={t} />
-      <Scene5 t={t} />
-      <Scene6 t={t} />
+      <div style={{ position: "absolute", inset: 0, transform: `translate(${sh.x}px, ${sh.y}px) rotate(${sh.r}deg)` }}>
+        <Scene1 t={t} />
+        <Scene2 t={t} />
+        <Scene3 t={t} />
+        <Scene4 t={t} />
+        <Scene5 t={t} />
+        <Scene6 t={t} />
+      </div>
+      <RevealRing t={t} />
+      <PixelWipe t={t} />
+      <WipeBands t={t} />
       <Flash t={t} />
       <Grain t={t} />
       <EndFade t={t} />
@@ -1512,11 +1666,347 @@ function Frame({ t }) {
 }
 
 /* =============================================================================
+   SOM — trilha e efeitos 100% sintetizados com Web Audio (nenhum arquivo externo)
+   Cada som é um evento com tempo fixo na timeline, agendado com lookahead no
+   relógio do AudioContext: imagem e som ficam sincronizados mesmo ao pular na timeline.
+============================================================================= */
+const midi = (n) => 440 * Math.pow(2, (n - 69) / 12);
+// Progressões: brilhante (Cmaj7 · Am7 · Fmaj7 · G7) e tensa na "dor" (Am · F · Dm · E)
+const CH_BRIGHT = [[48, 55, 59, 64], [45, 52, 55, 60], [41, 48, 52, 57], [43, 50, 53, 59]];
+const CH_DARK = [[45, 52, 57, 60], [41, 48, 53, 57], [38, 45, 50, 53], [40, 47, 52, 56]];
+
+function makeEngine(offlineCtx) {
+  const AC = typeof window !== "undefined" && (window.AudioContext || window.webkitAudioContext);
+  if (!offlineCtx && !AC) return null;
+  const ctx = offlineCtx || new AC();
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -16;
+  comp.knee.value = 12;
+  comp.ratio.value = 4;
+  comp.attack.value = 0.004;
+  comp.release.value = 0.2;
+  const master = ctx.createGain();
+  master.gain.value = 0.85;
+  master.connect(comp);
+  comp.connect(ctx.destination);
+  // Reverb por convolução com resposta ao impulso gerada (ruído com decaimento)
+  const len = Math.floor(ctx.sampleRate * 2.4);
+  const ir = ctx.createBuffer(2, len, ctx.sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = ir.getChannelData(ch);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.2);
+  }
+  const rev = ctx.createConvolver();
+  rev.buffer = ir;
+  const revOut = ctx.createGain();
+  revOut.gain.value = 0.5;
+  rev.connect(revOut);
+  revOut.connect(master);
+  const noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+  const nd = noiseBuf.getChannelData(0);
+  for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+  return { ctx, master, rev, noise: noiseBuf };
+}
+
+function route(A, node, { send = 0, pan = 0, panTo = null, w, dur }) {
+  let n = node;
+  if ((pan || panTo != null) && A.ctx.createStereoPanner) {
+    const p = A.ctx.createStereoPanner();
+    p.pan.setValueAtTime(pan, w);
+    if (panTo != null) p.pan.linearRampToValueAtTime(panTo, w + dur);
+    n.connect(p);
+    n = p;
+  }
+  n.connect(A.out);
+  if (send) {
+    const g = A.ctx.createGain();
+    g.gain.value = send;
+    n.connect(g);
+    g.connect(A.send);
+  }
+}
+function tone(A, w, { type = "sine", f, f2, glide, dur = 0.2, v = 0.2, a = 0.004, lp, q = 1, send = 0, pan = 0 }) {
+  const { ctx } = A;
+  const o = ctx.createOscillator();
+  o.type = type;
+  o.frequency.setValueAtTime(f, w);
+  if (f2) o.frequency.exponentialRampToValueAtTime(f2, w + (glide || dur));
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, w);
+  g.gain.exponentialRampToValueAtTime(v, w + a);
+  g.gain.exponentialRampToValueAtTime(0.0001, w + Math.max(dur, a + 0.01));
+  let n = o;
+  if (lp) {
+    const fl = ctx.createBiquadFilter();
+    fl.type = "lowpass";
+    fl.frequency.value = lp;
+    fl.Q.value = q;
+    o.connect(fl);
+    n = fl;
+  }
+  n.connect(g);
+  route(A, g, { send, pan, w, dur });
+  o.start(w);
+  o.stop(w + dur + 0.05);
+}
+function hiss(A, w, { type = "bandpass", f = 1200, f2, q = 1, dur = 0.2, v = 0.2, a = 0.004, shape = "decay", send = 0, pan = 0, panTo = null }) {
+  const { ctx } = A;
+  const s = ctx.createBufferSource();
+  s.buffer = A.noise;
+  const fl = ctx.createBiquadFilter();
+  fl.type = type;
+  fl.Q.value = q;
+  fl.frequency.setValueAtTime(f, w);
+  if (f2) fl.frequency.exponentialRampToValueAtTime(f2, w + dur);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, w);
+  if (shape === "swell") {
+    g.gain.exponentialRampToValueAtTime(v, w + dur * 0.62);
+    g.gain.exponentialRampToValueAtTime(0.0001, w + dur);
+  } else if (shape === "rise") {
+    g.gain.exponentialRampToValueAtTime(v, w + dur);
+    g.gain.linearRampToValueAtTime(0.0001, w + dur + 0.03);
+  } else {
+    g.gain.exponentialRampToValueAtTime(v, w + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, w + dur);
+  }
+  s.connect(fl);
+  fl.connect(g);
+  route(A, g, { send, pan, panTo, w, dur });
+  s.start(w, Math.random() * 1.5);
+  s.stop(w + dur + 0.06);
+}
+function pad(A, w, notes, dur, cut, v = 1) {
+  const { ctx } = A;
+  const fl = ctx.createBiquadFilter();
+  fl.type = "lowpass";
+  fl.frequency.value = cut;
+  fl.Q.value = 0.7;
+  const g = ctx.createGain();
+  const peak = 0.04 * v;
+  g.gain.setValueAtTime(0.0001, w);
+  g.gain.exponentialRampToValueAtTime(peak, w + Math.min(0.35, dur * 0.3));
+  g.gain.setValueAtTime(peak, w + dur * 0.72);
+  g.gain.exponentialRampToValueAtTime(0.0001, w + dur);
+  fl.connect(g);
+  route(A, g, { send: 0.55, w, dur });
+  notes.forEach((n) => [-8, 8].forEach((det) => {
+    const o = ctx.createOscillator();
+    o.type = "sawtooth";
+    o.frequency.value = midi(n + 12);
+    o.detune.value = det;
+    o.connect(fl);
+    o.start(w);
+    o.stop(w + dur + 0.05);
+  }));
+}
+
+const SND = {
+  // bateria e trilha
+  kick: (A, w, v = 1) => tone(A, w, { f: 160, f2: 42, glide: 0.12, dur: 0.42, v: 0.9 * v, a: 0.003 }),
+  clap: (A, w, v = 1) => [0, 0.011, 0.022].forEach((d, i) => hiss(A, w + d, { f: 1500, q: 0.9, dur: i === 2 ? 0.2 : 0.03, v: 0.3 * v, send: 0.25 })),
+  hat: (A, w, v = 1, pan = 0.2) => hiss(A, w, { type: "highpass", f: 7800, dur: 0.045, v: 0.12 * v, pan }),
+  bass: (A, w, n, dur = 0.22, v = 1) => tone(A, w, { type: "sawtooth", f: midi(n), dur, v: 0.2 * v, a: 0.006, lp: 420, q: 5 }),
+  sub: (A, w, n, dur = 0.45, v = 1) => tone(A, w, { f: midi(n), dur, v: 0.32 * v, a: 0.02 }),
+  pluck: (A, w, n, v = 1, pan = 0) => tone(A, w, { type: "triangle", f: midi(n), dur: 0.32, v: 0.11 * v, send: 0.35, pan }),
+  pad,
+  // efeitos sincronizados
+  whoosh: (A, w, { dur = 0.55, from = 250, to = 3200, v = 0.3, pan = -0.7, panTo = 0.7 } = {}) => hiss(A, w, { f: from, f2: to, q: 1.4, dur, v, shape: "swell", send: 0.2, pan, panTo }),
+  pop: (A, w, f = 620, v = 0.2) => tone(A, w, { f: f * 1.8, f2: f, glide: 0.05, dur: 0.11, v, send: 0.12 }),
+  click: (A, w, v = 1) => {
+    hiss(A, w, { type: "highpass", f: 3500, dur: 0.018, v: 0.26 * v });
+    tone(A, w, { type: "square", f: 2100, dur: 0.02, v: 0.035 * v });
+  },
+  blip: (A, w, f = 1046, pan = 0) => {
+    tone(A, w, { f, dur: 0.08, v: 0.12, pan, send: 0.2 });
+    tone(A, w + 0.075, { f: f * 1.5, dur: 0.14, v: 0.12, pan, send: 0.2 });
+  },
+  alert: (A, w) => {
+    tone(A, w, { type: "square", f: 880, dur: 0.09, v: 0.045, lp: 2500 });
+    tone(A, w + 0.11, { type: "square", f: 880, dur: 0.09, v: 0.045, lp: 2500 });
+  },
+  glitch: (A, w) => {
+    for (let i = 0; i < 9; i++) tone(A, w + i * 0.028, { type: "square", f: 180 + rnd(i, 9) * 1400, dur: 0.03, v: 0.045 });
+    hiss(A, w, { type: "highpass", f: 2000, dur: 0.25, v: 0.07 });
+  },
+  ding: (A, w) => {
+    tone(A, w, { f: 1318.5, dur: 0.9, v: 0.11, send: 0.4 });
+    tone(A, w, { f: 1975.5, dur: 0.7, v: 0.06, send: 0.4 });
+    tone(A, w + 0.07, { f: 2637, dur: 0.5, v: 0.035, send: 0.4 });
+  },
+  chime: (A, w, notes = [72, 76, 79, 84], v = 1) => notes.forEach((n, i) => tone(A, w + i * 0.06, {
+    type: "triangle", f: midi(n), dur: 0.9, v: 0.085 * v, send: 0.5, pan: (i / Math.max(1, notes.length - 1)) * 1.2 - 0.6,
+  })),
+  impact: (A, w, v = 1) => {
+    tone(A, w, { f: 110, f2: 30, glide: 0.7, dur: 1.1, v: 0.65 * v, send: 0.4 });
+    hiss(A, w, { type: "lowpass", f: 1400, f2: 120, dur: 0.9, v: 0.32 * v, send: 0.6 });
+  },
+  riser: (A, w, dur = 1) => {
+    hiss(A, w, { f: 300, f2: 7000, q: 2, dur, v: 0.2, shape: "rise", send: 0.3 });
+    tone(A, w, { type: "sawtooth", f: 110, f2: 880, glide: dur, dur, v: 0.035, a: dur * 0.9, lp: 2000 });
+  },
+  shimmer: (A, w) => [84, 88, 91, 96].forEach((n, i) => tone(A, w + i * 0.03, { f: midi(n), dur: 1.4, v: 0.035, send: 0.8, pan: i % 2 ? 0.5 : -0.5 })),
+  descend: (A, w) => tone(A, w, { type: "sawtooth", f: 620, f2: 120, glide: 0.8, dur: 0.85, v: 0.07, lp: 1400 }),
+  scratch: (A, w) => hiss(A, w, { f: 2500, f2: 600, q: 3, dur: 0.22, v: 0.22 }),
+  flutter: (A, w, pan = 0) => {
+    for (let i = 0; i < 7; i++) hiss(A, w + i * 0.07, { f: 700, q: 0.8, dur: 0.06, v: 0.1, pan });
+  },
+  swipe: (A, w, v = 1) => hiss(A, w, { type: "highpass", f: 1800, f2: 5000, dur: 0.16, v: 0.11 * v, shape: "swell" }),
+  tick: (A, w, f = 3000, v = 1) => tone(A, w, { type: "square", f, dur: 0.012, v: 0.03 * v }),
+  suck: (A, w, dur = 0.55) => hiss(A, w, { f: 4000, f2: 200, q: 1.5, dur, v: 0.28, shape: "rise" }),
+};
+
+function buildEvents() {
+  const ev = [];
+  const add = (t, fn) => ev.push({ t, fn });
+  const STARTS = [4, 11, 26, 28, 39];
+  const sec = (t) => (t < 4 ? "intro" : t < 11 ? "dark" : t < 26 ? "drop" : t < 28 ? "break" : t < 39 ? "drop2" : "end");
+
+  // ---- Trilha (120 BPM, 1 compasso = 2s) ----
+  for (let b = 0; b < 80; b++) {
+    const tb = b * 0.5;
+    const s = sec(tb);
+    const bar = Math.floor(b / 4);
+    const bb = b % 4;
+    const ch = s === "dark" ? CH_DARK[(bar + 2) % 4] : CH_BRIGHT[bar % 4];
+    if (s === "drop" || s === "drop2") {
+      add(tb, (A, w) => SND.kick(A, w));
+      if (bb % 2 === 1) add(tb, (A, w) => SND.clap(A, w));
+      add(tb + 0.25, (A, w) => SND.hat(A, w, 1, 0.25));
+      add(tb + 0.125, (A, w) => SND.hat(A, w, 0.4, -0.3));
+      add(tb + 0.375, (A, w) => SND.hat(A, w, 0.45, -0.3));
+      add(tb, (A, w) => SND.bass(A, w, ch[0] - 12));
+      add(tb + 0.25, (A, w) => SND.bass(A, w, ch[0], 0.18, 0.8));
+      [0, 1].forEach((k) => add(tb + k * 0.25, (A, w) => SND.pluck(A, w, ch[(b * 2 + k) % 4] + 24, 0.5, k ? 0.4 : -0.4)));
+    } else if (s === "intro") {
+      add(tb + 0.25, (A, w) => SND.hat(A, w, 0.6));
+      [0, 1].forEach((k) => add(tb + k * 0.25, (A, w) => SND.pluck(A, w, ch[(b * 2 + k) % 4] + 12 + 12 * ((b >> 1) % 2), 0.9, k ? 0.35 : -0.35)));
+    } else if (s === "dark") {
+      add(tb, (A, w) => SND.sub(A, w, ch[0] - 12, 0.42, bb === 0 ? 1 : 0.6));
+      if (bb === 0) add(tb, (A, w) => SND.kick(A, w, 0.5));
+      [0.125, 0.25, 0.375].forEach((o) => add(tb + o, (A, w) => SND.hat(A, w, 0.3, o === 0.25 ? 0.5 : -0.5)));
+    } else if (s === "break") {
+      if (bb % 2 === 0) add(tb, (A, w) => SND.sub(A, w, ch[0] - 12, 0.9, 0.6));
+      add(tb, (A, w) => SND.pluck(A, w, ch[b % 4] + 24, 0.5));
+    }
+    if (bb === 0 && s !== "end") {
+      const next = STARTS.find((x) => x > tb) ?? 40;
+      const dur = Math.min(2, next - tb);
+      add(tb, (A, w) => SND.pad(A, w, ch, dur, s === "dark" ? 650 : s === "break" ? 2400 : 1500, s === "dark" ? 1.2 : 1));
+    }
+  }
+  add(11.0, (A, w) => SND.pad(A, w, CH_BRIGHT[1], 1, 1800));
+  add(39.0, (A, w) => {
+    SND.pad(A, w, CH_BRIGHT[0], 1.2, 2200, 1.3);
+    SND.sub(A, w, 36, 1.1, 0.8);
+  });
+
+  // ---- Efeitos sincronizados com a imagem ----
+  const fx = [
+    // Cena 1
+    [0.15, (A, w) => SND.pop(A, w, 520)], [0.27, (A, w) => SND.pop(A, w, 620)], [0.39, (A, w) => SND.pop(A, w, 740)],
+    [1.0, (A, w) => SND.click(A, w)], [1.25, (A, w) => SND.swipe(A, w)], [1.4, (A, w) => SND.pop(A, w, 880, 0.15)],
+    [2.2, (A, w) => SND.swipe(A, w)], [2.2, (A, w) => SND.tick(A, w, 2600)],
+    [3.05, (A, w) => SND.swipe(A, w)], [3.05, (A, w) => SND.tick(A, w, 3000)],
+    [3.98, (A, w) => SND.click(A, w, 1.3)],
+    [4.0, (A, w) => SND.whoosh(A, w, { dur: 0.8, from: 1500, to: 160, v: 0.38 })], [4.05, (A, w) => SND.impact(A, w, 0.5)],
+    // Cena 2
+    ...[0, 2, 4, 6, 8].map((i) => [4.45 + i * 0.055, (A, w) => SND.pop(A, w, 400 + i * 30, 0.08)]),
+    [5.25, (A, w) => SND.blip(A, w, 1046, -0.5)], [5.5, (A, w) => SND.alert(A, w)], [5.75, (A, w) => SND.blip(A, w, 1175, 0.3)],
+    [6.0, (A, w) => SND.alert(A, w)], [6.2, (A, w) => SND.glitch(A, w)], [6.45, (A, w) => SND.blip(A, w, 988, 0.5)],
+    [6.7, (A, w) => SND.glitch(A, w)], [6.95, (A, w) => SND.pop(A, w, 300, 0.15)], [7.2, (A, w) => SND.blip(A, w, 880, -0.2)],
+    [7.5, (A, w) => SND.flutter(A, w, -0.4)], [7.8, (A, w) => SND.flutter(A, w, 0.4)], [8.15, (A, w) => SND.flutter(A, w, 0)],
+    [8.1, (A, w) => SND.whoosh(A, w, { dur: 0.35, from: 2500, to: 600, v: 0.18 })],
+    [8.45, (A, w) => SND.impact(A, w, 0.35)], [9.05, (A, w) => SND.scratch(A, w)], [9.1, (A, w) => SND.descend(A, w)],
+    [9.9, (A, w) => SND.riser(A, w, 1.1)], [10.3, (A, w) => SND.suck(A, w, 0.6)],
+    // Cena 3
+    [11.0, (A, w) => SND.impact(A, w, 1)], [11.0, (A, w) => SND.shimmer(A, w)],
+    [11.25, (A, w) => SND.chime(A, w, [79, 83, 86, 91])],
+    [11.6, (A, w) => SND.pop(A, w, 560, 0.12)], [11.78, (A, w) => SND.pop(A, w, 660, 0.12)],
+    [12.15, (A, w) => SND.whoosh(A, w, { dur: 0.6, from: 200, to: 2400, v: 0.26, pan: 0, panTo: 0 })],
+    [13.2, (A, w) => SND.pop(A, w, 990, 0.14)], [13.45, (A, w) => SND.pop(A, w, 1100, 0.14)],
+    ...[0, 1, 2, 3].map((i) => [13.75 + i * 0.08, (A, w) => SND.pop(A, w, 500 + i * 60, 0.08)]),
+    [14.45, (A, w) => SND.click(A, w)],
+    [15.5, (A, w) => SND.whoosh(A, w, { dur: 0.65, from: 300, to: 5000, v: 0.34, pan: 0, panTo: 0 })],
+    // Cena 4 (whips entre cards + interações)
+    ...[1, 2, 3].map((i) => [15.75 + i * 2.5, (A, w) => SND.whoosh(A, w, { dur: 0.6, from: 400, to: 2800, v: 0.26, pan: 0.8, panTo: -0.8 })]),
+    ...[0, 1, 2, 3].map((i) => [16.1 + i * 2.5, (A, w) => SND.pop(A, w, 700, 0.1)]),
+    [17.75, (A, w) => SND.click(A, w)], [17.78, (A, w) => SND.pop(A, w, 1200, 0.18)],
+    [19.35, (A, w) => SND.click(A, w)], [19.42, (A, w) => SND.tick(A, w, 2200)],
+    [20.1, (A, w) => SND.click(A, w)], ...[0, 1, 2, 3].map((i) => [20.18 + i * 0.1, (A, w) => SND.tick(A, w, 1800 + i * 300, 0.7)]),
+    [20.57, (A, w) => SND.chime(A, w, [76, 79, 84])],
+    [21.4, (A, w) => SND.swipe(A, w, 1.4)], [21.95, (A, w) => SND.swipe(A, w, 1.4)],
+    [22.6, (A, w) => SND.click(A, w)], [22.62, (A, w) => SND.pop(A, w, 400, 0.16)],
+    [24.0, (A, w) => SND.riser(A, w, 0.6)], [24.6, (A, w) => SND.ding(A, w)], [25.0, (A, w) => SND.pop(A, w, 1000, 0.14)], [25.1, (A, w) => SND.ding(A, w)],
+    // Transição de pixels
+    ...Array.from({ length: 14 }, (_, k) => [25.5 + k * 0.045, (A, w) => SND.tick(A, w, 1400 + k * 160, 1.2)]),
+    ...Array.from({ length: 10 }, (_, k) => [26.15 + k * 0.045, (A, w) => SND.tick(A, w, 3400 - k * 160, 0.9)]),
+    [26.1, (A, w) => SND.impact(A, w, 0.35)],
+    // Cena 5
+    [26.35, (A, w) => SND.pop(A, w, 520, 0.14)], [26.45, (A, w) => SND.pop(A, w, 620, 0.14)], [26.55, (A, w) => SND.pop(A, w, 740, 0.14)],
+    [26.9, (A, w) => SND.riser(A, w, 1.1)], [27.1, (A, w) => SND.click(A, w)], [27.45, (A, w) => SND.tick(A, w, 2400)], [27.92, (A, w) => SND.click(A, w, 1.3)],
+    [28.0, (A, w) => SND.impact(A, w, 1)], [28.0, (A, w) => SND.shimmer(A, w)], [28.0, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 600, to: 6000, v: 0.25, pan: 0, panTo: 0 })],
+    [28.9, (A, w) => SND.chime(A, w, [84, 88, 91], 0.7)],
+    ...[0, 3, 6, 9, 12, 15].map((i) => [28.75 + i * 0.05, (A, w) => SND.pop(A, w, 480 + i * 20, 0.07)]),
+    ...[0, 1, 2, 3, 4].map((k) => [30.3 + k * 0.12, (A, w) => SND.swipe(A, w, 0.9)]),
+    [32.65, (A, w) => SND.whoosh(A, w, { dur: 0.75, from: 200, to: 6000, v: 0.36, pan: -0.9, panTo: 0.9 })],
+    // Cena 6
+    [33.3, (A, w) => SND.chime(A, w, [72, 76, 79, 84])],
+    [33.5, (A, w) => SND.whoosh(A, w, { dur: 0.55, from: 200, to: 2400, v: 0.22, pan: 0, panTo: 0 })],
+    [33.95, (A, w) => SND.whoosh(A, w, { dur: 0.4, from: 800, to: 3000, v: 0.18, pan: 0.8, panTo: 0.2 })],
+    ...[0, 1, 2].map((i) => [34.5 + i * 0.08, (A, w) => SND.pop(A, w, 520 + i * 70, 0.1)]),
+    ...[0, 1, 2].map((i) => [34.75 + i * 0.08, (A, w) => SND.pop(A, w, 740 + i * 70, 0.1)]),
+    [35.2, (A, w) => SND.pop(A, w, 420, 0.26)],
+    [37.0, (A, w) => SND.click(A, w, 1.4)], [37.05, (A, w) => SND.chime(A, w, [72, 76, 79, 84, 88], 1.2)],
+    ...Array.from({ length: 8 }, (_, k) => [37.12 + k * 0.05, (A, w) => SND.tick(A, w, 3000 + rnd(k, 5) * 2500, 0.8)]),
+    [39.2, (A, w) => SND.whoosh(A, w, { dur: 0.75, from: 5000, to: 300, v: 0.22, pan: 0, panTo: 0 })],
+  ];
+  fx.forEach(([t, fn]) => add(t, fn));
+  return ev.sort((a, b) => a.t - b.t);
+}
+const EVENTS = buildEvents();
+
+// Renderiza a trilha completa (40s) offline e devolve um WAV estéreo 16-bit em base64.
+// Útil para juntar com uma gravação de tela ou exportar o vídeo final.
+async function renderSoundtrackWav(sampleRate = 48000) {
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  const ctx = new OAC(2, Math.ceil(sampleRate * DURATION), sampleRate);
+  const eng = makeEngine(ctx);
+  const bus = ctx.createGain();
+  bus.connect(eng.master);
+  const send = ctx.createGain();
+  send.connect(eng.rev);
+  const A = { ctx, out: bus, send, noise: eng.noise };
+  EVENTS.forEach((e) => e.fn(A, Math.max(0.001, e.t)));
+  const buf = await ctx.startRendering();
+  const n = buf.length;
+  const L = buf.getChannelData(0);
+  const Rc = buf.getChannelData(1);
+  const out = new DataView(new ArrayBuffer(44 + n * 4));
+  const str = (o, x) => [...x].forEach((c, i) => out.setUint8(o + i, c.charCodeAt(0)));
+  str(0, "RIFF"); out.setUint32(4, 36 + n * 4, true); str(8, "WAVE"); str(12, "fmt ");
+  out.setUint32(16, 16, true); out.setUint16(20, 1, true); out.setUint16(22, 2, true); out.setUint32(24, sampleRate, true);
+  out.setUint32(28, sampleRate * 4, true); out.setUint16(32, 4, true); out.setUint16(34, 16, true); str(36, "data"); out.setUint32(40, n * 4, true);
+  for (let i = 0; i < n; i++) {
+    out.setInt16(44 + i * 4, clamp(L[i], -1, 1) * 0x7fff, true);
+    out.setInt16(46 + i * 4, clamp(Rc[i], -1, 1) * 0x7fff, true);
+  }
+  const bytes = new Uint8Array(out.buffer);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+
+/* =============================================================================
    Player (controles discretos fora do frame)
 ============================================================================= */
 const GLOBAL_CSS = `
 .eac-btn{width:34px;height:34px;border-radius:999px;display:grid;place-items:center;color:rgba(233,235,242,.75);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);transition:background .2s,color .2s;cursor:pointer}
 .eac-btn:hover{background:rgba(255,255,255,.12);color:#fff}
+.eac-sound-off{width:auto;padding:0 12px 0 10px;display:flex;gap:6px;align-items:center;font-size:12px;font-weight:700;color:#00203F;background:#2FD4FF;border-color:#2FD4FF;animation:eacPulse 1.6s ease-out infinite;white-space:nowrap}
+.eac-sound-off:hover{background:#7FE3FF;color:#00203F}
+@keyframes eacPulse{0%{box-shadow:0 0 0 0 rgba(47,212,255,.55)}100%{box-shadow:0 0 0 12px rgba(47,212,255,0)}}
+@media (prefers-reduced-motion: reduce){.eac-sound-off{animation:none}}
 .eac-btn:focus-visible,.eac-range:focus-visible{outline:2px solid #2FD4FF;outline-offset:2px}
 .eac-btn[aria-pressed="true"]{color:#2FD4FF}
 .eac-range{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;cursor:pointer;background:transparent}
@@ -1532,12 +2022,68 @@ export default function EstokeAoCuboPromo() {
   const [loop, setLoop] = useState(true);
   const [, setFontTick] = useState(0);
   const [scale, setScale] = useState(0.6);
+  const [soundOn, setSoundOn] = useState(false);
   const tRef = useRef(0);
   const loopRef = useRef(loop);
   const areaRef = useRef(null);
+  const playingRef = useRef(playing);
+  const soundRef = useRef(soundOn);
+  const audio = useRef({ eng: null, bus: null, send: null, anchorCtx: 0, anchorT: 0, idx: 0 });
   loopRef.current = loop;
+  playingRef.current = playing;
+  soundRef.current = soundOn;
 
-  // Relógio mestre
+  /* ---- Áudio: barramento por "sessão" (cada play/seek cria um novo e silencia o anterior) ---- */
+  const audioStop = useCallback(() => {
+    const a = audio.current;
+    if (!a.eng || !a.bus) return;
+    const { bus, send } = a;
+    const now = a.eng.ctx.currentTime;
+    bus.gain.setTargetAtTime(0, now, 0.015);
+    send.gain.setTargetAtTime(0, now, 0.015);
+    setTimeout(() => {
+      try {
+        bus.disconnect();
+        send.disconnect();
+      } catch (e) {
+        /* já desconectado */
+      }
+    }, 400);
+    a.bus = null;
+    a.send = null;
+  }, []);
+  const audioStart = useCallback((fromT) => {
+    const a = audio.current;
+    if (!a.eng) return;
+    audioStop();
+    const { ctx } = a.eng;
+    a.bus = ctx.createGain();
+    a.bus.connect(a.eng.master);
+    a.send = ctx.createGain();
+    a.send.connect(a.eng.rev);
+    a.anchorCtx = ctx.currentTime + 0.05;
+    a.anchorT = fromT;
+    const i = EVENTS.findIndex((e) => e.t >= fromT - 0.001);
+    a.idx = i < 0 ? EVENTS.length : i;
+  }, [audioStop]);
+  const audioPump = (curT) => {
+    const a = audio.current;
+    if (!a.bus) return;
+    const { ctx } = a.eng;
+    const A = { ctx, out: a.bus, send: a.send, noise: a.eng.noise };
+    while (a.idx < EVENTS.length && EVENTS[a.idx].t < curT + 0.25) {
+      const e = EVENTS[a.idx++];
+      const w = a.anchorCtx + (e.t - a.anchorT);
+      if (w < ctx.currentTime - 0.02) continue;
+      try {
+        e.fn(A, Math.max(w, ctx.currentTime + 0.001));
+      } catch (err) {
+        /* um efeito com problema não deve parar o vídeo */
+      }
+    }
+  };
+
+  // Relógio mestre: com som ligado, o tempo vem do relógio do AudioContext (sincronia exata)
   useEffect(() => {
     if (!playing) return undefined;
     let raf;
@@ -1546,10 +2092,14 @@ export default function EstokeAoCuboPromo() {
       if (last == null) last = now;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
-      let nt = tRef.current + dt;
+      const a = audio.current;
+      const live = soundRef.current && a.bus;
+      let nt = live ? Math.max(a.anchorT, a.anchorT + (a.eng.ctx.currentTime - a.anchorCtx)) : tRef.current + dt;
       if (nt >= DURATION) {
-        if (loopRef.current) nt -= DURATION;
-        else {
+        if (loopRef.current) {
+          nt -= DURATION;
+          if (live) audioStart(nt);
+        } else {
           tRef.current = DURATION;
           setT(DURATION);
           setPlaying(false);
@@ -1557,17 +2107,31 @@ export default function EstokeAoCuboPromo() {
         }
       }
       tRef.current = nt;
+      if (live) audioPump(nt);
       setT(nt);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playing]);
+
+  // Liga/desliga o áudio junto com play/pause e com o botão de som
+  useEffect(() => {
+    if (playing && soundOn) audioStart(tRef.current);
+    else audioStop();
+  }, [playing, soundOn, audioStart, audioStop]);
+  useEffect(() => () => {
+    audioStop();
+    const a = audio.current;
+    if (a.eng) a.eng.ctx.close().catch(() => {});
+  }, [audioStop]);
 
   const seek = useCallback((v) => {
     tRef.current = clamp(v, 0, DURATION);
     setT(tRef.current);
-  }, []);
+    if (playingRef.current && soundRef.current) audioStart(tRef.current);
+  }, [audioStart]);
   const restart = useCallback(() => {
     seek(0);
     setPlaying(true);
@@ -1576,6 +2140,27 @@ export default function EstokeAoCuboPromo() {
     if (tRef.current >= DURATION) seek(0);
     setPlaying((p) => !p);
   }, [seek]);
+  // O navegador só libera áudio após um clique: o motor nasce aqui.
+  // Na primeira ativação o vídeo recomeça do início, para ouvir a trilha inteira.
+  const toggleSound = useCallback(() => {
+    const a = audio.current;
+    const first = !a.eng;
+    if (first) {
+      a.eng = makeEngine();
+      if (!a.eng) return;
+    }
+    if (a.eng.ctx.state === "suspended") a.eng.ctx.resume().catch(() => {});
+    if (first || !soundRef.current) {
+      if (first) {
+        tRef.current = 0;
+        setT(0);
+      }
+      setSoundOn(true);
+      setPlaying(true);
+    } else {
+      setSoundOn(false);
+    }
+  }, []);
 
   // Reavalia medidas de texto quando a fonte carregar
   useEffect(() => {
@@ -1611,7 +2196,7 @@ export default function EstokeAoCuboPromo() {
     return () => ro.disconnect();
   }, []);
 
-  // Atalhos: espaço = play/pause, R = reiniciar, ←/→ = ±1s
+  // Atalhos: espaço = play/pause, R = reiniciar, M = som, ←/→ = ±1s
   useEffect(() => {
     const onKey = (e) => {
       if (e.target && e.target.type === "range" && e.key.startsWith("Arrow")) return;
@@ -1619,16 +2204,17 @@ export default function EstokeAoCuboPromo() {
         e.preventDefault();
         toggle();
       } else if (e.key === "r" || e.key === "R") restart();
+      else if (e.key === "m" || e.key === "M") toggleSound();
       else if (e.key === "ArrowRight") seek(tRef.current + 1);
       else if (e.key === "ArrowLeft") seek(tRef.current - 1);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [toggle, restart, seek]);
+  }, [toggle, restart, seek, toggleSound]);
 
   // Gancho para gravação/QA: window.__eac.seek(12.5)
   useEffect(() => {
-    window.__eac = { seek, play: () => setPlaying(true), pause: () => setPlaying(false) };
+    window.__eac = { seek, play: () => setPlaying(true), pause: () => setPlaying(false), renderSoundtrack: renderSoundtrackWav };
   }, [seek]);
 
   const scene = [...SCENES].reverse().find((s) => t >= s.from) || SCENES[0];
@@ -1675,6 +2261,14 @@ export default function EstokeAoCuboPromo() {
                 onChange={(e) => seek(parseFloat(e.target.value))} style={{ position: "relative" }} />
             </div>
           </div>
+          <button type="button" className={soundOn ? "eac-btn" : "eac-btn eac-sound-off"} onClick={toggleSound} aria-pressed={soundOn}
+            aria-label={soundOn ? "Desligar som" : "Ativar som"} title={soundOn ? "Desligar som (M)" : "Ativar som (M)"}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M11 5 6 9H3v6h3l5 4z" fill="currentColor" />
+              {soundOn ? <><path d="M15.5 8.5a5 5 0 0 1 0 7" /><path d="M18.5 5.5a9 9 0 0 1 0 13" /></> : <path d="M16 9l5 6M21 9l-5 6" />}
+            </svg>
+            {!soundOn && <span>Ativar som</span>}
+          </button>
           <button type="button" className="eac-btn" onClick={() => setLoop((l) => !l)} aria-pressed={loop} aria-label="Repetir em loop">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 2l4 4-4 4" /><path d="M3 11V9a3 3 0 0 1 3-3h15" /><path d="M7 22l-4-4 4-4" /><path d="M21 13v2a3 3 0 0 1-3 3H3" /></svg>
           </button>
