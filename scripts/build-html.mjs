@@ -13,6 +13,7 @@ const ENTRIES = [
   // Apresentações de site: o mesmo DeviceShowcase com "./sites/current" apontando para cada site
   { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "misu-apresentacao", title: "Misú Apresentação", alias: { "./sites/current": "src/sites/misu.js" } },
   { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "lcs-apresentacao", title: "LCS Apresentação", alias: { "./sites/current": "src/sites/lcs.js" } },
+  { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "noka-apresentacao", title: "Noka Apresentação", alias: { "./sites/current": "src/sites/noka.js" } },
 ];
 const IMPORT_RE = /^import\s+([\s\S]+?)\s+from\s+["'](.+?)["'];?[ \t]*$/gm;
 

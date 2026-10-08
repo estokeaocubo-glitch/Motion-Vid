@@ -911,6 +911,7 @@ function Frame({ t, format = "9x16" }) {
    tempo 1, com whoosh. Estilo por site (SITE.music):
    - "japanese": escala in (Mi Fá Lá Si Dó), taiko em 3-3-2, koto em arpejo
    - "premium": acordes maj7/add9, pulso de bumbo suave, arpejo de sino limpo
+   - "elegant": acordes abertos (add9/maj7), sem bateria, sino a cada dois tempos
 ============================================================================= */
 const BEAT = T / 8;
 const taiko = (A, w, v = 1) => {
@@ -939,6 +940,15 @@ const STYLES = {
     lead: (A, w, n, v = 1, pan = 0) => SND.bell(A, w, n, 0.55 * v, pan),
   },
 };
+STYLES.elegant = {
+  scale: [62, 64, 66, 69, 71, 74, 76, 78, 81, 83], // Ré maior pentatônica
+  chords: [[38, 45, 52, 54, 57], [43, 50, 54, 57, 62], [35, 42, 50, 54, 57], [40, 47, 50, 55, 59], [38, 45, 52, 54, 57], [43, 50, 54, 59, 62]], // Dadd9 · Gmaj7 · Bm7 · Em9 …
+  motifs: [[4, -1, 6, -1, 5, -1, 3, -1], [5, -1, 7, -1, 6, -1, 4, -1], [3, -1, 5, -1, 6, -1, 8, -1], [6, -1, 5, -1, 4, -1, 2, -1], [4, -1, 6, -1, 8, -1, 7, -1], [5, -1, 4, -1, 3, -1, 4, -1]],
+  hits: [],
+  hit: () => {},
+  lead: (A, w, n, v = 1, pan = 0) => SND.bell(A, w, n, 0.75 * v, pan),
+  noHats: true,
+};
 const STYLE = STYLES[SITE.music] || STYLES.premium;
 function buildEvents() {
   const ev = [];
@@ -949,10 +959,12 @@ function buildEvents() {
     add(t0, (A, w) => SND.pad(A, w, ch, T, 1200, 1.1));
     STYLE.hits.forEach((b, j) => add(t0 + b * BEAT, (A, w) => STYLE.hit(A, w, j === 0 ? 1 : 0.6)));
     for (let b = 0; b < 8; b++) {
-      add(t0 + b * BEAT + BEAT / 2, (A, w) => SND.hat(A, w, 0.45, b % 2 ? 0.4 : -0.4));
-      add(t0 + b * BEAT, (A, w) => SND.sub(A, w, ch[0] - 12, BEAT * 0.9, b === 0 ? 0.8 : 0.35));
-      const n = STYLE.scale[STYLE.motifs[k % STYLE.motifs.length][b]];
-      add(t0 + b * BEAT, (A, w) => STYLE.lead(A, w, n, b === 0 ? 1 : 0.7, b % 2 ? 0.35 : -0.35));
+      if (!STYLE.noHats) add(t0 + b * BEAT + BEAT / 2, (A, w) => SND.hat(A, w, 0.45, b % 2 ? 0.4 : -0.4));
+      if (!STYLE.noHats || b % 4 === 0) add(t0 + b * BEAT, (A, w) => SND.sub(A, w, ch[0] - 12, STYLE.noHats ? BEAT * 3.5 : BEAT * 0.9, b === 0 ? 0.8 : 0.35));
+      const step = STYLE.motifs[k % STYLE.motifs.length][b];
+      if (step < 0) continue; // pausa no motivo
+      const n = STYLE.scale[step];
+      add(t0 + b * BEAT, (A, w) => STYLE.lead(A, w, n, b === 0 ? 1 : 0.7, (STYLE.noHats ? b % 4 < 2 : b % 2 === 0) ? -0.35 : 0.35));
     }
     add(t0 - 0.4 < 0 ? DURATION - 0.4 : t0 - 0.4, (A, w) => SND.whoosh(A, w, { dur: 0.8, from: 300, to: 3200, v: 0.24, pan: k % 2 ? 0.8 : -0.8, panTo: k % 2 ? -0.8 : 0.8 }));
   }

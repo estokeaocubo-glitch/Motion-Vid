@@ -1,4 +1,4 @@
-<title>LCS Apresentação</title>
+<title>Noka Apresentação</title>
 <style>
   :root { color-scheme: dark; }
   html, body, #root { height: 100%; }
@@ -637,24 +637,24 @@ function MotionPlayer({ Frame, duration, events = [], formats, defaultFormat, sc
   );
 }
 
-/* ---- src/sites/lcs.js ---- */
-// LCS Transporte e Turismo — apresentação no motion DeviceShowcase.
-// Modo vídeo: 5 trechos × 3,333s = 16,667s da gravação de tela, um por plano de câmera.
-// Fonte: "LCS Transporte Turismo _ Transporte Executivo e Fretamento Premium - Opera 2026-10-07 22-26-41.mp4"
-// Trechos usados da gravação (s): 8,6 (logo) · 11,7 (hero) · 15,03 (frota de vans) · 18,36 (carros → Por que escolher) · 21,69 (Como reservar → chamada final → rodapé)
+/* ---- src/sites/noka.js ---- */
+// Noka Arquitetura e Engenharia — apresentação no motion DeviceShowcase.
+// Modo vídeo: 6 trechos × 3,333s = 20s da gravação de tela, um por plano de câmera.
+// Fonte: "Noka Arquitetura e Engenharia _ Arquiteto em Petrópolis e Itaipava - Opera 2026-10-07 22-39-57 (1).mp4"
+// Trechos usados da gravação (s): 4,2 (logo → hero) · 15,2 (serviços) · 21,0 (projetos) · 26,0 (cinco etapas) · 31,3 (histórias / Casa Secretário) · 43,0 (Instagram → contato → rodapé)
 const SITE = {
-  projectName: "LCS Transporte e Turismo",
-  subtitle: "Transporte executivo e fretamento premium",
-  accent: "#84A892", // verde-sálvia dos botões do site
-  video: { webm: "media/lcs-site.webm", mp4: "media/lcs-site.mp4", w: 960, h: 540, duration: 50 / 3 },
-  shots: 5,
+  projectName: "Noka Arquitetura e Engenharia",
+  subtitle: "Arquitetura e engenharia em Petrópolis e Itaipava",
+  accent: "#BF624E", // terracota dos botões do site
+  video: { webm: "media/noka-site.webm", mp4: "media/noka-site.mp4", w: 960, h: 540, duration: 20 },
+  shots: 6,
   theme: {
-    label: "#A9C9B3",
-    bg: ["#121A15", "#080C09", "#030403"],
-    sphere: ["#1B261F", "#0E1511", "#060907"],
-    highlight: "225,245,232",
+    label: "#D9876F",
+    bg: ["#1C1A18", "#0E0D0C", "#050504"],
+    sphere: ["#2A2623", "#171513", "#0A0908"],
+    highlight: "245,235,225",
   },
-  music: "premium",
+  music: "elegant",
 };
 
 /* ---- src/DeviceShowcase.jsx ---- */

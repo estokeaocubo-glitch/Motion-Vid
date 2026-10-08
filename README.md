@@ -8,6 +8,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/misu.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
 | Apresentação de site: LCS | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/lcs.js` | `dist/lcs-apresentacao-9x16.mp4`, `dist/lcs-apresentacao-4x5.mp4` |
+| Apresentação de site: Noka | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/noka.js` | `dist/noka-apresentacao-9x16.mp4`, `dist/noka-apresentacao-4x5.mp4` |
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
 
@@ -16,6 +17,12 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 Um único motion (`src/DeviceShowcase.jsx`) e um arquivo por site em `src/sites/`, com os trechos da gravação, as cores e o estilo da trilha. No build, `./sites/current` é trocado pelo arquivo de cada site, gerando `dist/<site>-apresentacao.html` (preview, precisa de `dist/media/` ao lado).
 
 Para um novo site: grave a tela, escolha um trecho por plano (3,333s cada), gere `dist/media/<site>-site.webm/.mp4` com ffmpeg (ver comentário nos arquivos de `src/sites/`), crie `src/sites/<site>.js` copiando um existente e adicione uma linha em `ENTRIES` de `scripts/build-html.mjs`.
+
+### Noka Arquitetura e Engenharia
+
+- Gravação: `Noka Arquitetura e Engenharia _ Arquiteto em Petrópolis e Itaipava - Opera 2026-10-07 22-39-57 (1).mp4`. 6 planos: 4,2s (logo NOKA → hero) · 15,2s ("Tudo o que sua obra precisa") · 21,0s ("Projetos que saíram do papel") · 26,0s ("Cinco etapas") · 31,3s ("Histórias que contamos com orgulho" / Casa Secretário) · 43,0s (Instagram → "Vamos conversar" → NOKA do rodapé).
+- Tema grafite com contorno das esferas no terracota do site (`#BF624E`).
+- Trilha "elegante" (Dadd9 · Gmaj7 · Bm7 · Em9): sem bateria, sub longo e sino a cada dois tempos, combinando com a serifa e o clima de arquitetura.
 
 ### LCS Transporte e Turismo
 
@@ -89,6 +96,8 @@ node scripts/export-video.cjs dist/misu-apresentacao.html dist/misu-apresentacao
 node scripts/export-video.cjs dist/misu-apresentacao.html dist/misu-apresentacao-4x5.mp4 30 4x5
 node scripts/export-video.cjs dist/lcs-apresentacao.html dist/lcs-apresentacao-9x16.mp4 30 9x16
 node scripts/export-video.cjs dist/lcs-apresentacao.html dist/lcs-apresentacao-4x5.mp4 30 4x5
+node scripts/export-video.cjs dist/noka-apresentacao.html dist/noka-apresentacao-9x16.mp4 30 9x16
+node scripts/export-video.cjs dist/noka-apresentacao.html dist/noka-apresentacao-4x5.mp4 30 4x5
 ```
 
 O script captura cada quadro seguindo a timeline (1080 de largura) e junta com a trilha renderizada offline.
