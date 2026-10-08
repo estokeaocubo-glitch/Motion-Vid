@@ -19,9 +19,9 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 
 ## SaaS Gestão de Estoque (InventorySaaS)
 
-Motion de produto (prompt mestre "Vídeo Motion Graphics SaaS - Sistema de Gestão de Estoque"), estética Apple/Linear: ícones 3D soft-matte desenhados em SVG (extrusão + luz especular), UI em glassmorphism, fundos alternando verde-escuro/marinho e off-white, brilhos verde-neon e azul-elétrico.
+Motion de produto (prompt mestre "Vídeo Motion Graphics SaaS - Sistema de Gestão de Estoque"), estética Apple/Linear com a identidade da Estoke ao Cubo: ícones 3D soft-matte desenhados em SVG (extrusão + luz especular), UI em glassmorphism, fundos alternando navy/preto e claro, feixes de luz azul e ciano, grão, títulos em Monument e textos em Open Sauce (sem o verde do prompt original).
 
-- **0–5s Do caos ao controle**: planilhas, caixas, códigos de barras e notas flutuam em profundidade (desfoque nos mais distantes) e são sugados em espiral até virar um anel neon pulsante. Texto: "Transforme o estoque bagunçado em um sistema fluido."
+- **0–5s Do caos ao controle**: planilhas, caixas, códigos de barras e notas flutuam em profundidade (desfoque nos mais distantes) e são sugados em espiral até virar um anel ciano pulsante. Texto: "Transforme o estoque bagunçado em um sistema fluido."
 - **5–12s Módulos**: o anel abre como portal para o fundo claro; 4 cards 3D (Entradas, Rastreio, Logística, Relatórios) saem do centro e giram em carrossel com paradas elásticas. Texto: "Compras, Armazém, Vendas e Logística. Tudo em um só lugar."
 - **12–20s Dashboard**: zoom no card de Relatórios vira a tela do monitor; a câmera recua com mola, o painel "Nível de Estoque e Giro em Tempo Real" se descola do dashboard com gráfico subindo e contador; flutuam "✦ Controle", "✦ Previsão", "✦ Escala".
 - **20–28s Automação**: o card branco atravessa a câmera e vira o fundo claro; linha conecta Compras → Armazém → Vendas → Logística, mão 3D liga "Reposição Automática" e arrasta o pedido para o card; em sequência: estoque baixo → NF-e emitida → equipe atualizada. Texto: "Zere as rupturas. Automatize pedidos e acompanhe cada item em tempo real."
