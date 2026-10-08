@@ -28,10 +28,11 @@ Baseado na referência `480b5a3c102f16d5e0f18163fff49041_720w.mp4` (commit "New 
 
 Baseado na referência `2072e941c9e055b17fd31f443fcd863b_720w.mp4`: monitor numa mesa escura, parede de ripas iluminada na cor do site que está na tela, cortes rápidos e uma parada final num site de destaque.
 
-- Tela: `dist/media/reel-sites.webm` / `.mp4`, montada das quatro gravações: 8 cortes de 0,5s (Misú hero · LCS hero · Noka hero · Dizzy Universe · Misú "Gira o prato" · LCS frota · Noka projetos · Dizzy catálogo), 2,5s da moeda 3D da Dizzy e 1,5s escuro, onde o componente desenha o cartão final da Estoke ("Seu site pode ser o próximo.").
-- A luz da parede troca de cor a cada corte (vermelho Misú, verde LCS, terracota Noka, vermelho Dizzy, azul Estoke), com um flash no corte; câmera na mão periódica no loop, aproximação lenta e "soco" de zoom em cada corte; teclado RGB desfocado em primeiro plano.
-- Trilha a 120 BPM: bumbo e clique em cada corte, clap no contratempo, baixo e arpejo; riser até a parada, drop com impacto e shimmer em 4s, e acorde final no cartão da Estoke.
-- Exportado em 60fps por causa dos cortes rápidos.
+- Tela: `dist/media/reel-sites.webm` / `.mp4`, um trecho por site, sem repetição, escolhido onde a gravação está lisa e a página em movimento: Dizzy (moeda 3D, 6,75s) · LCS (rolagem até a frota, 14,0s) · Noka (projetos, 22,7s), com transições deslizantes de 0,25s (xfade slideup), destaque de 2,9s no prato girando da Misú (24,1s) e 1,5s escuro onde o componente desenha o cartão final da Estoke ("Seu site pode ser o próximo.").
+- Por que esses trechos: a gravação da Dizzy perde quadros nas partes mais pesadas (até 0,6s congelado), então a parada longa saiu dela e foi para a Misú (30 quadros únicos/s). As medições estão no histórico do commit.
+- A luz da parede troca de cor em cada troca de site (vermelho Dizzy, verde LCS, terracota Noka, vermelho Misú, azul Estoke), com flash; motion blur vertical durante o deslize; câmera na mão periódica no loop, aproximação lenta e "soco" de zoom em cada troca; teclado RGB desfocado em primeiro plano.
+- Trilha a 100 BPM (tempo = 0,6s): as trocas caem nos tempos 2, 4 e 6 com whoosh, riser até o destaque, drop com impacto e shimmer em 3,6s e acorde final no cartão da Estoke.
+- Exportado em 60fps.
 
 ## Apresentações de site (DeviceShowcase)
 

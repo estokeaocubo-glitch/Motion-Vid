@@ -671,8 +671,10 @@ function MotionPlayer({ Frame, duration, events = [], formats, defaultFormat, sc
    Referência: "2072e941c9e055b17fd31f443fcd863b_720w.mp4" — monitor numa mesa escura,
    parede de ripas iluminada na cor de cada site, cortes rápidos no tempo da batida
    e uma parada final num site de destaque.
-   Tela: dist/media/reel-sites.* (8 cortes de 0,5s + 2,5s da moeda da Dizzy + 1,5s escuro
-   onde entra o cartão final da Estoke).
+   Tela: dist/media/reel-sites.* — um trecho por site, sem repetição, escolhidos onde a
+   gravação está lisa e a página em movimento: Dizzy (moeda 3D) · LCS (rolagem até a frota) ·
+   Noka (projetos) com transições deslizantes de 0,25s, destaque de 2,9s no prato girando
+   da Misú e 1,5s escuro onde entra o cartão final da Estoke.
 ============================================================================= */
 const DURATION = 8;
 const FORMATS = {
@@ -680,25 +682,22 @@ const FORMATS = {
   "4x5": { w: 450, h: 562.5, label: "4:5" },
 };
 // Cor da luz na parede por trecho da montagem (cor dominante de cada marca)
+// Cada troca é uma transição deslizante centrada no instante "from" (cortes no tempo da trilha a 100 BPM)
 const SEGMENTS = [
-  { from: 0.0, site: "Misú", color: "#D1121F" },
-  { from: 0.5, site: "LCS", color: "#5FA67A" },
-  { from: 1.0, site: "Noka", color: "#D9763F" },
-  { from: 1.5, site: "Dizzy", color: "#E0451B" },
-  { from: 2.0, site: "Misú", color: "#D1121F" },
-  { from: 2.5, site: "LCS", color: "#5FA67A" },
-  { from: 3.0, site: "Noka", color: "#D9763F" },
-  { from: 3.5, site: "Dizzy", color: "#E00000" },
-  { from: 4.0, site: "Dizzy", color: "#E00000", hold: true },
+  { from: 0.0, site: "Dizzy", color: "#E00000" },
+  { from: 1.2, site: "LCS", color: "#5FA67A" },
+  { from: 2.4, site: "Noka", color: "#D9763F" },
+  { from: 3.6, site: "Misú", color: "#D1121F", hold: true },
   { from: 6.5, site: "Estoke ao Cubo", color: C.blue, end: true },
 ];
+const SLIDES = [1.2, 2.4, 3.6]; // transições deslizantes de 0,25s no vídeo da tela
 const segAt = (t) => [...SEGMENTS].reverse().find((s) => t >= s.from) || SEGMENTS[0];
 const CUTS = SEGMENTS.map((s) => s.from);
 const sinceCut = (t) => Math.min(...CUTS.filter((c) => c <= t).map((c) => t - c));
 
 const LAYOUT = {
-  "9x16": { mon: { cx: 236, cy: 340, w: 560 }, deskTop: 480, wallH: 340, kb: { x: -140, y: 600 } },
-  "4x5": { mon: { cx: 236, cy: 236, w: 480 }, deskTop: 360, wallH: 236, kb: { x: -150, y: 430 } },
+  "9x16": { mon: { cx: 232, cy: 340, w: 470 }, deskTop: 470, wallH: 340, kb: { x: -140, y: 600 } },
+  "4x5": { mon: { cx: 232, cy: 236, w: 440 }, deskTop: 356, wallH: 236, kb: { x: -150, y: 430 } },
 };
 
 // Mistura de cor (hex) para a transição suave da luz da parede
@@ -762,6 +761,9 @@ function Monitor({ t, L, light }) {
   const { cx, cy, w } = L.mon;
   const h = (w * 9) / 16;
   const punch = Math.exp(-sinceCut(t) * 9) * 0.015;
+  // motion blur vertical durante o deslize entre sites
+  const slide = Math.max(0, ...SLIDES.map((c) => 1 - Math.abs(t - c) / 0.14));
+  const vblur = slide * 5;
   return (
     <div style={{ position: "absolute", left: cx - w / 2, top: cy - h / 2, width: w, height: h, perspective: 1400, zIndex: 10 }}>
       <div style={{ position: "absolute", inset: 0, transform: `rotateY(-7deg) rotateX(3deg) scale(${1 + punch})`, transformStyle: "preserve-3d" }}>
@@ -773,7 +775,11 @@ function Monitor({ t, L, light }) {
           boxShadow: `0 0 0 1px rgba(255,255,255,.07), 0 30px 80px -10px rgba(0,0,0,.9), 0 0 120px ${rgba(light, 0.35)}`,
         }}>
           <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden", borderRadius: 3, background: "#000" }}>
-            <SyncedVideo t={t} duration={DURATION} webm="media/reel-sites.webm" mp4="media/reel-sites.mp4" />
+            <SyncedVideo t={t} duration={DURATION} webm="media/reel-sites.webm" mp4="media/reel-sites.mp4"
+              style={{ filter: vblur > 0.3 ? "url(#mrBlur)" : "none" }} />
+            <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+              <filter id="mrBlur" x="-5%" y="-20%" width="110%" height="140%"><feGaussianBlur stdDeviation={`0 ${vblur.toFixed(2)}`} /></filter>
+            </svg>
             <EndCard t={t} />
             {/* reflexo leve no vidro */}
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(120deg, rgba(255,255,255,.07), transparent 35%)", pointerEvents: "none" }} />
@@ -850,37 +856,40 @@ function Frame({ t, format = "9x16" }) {
 }
 
 /* =============================================================================
-   Som — 8s a 120 BPM: groove com impacto em cada corte, riser, drop na parada
-   da Dizzy e acorde final no cartão da Estoke
+   Som — 100 BPM (tempo = 0,6s): as trocas de site caem nos tempos 2, 4 e 6,
+   drop no destaque da Misú (3,6s) e acorde final no cartão da Estoke (6,5s)
 ============================================================================= */
 function buildEvents() {
   const ev = [];
   const add = (t, fn) => ev.push({ t, fn });
-  const B = 0.5;
-  // 0–4s: um corte por tempo
-  for (let b = 0; b < 8; b++) {
+  const B = 0.6;
+  const ROOTS = [33, 33, 38, 38, 36, 36]; // Lá · Ré · Dó (um por site)
+  // 0–3,6s: groove com um impacto em cada troca
+  for (let b = 0; b < 6; b++) {
     const tb = b * B;
-    add(tb, (A, w) => SND.kick(A, w, 1));
-    add(tb, (A, w) => hiss(A, w, { type: "highpass", f: 3000, f2: 7000, dur: 0.07, v: 0.16, pan: b % 2 ? 0.4 : -0.4 })); // "clique" do corte
-    if (b % 2 === 1) add(tb, (A, w) => SND.clap(A, w, 1));
+    add(tb, (A, w) => SND.kick(A, w, b % 2 === 0 ? 1 : 0.75));
+    if (b % 2 === 1) add(tb, (A, w) => SND.clap(A, w, 0.9));
     for (let i = 1; i < 4; i++) add(tb + i * (B / 4), (A, w) => SND.hat(A, w, i === 2 ? 0.8 : 0.4, i % 2 ? 0.3 : -0.3));
-    add(tb, (A, w) => SND.bass(A, w, [45, 45, 41, 43][Math.floor(b / 2)] - 12, 0.3, 1));
-    add(tb, (A, w) => SND.pluck(A, w, [69, 72, 76, 79, 81, 79, 76, 72][b], 0.8, b % 2 ? 0.4 : -0.4));
+    add(tb, (A, w) => SND.bass(A, w, ROOTS[b], 0.4, 1));
+    add(tb, (A, w) => SND.pluck(A, w, [69, 72, 76, 74, 77, 81][b], 0.8, b % 2 ? 0.4 : -0.4));
   }
-  add(3.0, (A, w) => hiss(A, w, { f: 300, f2: 7000, q: 2, dur: 1, v: 0.2, shape: "rise", send: 0.3 }));
-  // 4–6,5s: drop na parada da Dizzy
-  add(4.0, (A, w) => {
+  SLIDES.forEach((c, i) => {
+    add(c - 0.12, (A, w) => SND.whoosh(A, w, { dur: 0.3, from: 500, to: 4500, v: 0.22, pan: i % 2 ? 0.6 : -0.6, panTo: i % 2 ? -0.6 : 0.6 }));
+  });
+  add(2.4, (A, w) => hiss(A, w, { f: 300, f2: 7000, q: 2, dur: 1.2, v: 0.2, shape: "rise", send: 0.3 }));
+  // 3,6–6,5s: drop no destaque da Misú
+  add(3.6, (A, w) => {
     tone(A, w, { f: 110, f2: 30, glide: 0.7, dur: 1.2, v: 0.7, send: 0.4 });
     hiss(A, w, { type: "lowpass", f: 1400, f2: 120, dur: 0.9, v: 0.3, send: 0.6 });
   });
-  add(4.0, (A, w) => SND.shimmer(A, w, 0.8));
-  [4.0, 4.75, 5.5, 6.0].forEach((tb, i) => add(tb, (A, w) => SND.kick(A, w, i === 0 ? 1 : 0.7)));
-  [5.0, 6.0].forEach((tb) => add(tb, (A, w) => SND.clap(A, w, 0.9)));
-  for (let i = 0; i < 10; i++) add(4.0 + i * 0.25 + 0.125, (A, w) => SND.hat(A, w, 0.45, i % 2 ? 0.3 : -0.3));
-  add(4.0, (A, w) => SND.pad(A, w, [45, 52, 55, 60], 2.5, 1600, 1.1));
-  [[4.25, 76], [4.75, 79], [5.25, 84], [5.75, 83], [6.25, 79]].forEach(([tb, n]) => add(tb, (A, w) => SND.bell(A, w, n, 0.8, 0.2)));
+  add(3.6, (A, w) => SND.shimmer(A, w, 0.8));
+  [3.6, 4.5, 5.4, 6.0].forEach((tb, i) => add(tb, (A, w) => SND.kick(A, w, i === 0 ? 1 : 0.7)));
+  [4.2, 5.4].forEach((tb) => add(tb, (A, w) => SND.clap(A, w, 0.9)));
+  for (let i = 0; i < 9; i++) add(3.6 + i * 0.3 + 0.15, (A, w) => SND.hat(A, w, 0.45, i % 2 ? 0.3 : -0.3));
+  add(3.6, (A, w) => SND.pad(A, w, [45, 52, 55, 60], 2.9, 1600, 1.1));
+  [[3.9, 76], [4.5, 79], [5.1, 84], [5.7, 83], [6.2, 79]].forEach(([tb, n]) => add(tb, (A, w) => SND.bell(A, w, n, 0.8, 0.2)));
   // 6,5–8s: cartão final
-  add(6.45, (A, w) => SND.whoosh(A, w, { dur: 0.6, from: 4000, to: 300, v: 0.25, pan: 0, panTo: 0 }));
+  add(6.4, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 4000, to: 300, v: 0.22, pan: 0, panTo: 0 }));
   add(6.6, (A, w) => [72, 76, 79, 84].forEach((n, i) => tone(A, w + i * 0.06, { type: "triangle", f: midi(n), dur: 1.3, v: 0.08, send: 0.5, pan: i / 3 - 0.5 })));
   add(6.6, (A, w) => SND.pad(A, w, [48, 55, 59, 64], 1.4, 2000, 1));
   return ev.sort((a, b) => a.t - b.t);
@@ -894,6 +903,6 @@ const MOTION = { Frame, duration: DURATION, formats: FORMATS, renderWav, loop: t
 export default function MonitorReel() {
   return (
     <MotionPlayer Frame={Frame} duration={DURATION} events={EVENTS} formats={FORMATS} defaultFormat="9x16" renderWav={renderWav}
-      scenes={[{ name: "Cortes", from: 0 }, { name: "Destaque", from: 4 }, { name: "Estoke ao Cubo", from: 6.5 }]} />
+      scenes={[{ name: "Dizzy", from: 0 }, { name: "LCS", from: 1.2 }, { name: "Noka", from: 2.4 }, { name: "Misú", from: 3.6 }, { name: "Estoke ao Cubo", from: 6.5 }]} />
   );
 }
