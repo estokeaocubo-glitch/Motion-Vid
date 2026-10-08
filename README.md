@@ -9,6 +9,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/misu.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
 | Apresentação de site: LCS | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/lcs.js` | `dist/lcs-apresentacao-9x16.mp4`, `dist/lcs-apresentacao-4x5.mp4` |
 | Apresentação de site: Noka | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/noka.js` | `dist/noka-apresentacao-9x16.mp4`, `dist/noka-apresentacao-4x5.mp4` |
+| Apresentação de site: Dizzy | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/dizzy.js` | `dist/dizzy-apresentacao-9x16.mp4`, `dist/dizzy-apresentacao-4x5.mp4` |
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
 
@@ -17,6 +18,12 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 Um único motion (`src/DeviceShowcase.jsx`) e um arquivo por site em `src/sites/`, com os trechos da gravação, as cores e o estilo da trilha. No build, `./sites/current` é trocado pelo arquivo de cada site, gerando `dist/<site>-apresentacao.html` (preview, precisa de `dist/media/` ao lado).
 
 Para um novo site: grave a tela, escolha um trecho por plano (3,333s cada), gere `dist/media/<site>-site.webm/.mp4` com ffmpeg (ver comentário nos arquivos de `src/sites/`), crie `src/sites/<site>.js` copiando um existente e adicione uma linha em `ENTRIES` de `scripts/build-html.mjs`.
+
+### Dizzy House Studio
+
+- Gravação: `Dizzy House Studio _ Tattoo & Dizzy Shop - Opera 2026-10-07 22-45-59.mp4`. 5 planos: 5,5s (moeda 3D + ENTER) · 14,0s ("Dizzy House Shop") · 19,5s (Dizzy Universe 3D) · 25,8s (catálogo) · 31,8s (produtos → Dizzy Menu). A seção de tattoo aparece como "Em construção" na gravação e ficou de fora.
+- Tema preto com contorno das esferas no vermelho neon do site (`#E00000`).
+- Trilha "street": trap em meio tempo, 808 com glide, clap no tempo 5, hi-hats em semicolcheia com rolo no fim de cada plano.
 
 ### Noka Arquitetura e Engenharia
 
@@ -98,6 +105,8 @@ node scripts/export-video.cjs dist/lcs-apresentacao.html dist/lcs-apresentacao-9
 node scripts/export-video.cjs dist/lcs-apresentacao.html dist/lcs-apresentacao-4x5.mp4 30 4x5
 node scripts/export-video.cjs dist/noka-apresentacao.html dist/noka-apresentacao-9x16.mp4 30 9x16
 node scripts/export-video.cjs dist/noka-apresentacao.html dist/noka-apresentacao-4x5.mp4 30 4x5
+node scripts/export-video.cjs dist/dizzy-apresentacao.html dist/dizzy-apresentacao-9x16.mp4 30 9x16
+node scripts/export-video.cjs dist/dizzy-apresentacao.html dist/dizzy-apresentacao-4x5.mp4 30 4x5
 ```
 
 O script captura cada quadro seguindo a timeline (1080 de largura) e junta com a trilha renderizada offline.

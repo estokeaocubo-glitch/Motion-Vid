@@ -14,6 +14,7 @@ const ENTRIES = [
   { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "misu-apresentacao", title: "Misú Apresentação", alias: { "./sites/current": "src/sites/misu.js" } },
   { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "lcs-apresentacao", title: "LCS Apresentação", alias: { "./sites/current": "src/sites/lcs.js" } },
   { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "noka-apresentacao", title: "Noka Apresentação", alias: { "./sites/current": "src/sites/noka.js" } },
+  { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "dizzy-apresentacao", title: "Dizzy Apresentação", alias: { "./sites/current": "src/sites/dizzy.js" } },
 ];
 const IMPORT_RE = /^import\s+([\s\S]+?)\s+from\s+["'](.+?)["'];?[ \t]*$/gm;
 

@@ -267,6 +267,7 @@ function Frame({ t, format = "9x16" }) {
    - "japanese": escala in (Mi Fá Lá Si Dó), taiko em 3-3-2, koto em arpejo
    - "premium": acordes maj7/add9, pulso de bumbo suave, arpejo de sino limpo
    - "elegant": acordes abertos (add9/maj7), sem bateria, sino a cada dois tempos
+   - "street": trap em meio tempo, 808 com glide, clap, hi-hats com rolos
 ============================================================================= */
 const BEAT = T / 8;
 const taiko = (A, w, v = 1) => {
@@ -304,6 +305,27 @@ STYLES.elegant = {
   lead: (A, w, n, v = 1, pan = 0) => SND.bell(A, w, n, 0.75 * v, pan),
   noHats: true,
 };
+// "street": trap em meio tempo — 808 com glide, clap no tempo 5, hi-hats em semicolcheias com rolos
+const k808 = (A, w, n, dur) => {
+  tone(A, w, { f: midi(n + 12) * 2.2, f2: midi(n), glide: 0.06, dur, v: 0.55, a: 0.003 });
+  tone(A, w, { type: "triangle", f: midi(n + 12), dur: Math.min(dur, 0.25), v: 0.08 });
+};
+STYLES.street = {
+  scale: [57, 60, 62, 63, 64, 67, 69, 72, 74, 75], // Lá menor com blue note
+  chords: [[45, 52, 55, 60], [41, 48, 52, 57], [43, 50, 53, 58], [40, 47, 52, 56], [45, 52, 55, 60]],
+  motifs: [[7, -1, -1, 5, -1, 4, -1, -1], [7, -1, -1, 8, -1, 7, -1, 5], [4, -1, -1, 5, -1, 7, -1, -1], [3, -1, -1, 4, -1, 2, -1, 0], [7, -1, -1, 9, -1, 8, -1, 7]],
+  hits: [],
+  hit: () => {},
+  lead: (A, w, n, v = 1, pan = 0) => tone(A, w, { type: "square", f: midi(n), dur: 0.16, v: 0.035 * v, lp: 2200, send: 0.3, pan }),
+  noHats: true,
+  extra(add, t0, ch) {
+    // 808: tempo 1 (longo), 4 e 7 (curtos); clap no 5; hats em semicolcheia com rolo no fim do plano
+    [[0, 0.9], [3, 0.35], [6, 0.5]].forEach(([b, d]) => add(t0 + b * BEAT, (A, w) => k808(A, w, ch[0] - 12, d)));
+    add(t0 + 4 * BEAT, (A, w) => SND.clap(A, w, 1.1));
+    for (let i = 0; i < 16; i++) add(t0 + i * (BEAT / 2), (A, w) => SND.hat(A, w, i % 2 ? 0.35 : 0.6, i % 4 < 2 ? 0.3 : -0.3));
+    for (let i = 0; i < 6; i++) add(t0 + 7 * BEAT + i * (BEAT / 6), (A, w) => SND.hat(A, w, 0.3 + i * 0.08, 0.5));
+  },
+};
 const STYLE = STYLES[SITE.music] || STYLES.premium;
 function buildEvents() {
   const ev = [];
@@ -313,9 +335,10 @@ function buildEvents() {
     const ch = STYLE.chords[k % STYLE.chords.length];
     add(t0, (A, w) => SND.pad(A, w, ch, T, 1200, 1.1));
     STYLE.hits.forEach((b, j) => add(t0 + b * BEAT, (A, w) => STYLE.hit(A, w, j === 0 ? 1 : 0.6)));
+    if (STYLE.extra) STYLE.extra(add, t0, ch);
     for (let b = 0; b < 8; b++) {
       if (!STYLE.noHats) add(t0 + b * BEAT + BEAT / 2, (A, w) => SND.hat(A, w, 0.45, b % 2 ? 0.4 : -0.4));
-      if (!STYLE.noHats || b % 4 === 0) add(t0 + b * BEAT, (A, w) => SND.sub(A, w, ch[0] - 12, STYLE.noHats ? BEAT * 3.5 : BEAT * 0.9, b === 0 ? 0.8 : 0.35));
+      if (!STYLE.extra && (!STYLE.noHats || b % 4 === 0)) add(t0 + b * BEAT, (A, w) => SND.sub(A, w, ch[0] - 12, STYLE.noHats ? BEAT * 3.5 : BEAT * 0.9, b === 0 ? 0.8 : 0.35));
       const step = STYLE.motifs[k % STYLE.motifs.length][b];
       if (step < 0) continue; // pausa no motivo
       const n = STYLE.scale[step];
