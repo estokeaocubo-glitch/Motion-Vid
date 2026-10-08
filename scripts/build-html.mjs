@@ -12,6 +12,7 @@ const ENTRIES = [
   { src: "src/PortfolioCarousel.jsx", name: "PortfolioCarousel", slug: "portfolio-carrossel", title: "Carrossel Portfólio" },
   { src: "src/MonitorReel.jsx", name: "MonitorReel", slug: "reel-monitor", title: "Reel Portfólio" },
   { src: "src/EditorialReel.jsx", name: "EditorialReel", slug: "reel-editorial", title: "Reel Editorial" },
+  { src: "src/FolderReveal.jsx", name: "FolderReveal", slug: "pasta-clientes", title: "Pasta de Clientes" },
   // Apresentações de site: o mesmo DeviceShowcase com "./sites/current" apontando para cada site
   { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "misu-apresentacao", title: "Misú Apresentação", alias: { "./sites/current": "src/sites/misu.js" } },
   { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "lcs-apresentacao", title: "LCS Apresentação", alias: { "./sites/current": "src/sites/lcs.js" } },

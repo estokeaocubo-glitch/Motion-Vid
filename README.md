@@ -8,12 +8,23 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
+| Pasta "Nossos clientes" | 5,2s, loop | 9:16 e 4:5 | `src/FolderReveal.jsx` | `dist/pasta-clientes-9x16.mp4`, `dist/pasta-clientes-4x5.mp4` |
 | Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/misu.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
 | Apresentação de site: LCS | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/lcs.js` | `dist/lcs-apresentacao-9x16.mp4`, `dist/lcs-apresentacao-4x5.mp4` |
 | Apresentação de site: Noka | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/noka.js` | `dist/noka-apresentacao-9x16.mp4`, `dist/noka-apresentacao-4x5.mp4` |
 | Apresentação de site: Dizzy | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/dizzy.js` | `dist/dizzy-apresentacao-9x16.mp4`, `dist/dizzy-apresentacao-4x5.mp4` |
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## Pasta "Nossos clientes" (FolderReveal)
+
+Baseado na referência `2bd63997cba454b2744b6f348a45040d (1).mp4` (commit "Use as logos do carrosel pra gerar o seguinte video"): pasta azul estilo macOS em fundo preto, cursor pousa e clica, um cone de luz colorida sai da pasta, os itens voam e flutuam no feixe, depois caem de volta e o feixe se fecha. Os itens são os 9 logos de clientes do carrossel.
+
+- Tempo fiel à referência (clique em 0,95s, feixe em 1,85s, volta e fechamento no fim); a parada com os logos é 0,6s mais longa (loop de 5,2s) para dar tempo de ler as marcas.
+- Feixe em 4 raios com gradientes rosa/amarelo/azul/vermelho correndo para cima, bloom e véu de luz; abre com mola e fecha estreitando até virar um traço.
+- Logos saem em arco com escalonamento, flutuam e giram levemente, e caem de volta em ordem inversa; a pasta "pula" na abertura e no fechamento.
+- Som seguindo o desenho da referência (medido por envelope e brilho espectral): sopro do cursor, silêncio, clique e a música entra (128 BPM, com pad contínua), grave + whoosh na abertura, "pings" na saída dos logos, sparkle subindo na volta e decaimento curto.
+- Exportado em 60fps.
 
 ## Reel editorial (EditorialReel)
 
@@ -132,6 +143,8 @@ node scripts/export-video.cjs dist/reel-monitor.html dist/reel-portfolio-9x16.mp
 node scripts/export-video.cjs dist/reel-monitor.html dist/reel-portfolio-4x5.mp4 60 4x5
 node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-3x4.mp4 30 3x4
 node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-9x16.mp4 30 9x16
+node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-9x16.mp4 60 9x16
+node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-4x5.mp4 60 4x5
 ```
 
 O script captura cada quadro seguindo a timeline (1080 de largura) e junta com a trilha renderizada offline.
