@@ -8,6 +8,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
+| SaaS Gestão de Estoque | 35s | 9:16 e 4:5 | `src/InventorySaaS.jsx` | `dist/saas-estoque-9x16.mp4`, `dist/saas-estoque-4x5.mp4` |
 | Pasta "Nossos clientes" | 5,2s, loop | 9:16 e 4:5 | `src/FolderReveal.jsx` | `dist/pasta-clientes-9x16.mp4`, `dist/pasta-clientes-4x5.mp4` |
 | Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/misu.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
 | Apresentação de site: LCS | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/lcs.js` | `dist/lcs-apresentacao-9x16.mp4`, `dist/lcs-apresentacao-4x5.mp4` |
@@ -15,6 +16,18 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Apresentação de site: Dizzy | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/dizzy.js` | `dist/dizzy-apresentacao-9x16.mp4`, `dist/dizzy-apresentacao-4x5.mp4` |
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## SaaS Gestão de Estoque (InventorySaaS)
+
+Motion de produto (prompt mestre "Vídeo Motion Graphics SaaS - Sistema de Gestão de Estoque"), estética Apple/Linear: ícones 3D soft-matte desenhados em SVG (extrusão + luz especular), UI em glassmorphism, fundos alternando verde-escuro/marinho e off-white, brilhos verde-neon e azul-elétrico.
+
+- **0–5s Do caos ao controle**: planilhas, caixas, códigos de barras e notas flutuam em profundidade (desfoque nos mais distantes) e são sugados em espiral até virar um anel neon pulsante. Texto: "Transforme o estoque bagunçado em um sistema fluido."
+- **5–12s Módulos**: o anel abre como portal para o fundo claro; 4 cards 3D (Entradas, Rastreio, Logística, Relatórios) saem do centro e giram em carrossel com paradas elásticas. Texto: "Compras, Armazém, Vendas e Logística. Tudo em um só lugar."
+- **12–20s Dashboard**: zoom no card de Relatórios vira a tela do monitor; a câmera recua com mola, o painel "Nível de Estoque e Giro em Tempo Real" se descola do dashboard com gráfico subindo e contador; flutuam "✦ Controle", "✦ Previsão", "✦ Escala".
+- **20–28s Automação**: o card branco atravessa a câmera e vira o fundo claro; linha conecta Compras → Armazém → Vendas → Logística, mão 3D liga "Reposição Automática" e arrasta o pedido para o card; em sequência: estoque baixo → NF-e emitida → equipe atualizada. Texto: "Zere as rupturas. Automatize pedidos e acompanhe cada item em tempo real."
+- **28–35s Segurança e logo**: o fundo escuro abre a partir do check da equipe; cadeado fecha com ondas de segurança e se divide em barras de crescimento; corte para o fundo claro com a logo e digitação de "Estoke ao Cubo" e "Transforme complexidade em controle."
+- Som: 120 BPM em Dó (I–V–vi–IV), pad no caos, batida entra no portal, arpejo nas cenas de produto, pausa no cadeado e acorde final; cada ação tem efeito (pops, swipes dos giros, tiques do contador, clique da mão, clack do cadeado, teclas da digitação).
+- Exportado em 60fps.
 
 ## Pasta "Nossos clientes" (FolderReveal)
 
@@ -146,6 +159,8 @@ node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-3x4.m
 node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-4x5.mp4 60 4x5
+node scripts/export-video.cjs dist/saas-estoque.html dist/saas-estoque-9x16.mp4 60 9x16
+node scripts/export-video.cjs dist/saas-estoque.html dist/saas-estoque-4x5.mp4 60 4x5
 ```
 
 O script captura cada quadro seguindo a timeline (1080 de largura) e junta com a trilha renderizada offline.
