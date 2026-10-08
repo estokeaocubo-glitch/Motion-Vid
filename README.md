@@ -23,7 +23,7 @@ Para um novo site: grave a tela, escolha um trecho por plano (3,333s cada), gere
 
 - Gravação: `Dizzy House Studio _ Tattoo & Dizzy Shop - Opera 2026-10-07 22-45-59.mp4`. 5 planos: 5,5s (moeda 3D + ENTER) · 14,0s ("Dizzy House Shop") · 19,5s (Dizzy Universe 3D) · 25,8s (catálogo) · 31,8s (produtos → Dizzy Menu). A seção de tattoo aparece como "Em construção" na gravação e ficou de fora.
 - Tema preto com contorno das esferas no vermelho neon do site (`#E00000`).
-- Trilha "street": trap em meio tempo, 808 com glide, clap no tempo 5, hi-hats em semicolcheia com rolo no fim de cada plano.
+- Trilha "hiphop" (type beat boom bap): cada plano é um compasso de 16 semicolcheias a 72 BPM com swing; bumbo seco com sub acompanhando, caixa no 2 e no 4 com ghost note, hi-hats suingados e hi-hat aberto no fim, Rhodes com tremolo (Am9 · Dm9 · Fmaj7 · E7(#9)), melodia de sino esparsa e chiado de vinil. (O estilo "street", trap com 808, continua disponível.)
 
 ### Noka Arquitetura e Engenharia
 

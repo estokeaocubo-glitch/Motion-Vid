@@ -15,5 +15,5 @@ export const SITE = {
     sphere: ["#1E0D0D", "#0C0505", "#030101"],
     highlight: "255,210,210",
   },
-  music: "street",
+  music: "hiphop",
 };

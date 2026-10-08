@@ -655,7 +655,7 @@ const SITE = {
     sphere: ["#1E0D0D", "#0C0505", "#030101"],
     highlight: "255,210,210",
   },
-  music: "street",
+  music: "hiphop",
 };
 
 /* ---- src/DeviceShowcase.jsx ---- */
@@ -924,6 +924,7 @@ function Frame({ t, format = "9x16" }) {
    - "premium": acordes maj7/add9, pulso de bumbo suave, arpejo de sino limpo
    - "elegant": acordes abertos (add9/maj7), sem bateria, sino a cada dois tempos
    - "street": trap em meio tempo, 808 com glide, clap, hi-hats com rolos
+   - "hiphop": type beat boom bap com swing, Rhodes em acordes de nona e chiado de vinil
 ============================================================================= */
 const BEAT = T / 8;
 const taiko = (A, w, v = 1) => {
@@ -982,6 +983,89 @@ STYLES.street = {
     for (let i = 0; i < 6; i++) add(t0 + 7 * BEAT + i * (BEAT / 6), (A, w) => SND.hat(A, w, 0.3 + i * 0.08, 0.5));
   },
 };
+// "hiphop": type beat boom bap — 1 compasso por plano (16 semicolcheias a 72 BPM), swing nos contratempos
+const kickBoom = (A, w, v = 1) => {
+  tone(A, w, { f: 115, f2: 44, glide: 0.09, dur: 0.48, v: 0.95 * v, a: 0.002 });
+  hiss(A, w, { type: "highpass", f: 2500, dur: 0.012, v: 0.18 * v });
+};
+const snareBap = (A, w, v = 1) => {
+  hiss(A, w, { f: 1900, q: 0.8, dur: 0.2, v: 0.42 * v, send: 0.22 });
+  tone(A, w, { type: "triangle", f: 210, f2: 170, glide: 0.06, dur: 0.11, v: 0.16 * v });
+};
+// Rhodes: senoide + harmônico, envelope com sustentação (o tone() é percussivo) e tremolo leve
+const rhodes = (A, w, notes, dur, v = 1) => {
+  const { ctx } = A;
+  const g = ctx.createGain();
+  const peak = 0.05 * v;
+  g.gain.setValueAtTime(0.0001, w);
+  g.gain.linearRampToValueAtTime(peak, w + 0.012);
+  g.gain.setTargetAtTime(peak * 0.55, w + 0.012, dur * 0.35);
+  g.gain.setValueAtTime(peak * 0.45, w + dur * 0.85);
+  g.gain.exponentialRampToValueAtTime(0.0001, w + dur);
+  const trem = ctx.createGain();
+  trem.gain.value = 1;
+  const lfo = ctx.createOscillator();
+  const depth = ctx.createGain();
+  lfo.frequency.value = 4.8;
+  depth.gain.value = 0.18;
+  lfo.connect(depth);
+  depth.connect(trem.gain);
+  g.connect(trem);
+  trem.connect(A.out);
+  const send = ctx.createGain();
+  send.gain.value = 0.35;
+  trem.connect(send);
+  send.connect(A.send);
+  notes.forEach((n, i) => {
+    const o = ctx.createOscillator();
+    o.frequency.value = midi(n);
+    o.connect(g);
+    const h = ctx.createOscillator();
+    h.type = "triangle";
+    h.frequency.value = midi(n + 12);
+    const hg = ctx.createGain();
+    hg.gain.value = 0.18;
+    h.connect(hg);
+    hg.connect(g);
+    [o, h].forEach((x) => {
+      x.start(w + i * 0.012);
+      x.stop(w + dur + 0.05);
+    });
+  });
+  lfo.start(w);
+  lfo.stop(w + dur + 0.05);
+};
+STYLES.hiphop = {
+  // Am9 · Dm9 · Fmaj7 · E7(#9) · Am9 (graves: Lá1, Ré2, Fá2, Mi2, Lá1)
+  chords: [[57, 60, 64, 67, 71], [50, 53, 57, 60, 64], [53, 57, 60, 64], [52, 56, 62, 67], [57, 60, 64, 67, 71]],
+  roots: [33, 38, 41, 40, 33],
+  melody: [[[2, 76], [6, 79], [9, 81], [13, 79]], [[2, 77], [6, 76], [10, 74], [14, 72]], [[2, 72], [5, 76], [9, 79], [13, 76]], [[3, 74], [6, 71], [10, 68], [14, 71]], [[2, 76], [6, 79], [9, 84], [12, 81]]],
+  scale: [0], motifs: [[-1, -1, -1, -1, -1, -1, -1, -1]],
+  hits: [], hit: () => {}, lead: () => {},
+  noHats: true, noPad: true,
+  extra(add, t0, ch, k) {
+    const S = T / 16;
+    const sw = (i) => t0 + i * S + (i % 2 ? S * 0.33 : 0); // swing nas semicolcheias pares
+    const root = this.roots[k % this.roots.length];
+    const kicks = k % 2 ? [0, 7, 10, 13] : [0, 3, 7, 10];
+    kicks.forEach((i, j) => {
+      add(sw(i), (A, w) => kickBoom(A, w, j === 0 ? 1 : 0.8));
+      add(sw(i), (A, w) => tone(A, w, { f: midi(root + (j === 2 ? 7 : 0)), dur: j === 0 ? 0.6 : 0.32, v: 0.3, a: 0.01, lp: 300 }));
+    });
+    [4, 12].forEach((i) => add(sw(i), (A, w) => snareBap(A, w)));
+    add(sw(15), (A, w) => snareBap(A, w, 0.25));
+    for (let i = 0; i < 16; i++) {
+      if (i === 14) add(sw(i), (A, w) => hiss(A, w, { type: "highpass", f: 6500, dur: 0.28, v: 0.09, pan: 0.3 }));
+      else if (i % 2 === 0 || rnd(i, k) > 0.6) add(sw(i), (A, w) => SND.hat(A, w, i % 4 === 0 ? 0.7 : i % 2 ? 0.25 : 0.45, -0.25));
+    }
+    add(sw(0), (A, w) => rhodes(A, w, ch, S * 10.5));
+    add(sw(10), (A, w) => rhodes(A, w, ch.slice(1), S * 6.2, 0.75));
+    this.melody[k % this.melody.length].forEach(([i, n]) => add(sw(i), (A, w) => SND.bell(A, w, n, 0.45, 0.25)));
+    // chiado de vinil: estalos esparsos + ruído de fundo
+    add(t0, (A, w) => hiss(A, w, { f: 5000, q: 0.5, dur: T, v: 0.012, shape: "swell" }));
+    for (let c = 0; c < 9; c++) add(t0 + rnd(c, k + 30) * T, (A, w) => hiss(A, w, { type: "highpass", f: 3000, dur: 0.006, v: 0.06 + rnd(c, k) * 0.08, pan: rnd(c, k + 9) - 0.5 }));
+  },
+};
 const STYLE = STYLES[SITE.music] || STYLES.premium;
 function buildEvents() {
   const ev = [];
@@ -989,9 +1073,9 @@ function buildEvents() {
   for (let k = 0; k < N_SHOTS; k++) {
     const t0 = k * T;
     const ch = STYLE.chords[k % STYLE.chords.length];
-    add(t0, (A, w) => SND.pad(A, w, ch, T, 1200, 1.1));
+    if (!STYLE.noPad) add(t0, (A, w) => SND.pad(A, w, ch, T, 1200, 1.1));
     STYLE.hits.forEach((b, j) => add(t0 + b * BEAT, (A, w) => STYLE.hit(A, w, j === 0 ? 1 : 0.6)));
-    if (STYLE.extra) STYLE.extra(add, t0, ch);
+    if (STYLE.extra) STYLE.extra(add, t0, ch, k);
     for (let b = 0; b < 8; b++) {
       if (!STYLE.noHats) add(t0 + b * BEAT + BEAT / 2, (A, w) => SND.hat(A, w, 0.45, b % 2 ? 0.4 : -0.4));
       if (!STYLE.extra && (!STYLE.noHats || b % 4 === 0)) add(t0 + b * BEAT, (A, w) => SND.sub(A, w, ch[0] - 12, STYLE.noHats ? BEAT * 3.5 : BEAT * 0.9, b === 0 ? 0.8 : 0.35));
