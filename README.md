@@ -30,9 +30,10 @@ Baseado na referência `2bd63997cba454b2744b6f348a45040d (1).mp4` (commit "Use a
 
 Baseado na referência `480b5a3c102f16d5e0f18163fff49041_720w.mp4` (commit "New Motion"): fundo cinza-claro, tipografia grande, telas de sites piscando, card de página em destaque e coluna de telas subindo. As telas da referência foram trocadas pelas dos nossos projetos e o texto pelo foco em venda de site, terminando com o logo e a fonte da marca.
 
-- 0–1s: 8 telas piscando (0,12s cada) · 1–2,4s: card com a moeda 3D da Dizzy e telas empilhadas · 2,4–3s: coluna de telas subindo · 3–4,8s: "Sites que transformam visitas em vendas." letra por letra (Open Sauce Sans) · 7,2–11s: telas, card com o prato girando da Misú e coluna por cima da frase · 12–14s: logo (cubo + Archivo larga), "Sites e lojas virtuais que vendem." e "Solicite seu orçamento →".
-- Telas: 27 prints das gravações (Misú, LCS, Noka, Dizzy) em `dist/media/editorial/s00–s26.webp`; cards animados em `dist/media/editorial/cards.*`.
-- Som: pulso nas partes rápidas, clique de obturador em cada tela, whoosh na coluna, um toque por palavra da frase e acorde no logo.
+- 0–1s: 8 telas piscando (0,12s cada), deslizando entre posições com leve zoom · 1–2,4s: card com o prato girando da Misú e telas empilhadas · 2,4–3s: coluna de telas subindo · 3–4,8s: "Sites que transformam visitas em vendas." letra por letra (Open Sauce Sans) · 7–11s: grade 2×2 com os quatro sites rodando ao vivo (Misú · Restaurante japonês, LCS · Transporte executivo, Noka · Arquitetura e engenharia, Dizzy · Streetwear), que sai pelo topo · 12–14s: logo (cubo + Archivo larga), "Sites e lojas virtuais que vendem." e "Solicite seu orçamento →".
+- v2: a primeira versão travava porque o card usava a moeda da Dizzy (a gravação perde quadros nesse trecho) e repetia no meio a sequência do começo. Agora nenhuma tela se repete, os trechos de vídeo foram escolhidos por medição quadro a quadro (Misú, LCS e Noka com ~29 quadros únicos/s; a Dizzy usa um print do catálogo com zoom lento, porque a gravação não tem 3,8s seguidos sem travar) e o vídeo é exportado em 60fps.
+- Telas: 27 prints das gravações em `dist/media/editorial/s00–s26.webp`; card em `dist/media/editorial/cards.*`; grade em `dist/media/editorial/grid.*` (um vídeo 2×2 recortado em quatro cards).
+- Som: pulso nas partes rápidas, clique de obturador em cada tela, whoosh na coluna, um toque por palavra da frase, um "pop" por card da grade e acorde no logo.
 - Formatos 3:4 (o da referência e do grid do Instagram, 1080×1440) e 9:16.
 
 ## Reel de portfólio no monitor (MonitorReel)
@@ -141,8 +142,8 @@ node scripts/export-video.cjs dist/dizzy-apresentacao.html dist/dizzy-apresentac
 node scripts/export-video.cjs dist/dizzy-apresentacao.html dist/dizzy-apresentacao-4x5.mp4 30 4x5
 node scripts/export-video.cjs dist/reel-monitor.html dist/reel-portfolio-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/reel-monitor.html dist/reel-portfolio-4x5.mp4 60 4x5
-node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-3x4.mp4 30 3x4
-node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-9x16.mp4 30 9x16
+node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-3x4.mp4 60 3x4
+node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-4x5.mp4 60 4x5
 ```

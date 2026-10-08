@@ -670,8 +670,11 @@ function MotionPlayer({ Frame, duration, events = [], formats, defaultFormat, sc
    Estoke ao Cubo — Reel editorial "Sites que transformam visitas em vendas." (loop de 14s)
    Referência: "480b5a3c102f16d5e0f18163fff49041_720w.mp4" — fundo cinza-claro, tipografia
    grande e telas de sites piscando, card de página em destaque e coluna de telas subindo.
-   As telas são prints dos nossos projetos (Misú, LCS, Noka, Dizzy) em dist/media/editorial/;
-   os cards animados usam dist/media/editorial/cards.* (moeda da Dizzy + prato da Misú).
+   As telas são prints dos nossos projetos (Misú, LCS, Noka, Dizzy) em dist/media/editorial/.
+   v2 (mais fluido, sem repetição): o card do início usa o prato girando da Misú
+   (cards.*, 30 quadros únicos/s; a gravação da Dizzy perde quadros); os prints deslizam
+   entre posições em vez de pular; e a segunda metade, que repetia o começo, virou uma
+   grade 2×2 com os quatro sites rodando ao vivo (grid.*) e o nome de cada cliente.
 ============================================================================= */
 const DURATION = 14;
 const FORMATS = {
@@ -687,7 +690,6 @@ const shot = (i) => `media/editorial/s${String(i % 27).padStart(2, "0")}.webp`;
 const FLASH_A = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => [
   0.04 + k * 0.12, 0.12, [150, 200, 238, 260, 262, 250, 268, 268][k], [0.64, 0.52, 0.44, 0.41, 0.39, 0.39, 0.4, 0.4][k], 292, k,
 ]);
-const FLASH_G = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => [7.2 + k * 0.17, 0.17, 225 + (k % 2 ? 14 : -10), 0.52, 270, 8 + k]);
 
 function Thumb({ i, cx, cy, w, style }) {
   const h = (w * 9) / 16;
@@ -698,17 +700,23 @@ function Thumb({ i, cx, cy, w, style }) {
   );
 }
 
+// Cada tela entra com um leve zoom e desliza da posição anterior (em vez de pular)
 function Flashes({ t, H, list }) {
-  const cur = list.find(([s, d]) => t >= s && t < s + d);
-  if (!cur) return null;
-  const [, , cx, fy, w, i] = cur;
-  return <Thumb i={i} cx={cx} cy={fy * H} w={w} />;
+  const k = list.findIndex(([s, d]) => t >= s && t < s + d);
+  if (k < 0) return null;
+  const [s0, , cx, fy, w, i] = list[k];
+  const prev = list[Math.max(0, k - 1)];
+  const g = easeOut(prog(t, s0, s0 + 0.07));
+  const x = lerp(prev[2], cx, k === 0 ? 1 : g);
+  const y = lerp(prev[3], fy, k === 0 ? 1 : g) * H;
+  const sc = 0.94 + 0.06 * spring(t - s0, { stiffness: 420, damping: 26 });
+  return <Thumb i={i} cx={x} cy={y} w={w} style={{ transform: `scale(${sc})` }} />;
 }
 
 // Card de página em destaque (clipe animado), com telas empilhadas por baixo
 function Card({ t, H, from, to, clipStart, fy, stackFrom }) {
-  if (t < from || t > to) return null;
-  const lt = t - from;
+  const visible = t >= from && t <= to; // sempre montado para o vídeo pré-carregar
+  const lt = clamp(t - from, 0, to - from);
   const s = spring(lt, { stiffness: 260, damping: 22 });
   const grow = easeInOut(prog(lt, 0.2, to - from)) * 0.08;
   const out = easeIn(prog(t, to - 0.15, to));
@@ -716,7 +724,7 @@ function Card({ t, H, from, to, clipStart, fy, stackFrom }) {
   const h = (w * 9) / 16 + 26;
   const cy = fy * H;
   return (
-    <div style={{ position: "absolute", inset: 0, opacity: 1 - out }}>
+    <div style={{ position: "absolute", inset: 0, opacity: visible ? 1 - out : 0, visibility: visible ? "visible" : "hidden" }}>
       {[0, 1, 2].map((k) => (
         <Thumb key={k} i={stackFrom + k} cx={225 + (k - 1) * 6} cy={cy + h / 2 + 18 + k * 16 - (1 - s) * 40} w={300 - k * 18}
           style={{ zIndex: 1, opacity: clamp(s * 2), transform: `translateY(${-lt * 12 * (k + 1)}px)` }} />
@@ -729,7 +737,7 @@ function Card({ t, H, from, to, clipStart, fy, stackFrom }) {
           {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => <span key={c} style={{ width: 7, height: 7, borderRadius: 7, background: c }} />)}
         </div>
         <div style={{ position: "relative", width: w, height: (w * 9) / 16, overflow: "hidden" }}>
-          <SyncedVideo t={clipStart + clamp(lt, 0, 1.999)} duration={4} webm="media/editorial/cards.webm" mp4="media/editorial/cards.mp4" />
+          <SyncedVideo t={clipStart + clamp(lt, 0, 1.999)} duration={2} webm="media/editorial/cards.webm" mp4="media/editorial/cards.mp4" />
         </div>
       </div>
     </div>
@@ -746,6 +754,57 @@ function Filmstrip({ t, H, from, dur, first }) {
   return (
     <>
       {[0, 1, 2, 3, 4, 5].map((k) => <Thumb key={k} i={first + k} cx={225} cy={y0 + k * gap} w={w} style={{ zIndex: 3, boxShadow: "none" }} />)}
+    </>
+  );
+}
+
+/* ---------- Grade de projetos (segunda metade) ---------- */
+// Um vídeo 2×2 (grid.*) recortado em quatro cards; cada card mostra um quadrante
+const GRID = { from: 7.0, to: 11.0 };
+const PROJECTS = [
+  { name: "Misú", seg: "Restaurante japonês", q: [0, 0] },
+  { name: "LCS", seg: "Transporte executivo", q: [1, 0] },
+  { name: "Noka", seg: "Arquitetura e engenharia", q: [0, 1] },
+  { name: "Dizzy", seg: "Streetwear", q: [1, 1] },
+];
+function ProjectGrid({ t, H }) {
+  // sempre montado (invisível fora da janela) para os vídeos já estarem carregados quando a grade entra
+  const visible = t >= GRID.from && t <= GRID.to;
+  const lt = clamp(t - GRID.from, 0, GRID.to - GRID.from);
+  const cw = 200;
+  const ch = (cw * 9) / 16;
+  const top = H * 0.36;
+  return (
+    <>
+      {PROJECTS.map((p, k) => {
+        const col = k % 2;
+        const row = Math.floor(k / 2);
+        const s = spring(lt - k * 0.16, { stiffness: 210, damping: 19 });
+        const out = easeIn(prog(t, GRID.to - 0.55 + k * 0.05, GRID.to - 0.1 + k * 0.05));
+        const x = 225 + (col ? 6 : -cw - 6);
+        const y = top + row * (ch + 44) + (1 - s) * 40 - out * (H * 0.9);
+        const blur = out > 0.05 && out < 0.95 ? 3 * Math.sin(out * Math.PI) : 0;
+        return (
+          <div key={p.name} style={{
+            position: "absolute", left: x, top: y, width: cw, zIndex: 3, opacity: visible ? clamp(s * 2.5) : 0, visibility: visible ? "visible" : "hidden",
+            transform: `scale(${0.85 + 0.15 * clamp(s, 0, 1.1)})`, filter: blur > 0.3 ? `blur(${blur.toFixed(1)}px)` : "none",
+          }}>
+            <div style={{ background: "#FAFAFA", boxShadow: "0 14px 30px -14px rgba(0,0,0,.45)" }}>
+              <div style={{ height: 12, display: "flex", alignItems: "center", gap: 3, padding: "0 6px" }}>
+                {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => <span key={c} style={{ width: 4, height: 4, borderRadius: 4, background: c }} />)}
+              </div>
+              <div style={{ position: "relative", width: cw, height: ch, overflow: "hidden" }}>
+                <SyncedVideo t={clamp(lt, 0, 3.799)} duration={3.8} webm="media/editorial/grid.webm" mp4="media/editorial/grid.mp4"
+                  style={{ inset: "auto", left: -p.q[0] * cw, top: -p.q[1] * ch, width: cw * 2, height: ch * 2, objectFit: "fill" }} />
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 6, alignItems: "baseline", marginTop: 7, fontFamily: FONT, color: INK }}>
+              <span style={{ fontWeight: 700, fontSize: 11 }}>{p.name}</span>
+              <span style={{ fontWeight: 600, fontSize: 9.5, color: "#5A5D63" }}>{p.seg}</span>
+            </div>
+          </div>
+        );
+      })}
     </>
   );
 }
@@ -827,9 +886,7 @@ function Frame({ t, format = "3x4" }) {
       <Flashes t={t} H={H} list={FLASH_A} />
       <Card t={t} H={H} from={1.0} to={2.4} clipStart={0} fy={0.42} stackFrom={16} />
       <Filmstrip t={t} H={H} from={2.35} dur={0.65} first={10} />
-      <Flashes t={t} H={H} list={FLASH_G} />
-      <Card t={t} H={H} from={8.6} to={10.4} clipStart={2} fy={0.55} stackFrom={20} />
-      <Filmstrip t={t} H={H} from={10.35} dur={0.75} first={4} />
+      <ProjectGrid t={t} H={H} />
       <EndCard t={t} H={H} />
       <Grain t={t} opacity={0.05} />
     </div>
@@ -847,20 +904,23 @@ function buildEvents() {
     hiss(A, w, { type: "highpass", f: 4000, dur: 0.025, v: 0.16 * v });
     tone(A, w, { type: "square", f: 1800, dur: 0.012, v: 0.025 * v });
   };
-  FLASH_A.concat(FLASH_G).forEach(([s], k) => add(s, (A, w) => shutter(A, w, k % 2 ? 0.8 : 1)));
+  FLASH_A.forEach(([s], k) => add(s, (A, w) => shutter(A, w, k % 2 ? 0.8 : 1)));
   // pulso nas partes rápidas
-  [[0, 3], [7.2, 11.2]].forEach(([a, b]) => {
+  [[0, 3], [7.0, 11.0]].forEach(([a, b]) => {
     for (let tb = a; tb < b - 0.01; tb += 0.5) {
       add(tb, (A, w) => SND.kick(A, w, 0.7));
       add(tb + 0.25, (A, w) => SND.hat(A, w, 0.6, 0.3));
       add(tb, (A, w) => SND.sub(A, w, 33, 0.4, 0.5));
     }
   });
-  [1.0, 8.6].forEach((tc) => {
+  [1.0].forEach((tc) => {
     add(tc, (A, w) => SND.pop(A, w, 520, 0.22));
     add(tc, (A, w) => SND.whoosh(A, w, { dur: 0.35, from: 800, to: 3000, v: 0.15, pan: 0, panTo: 0 }));
   });
-  [2.35, 10.35].forEach((tc) => add(tc, (A, w) => SND.whoosh(A, w, { dur: 0.7, from: 300, to: 5000, v: 0.26, pan: 0, panTo: 0 })));
+  add(2.35, (A, w) => SND.whoosh(A, w, { dur: 0.7, from: 300, to: 5000, v: 0.26, pan: 0, panTo: 0 }));
+  // grade de projetos: um "pop" por card e whoosh na saída
+  PROJECTS.forEach((_, k) => add(GRID.from + k * 0.16, (A, w) => SND.pop(A, w, [520, 620, 740, 880][k], 0.2)));
+  add(GRID.to - 0.6, (A, w) => SND.whoosh(A, w, { dur: 0.6, from: 400, to: 5000, v: 0.26, pan: 0, panTo: 0 }));
   // frase: toque por palavra + respiro harmônico
   WORD_T.forEach((tw, i) => add(tw, (A, w) => SND.bell(A, w, [72, 74, 76, 79, 81, 84][i], 0.55, -0.2 + i * 0.08)));
   add(3.0, (A, w) => SND.pad(A, w, [48, 55, 59, 64], 4.2, 1500, 1));
@@ -884,6 +944,6 @@ const MOTION = { Frame, duration: DURATION, formats: FORMATS, renderWav, loop: t
 export default function EditorialReel() {
   return (
     <MotionPlayer Frame={Frame} duration={DURATION} events={EVENTS} formats={FORMATS} defaultFormat="3x4" renderWav={renderWav}
-      scenes={[{ name: "Telas", from: 0 }, { name: "Frase", from: 3 }, { name: "Telas", from: 7.2 }, { name: "Logo", from: 12 }]} />
+      scenes={[{ name: "Telas", from: 0 }, { name: "Frase", from: 3 }, { name: "Projetos", from: 7 }, { name: "Logo", from: 12 }]} />
   );
 }
