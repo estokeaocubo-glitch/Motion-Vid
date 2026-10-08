@@ -1993,6 +1993,9 @@ async function renderSoundtrackWav(sampleRate = 48000) {
   return btoa(bin);
 }
 
+// Usado pelo exportador de vídeo (scripts/export-video.cjs)
+const MOTION = { Frame, duration: DURATION, formats: { "9x16": { w: W, h: H } }, renderWav: () => renderSoundtrackWav() };
+
 /* =============================================================================
    Player (controles discretos fora do frame)
 ============================================================================= */

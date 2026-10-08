@@ -1,11 +1,35 @@
-# Estoke ao Cubo — Promo 9:16
+# Estoke ao Cubo — Motions
 
-Vídeo promocional vertical (Reels/TikTok, 40s) em React, para a venda de sites e lojas virtuais da Estoke ao Cubo.
+Motions em React para a Estoke ao Cubo, com timeline determinística, som sintetizado e exportação para MP4.
+
+| Motion | Duração | Formatos | Fonte | Vídeos |
+|---|---|---|---|---|
+| Promo (venda de sites e lojas) | 40s | 9:16 | `src/EstokeAoCuboPromo.jsx` | `dist/estoke-ao-cubo-reels.mp4` |
+| Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
+
+`src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## Carrossel Padrão Portfólio
+
+Releitura do projeto OpenShot `01_Carrossel_Padrao_Portfolio.zip`, mantendo a estrutura original: cubo de cristal fixo no centro, 9 clientes em órbita 3D e 1 segundo de destaque por cliente, na ordem dos marcadores do projeto (Ruppel, Arteiro, Dizzy, Kaiirós, K Dust, LCS, Vicente, Yuri Miguez, OP Studio's).
+
+- Movimento "passo e pausa": giro de 40° com overshoot (0,6s) e pausa para ler o logo (0,4s). Nove passos fecham 360°, então o último quadro emenda no primeiro.
+- Profundidade: escala, brilho e desfoque (profundidade de campo) pela posição na órbita; reflexo no chão para os logos da frente; anel ciano girando e brilho varrendo o logo que chega à frente.
+- Cubo central com raios de luz e brilho que pulsa a cada chegada.
+- Nome do cliente com revelação por máscara, segmento, contador 01/09 e a frase "Sua marca pode ser a próxima."
+- Trilha em loop de 9s a 120 BPM (um cliente a cada dois tempos), whoosh a cada giro e uma nota de sino por chegada. O WAV é renderizado em dois ciclos e usa o segundo, para o áudio também emendar sem corte.
+- Para trocar clientes: edite `CLIENTS` em `src/PortfolioCarousel.jsx`, coloque o logo (círculo, PNG/WebP) em `assets/clients/`, adicione o id na lista de `scripts/build-assets.mjs` e ajuste `DURATION` para o número de clientes.
+
+---
+
+# Promo 9:16
+
+Vídeo promocional vertical (Reels/TikTok, 40s) para a venda de sites e lojas virtuais.
 
 - `dist/EstokeAoCuboPromo.artifact.jsx`: arquivo único, com fontes e logo embutidos. Cole direto num Claude Artifact (React).
 - `dist/estoke-ao-cubo-reels.mp4`: o vídeo final, 1080×1920, 30fps, H.264 + AAC, pronto para postar.
 - `dist/estoke-ao-cubo.html`: preview standalone (React UMD + Babel via CDN).
-- `src/EstokeAoCuboPromo.jsx` + `src/brandAssets.js`: código-fonte. Depois de editar, rode `node scripts/build-assets.mjs` (se mudou algo em `assets/`) e `node scripts/build-html.mjs`.
+- Depois de editar qualquer motion, rode `node scripts/build-assets.mjs` (se mudou algo em `assets/`) e `node scripts/build-html.mjs`. Os dois motions saem como `dist/<Nome>.artifact.jsx` (arquivo único para Claude Artifact) e `dist/<nome>.html`.
 
 ## Identidade aplicada (v2, a partir de `design` e `deesign.pdf`)
 
@@ -32,10 +56,12 @@ Revelação por máscara nos títulos, motion blur direcional (câmera dos cards
 ```bash
 npm i -D playwright && npx playwright install chromium   # uma vez; precisa de ffmpeg no PATH
 node scripts/build-html.mjs
-node scripts/export-video.cjs dist/estoke-ao-cubo-reels.mp4 30
+node scripts/export-video.cjs dist/estoke-ao-cubo.html dist/estoke-ao-cubo-reels.mp4 30
+node scripts/export-video.cjs dist/portfolio-carrossel.html dist/portfolio-carrossel-9x16.mp4 60 9x16
+node scripts/export-video.cjs dist/portfolio-carrossel.html dist/portfolio-carrossel-4x5.mp4 60 4x5
 ```
 
-O script captura os 1200 quadros seguindo a timeline e junta com a trilha renderizada offline.
+O script captura cada quadro seguindo a timeline (1080 de largura) e junta com a trilha renderizada offline.
 
 ## Roteiro
 

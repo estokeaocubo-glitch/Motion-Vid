@@ -22,3 +22,13 @@ export const CUBE_LOGO_SRC = "data:image/webp;base64,${b64("cube-logo.webp")}";
 `;
 writeFileSync(resolve(root, "src/brandAssets.js"), out);
 console.log("src/brandAssets.js", Math.round(out.length / 1024) + "KB");
+
+// Logos dos clientes do portfólio (assets/clients/*.webp → src/portfolioAssets.js)
+const clients = ["ruppel", "arteiro", "dizzy", "kaiiros", "k-dust", "lcs", "vicente", "yuri-miguez", "op-studios"];
+const portfolio = `// Arquivo gerado por scripts/build-assets.mjs — não editar à mão.
+export const CLIENT_LOGOS = {
+${clients.map((c) => `  "${c}": "data:image/webp;base64,${b64(`clients/${c}.webp`)}",`).join("\n")}
+};
+`;
+writeFileSync(resolve(root, "src/portfolioAssets.js"), portfolio);
+console.log("src/portfolioAssets.js", Math.round(portfolio.length / 1024) + "KB");

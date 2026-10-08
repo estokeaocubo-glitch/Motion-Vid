@@ -1,35 +1,61 @@
-// Gera, a partir de src/:
-//  - dist/EstokeAoCuboPromo.artifact.jsx: arquivo único (com fontes e logo embutidos) para colar num Claude Artifact
-//  - dist/estoke-ao-cubo.html: preview standalone (React UMD + Babel standalone via CDN)
+// Para cada motion, gera a partir de src/:
+//  - dist/<Nome>.artifact.jsx: arquivo único (módulos locais, fontes e logos embutidos) para colar num Claude Artifact
+//  - dist/<slug>.html: preview standalone (React UMD + Babel standalone via CDN)
 // Rode `node scripts/build-assets.mjs` antes se trocar algo em assets/.
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const read = (f) => readFileSync(resolve(root, f), "utf8");
+const ENTRIES = [
+  { src: "src/EstokeAoCuboPromo.jsx", name: "EstokeAoCuboPromo", slug: "estoke-ao-cubo", title: "Estoke ao Cubo Promo" },
+  { src: "src/PortfolioCarousel.jsx", name: "PortfolioCarousel", slug: "portfolio-carrossel", title: "Carrossel Portfólio" },
+];
+const IMPORT_RE = /^import\s+([\s\S]+?)\s+from\s+["'](.+?)["'];?[ \t]*$/gm;
 
-const assets = read("src/brandAssets.js")
-  .replace(/^\/\/.*$/m, "")
-  .replace(/^export /gm, "")
-  .trim();
-const component = read("src/EstokeAoCuboPromo.jsx").replace(/^import .*?from\s+["']\.\/brandAssets["'];?\s*$/m, "");
+// Junta o arquivo e seus imports locais (recursivo, sem duplicar) num único script
+function bundle(entry) {
+  const hooks = new Set();
+  const seen = new Set();
+  const chunks = [];
+  const visit = (file, isEntry) => {
+    if (seen.has(file)) return;
+    seen.add(file);
+    let code = readFileSync(file, "utf8");
+    const deps = [];
+    code = code.replace(IMPORT_RE, (_, what, from) => {
+      if (from === "react") {
+        const m = what.match(/\{([^}]*)\}/);
+        if (m) m[1].split(",").map((s) => s.trim()).filter(Boolean).forEach((h) => hooks.add(h));
+        return "";
+      }
+      if (from.startsWith(".")) {
+        const base = resolve(dirname(file), from);
+        const dep = [base, `${base}.js`, `${base}.jsx`].find((p) => existsSync(p) && !p.endsWith("/"));
+        if (!dep) throw new Error(`Import não encontrado: ${from} em ${file}`);
+        deps.push(dep);
+        return "";
+      }
+      throw new Error(`Import externo não suportado no artifact: ${from}`);
+    });
+    deps.forEach((d) => visit(d, false));
+    if (!isEntry) code = code.replace(/^export\s+(?=(const|function|let|class|async)\b)/gm, "");
+    chunks.push(`/* ---- ${file.replace(root + "/", "")} ---- */\n${code.trim()}\n`);
+  };
+  visit(resolve(root, entry.src), true);
+  return { hooks: [...hooks], body: chunks.join("\n") };
+}
 
-// 1) Single-file JSX para Artifact
-const single = component.replace(
-  /(^import .*?from\s+["']react["'];?\s*$)/m,
-  `$1\n\n/* ---------- Assets da marca embutidos (fontes Archivo + Open Sauce Sans, OFL; logo do cubo) ---------- */\n${assets}\n`,
-);
 mkdirSync(resolve(root, "dist"), { recursive: true });
-writeFileSync(resolve(root, "dist/EstokeAoCuboPromo.artifact.jsx"), single);
+for (const e of ENTRIES) {
+  const { hooks, body } = bundle(e);
+  const reactLine = `import React${hooks.length ? `, { ${hooks.join(", ")} }` : ""} from "react";`;
+  writeFileSync(resolve(root, `dist/${e.name}.artifact.jsx`), `${reactLine}\n\n${body}`);
 
-// 2) HTML standalone
-const browserSrc = single
-  .replace(/^import .*?from\s+["']react["'];?\s*$/m, "const { useState, useEffect, useRef, useCallback } = React;")
-  .replace("export default function EstokeAoCuboPromo", "function EstokeAoCuboPromo")
-  .replace(/<\/script/gi, "<\\/script");
-
-const html = `<title>Estoke ao Cubo Promo</title>
+  const browserSrc = body
+    .replace(`export default function ${e.name}`, `function ${e.name}`)
+    .replace(/<\/script/gi, "<\\/script");
+  const html = `<title>${e.title}</title>
 <style>
   :root { color-scheme: dark; }
   html, body, #root { height: 100%; }
@@ -40,9 +66,11 @@ const html = `<title>Estoke ao Cubo Promo</title>
 <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
 <div id="root"></div>
 <script type="text/babel" data-presets="react">
+const { ${hooks.join(", ")} } = React;
 ${browserSrc}
-ReactDOM.createRoot(document.getElementById("root")).render(<EstokeAoCuboPromo />);
+ReactDOM.createRoot(document.getElementById("root")).render(<${e.name} />);
 </script>
 `;
-writeFileSync(resolve(root, "dist/estoke-ao-cubo.html"), html);
-console.log("dist/EstokeAoCuboPromo.artifact.jsx\ndist/estoke-ao-cubo.html");
+  writeFileSync(resolve(root, `dist/${e.slug}.html`), html);
+  console.log(`dist/${e.name}.artifact.jsx  dist/${e.slug}.html`);
+}
