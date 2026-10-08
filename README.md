@@ -7,12 +7,22 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Promo (venda de sites e lojas) | 40s | 9:16 | `src/EstokeAoCuboPromo.jsx` | `dist/estoke-ao-cubo-reels.mp4` |
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
+| Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
 | Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/misu.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
 | Apresentação de site: LCS | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/lcs.js` | `dist/lcs-apresentacao-9x16.mp4`, `dist/lcs-apresentacao-4x5.mp4` |
 | Apresentação de site: Noka | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/noka.js` | `dist/noka-apresentacao-9x16.mp4`, `dist/noka-apresentacao-4x5.mp4` |
 | Apresentação de site: Dizzy | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/dizzy.js` | `dist/dizzy-apresentacao-9x16.mp4`, `dist/dizzy-apresentacao-4x5.mp4` |
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## Reel editorial (EditorialReel)
+
+Baseado na referência `480b5a3c102f16d5e0f18163fff49041_720w.mp4` (commit "New Motion"): fundo cinza-claro, tipografia grande, telas de sites piscando, card de página em destaque e coluna de telas subindo. As telas da referência foram trocadas pelas dos nossos projetos e o texto pelo foco em venda de site, terminando com o logo e a fonte da marca.
+
+- 0–1s: 8 telas piscando (0,12s cada) · 1–2,4s: card com a moeda 3D da Dizzy e telas empilhadas · 2,4–3s: coluna de telas subindo · 3–4,8s: "Sites que transformam visitas em vendas." letra por letra (Open Sauce Sans) · 7,2–11s: telas, card com o prato girando da Misú e coluna por cima da frase · 12–14s: logo (cubo + Archivo larga), "Sites e lojas virtuais que vendem." e "Solicite seu orçamento →".
+- Telas: 27 prints das gravações (Misú, LCS, Noka, Dizzy) em `dist/media/editorial/s00–s26.webp`; cards animados em `dist/media/editorial/cards.*`.
+- Som: pulso nas partes rápidas, clique de obturador em cada tela, whoosh na coluna, um toque por palavra da frase e acorde no logo.
+- Formatos 3:4 (o da referência e do grid do Instagram, 1080×1440) e 9:16.
 
 ## Reel de portfólio no monitor (MonitorReel)
 
@@ -119,6 +129,8 @@ node scripts/export-video.cjs dist/dizzy-apresentacao.html dist/dizzy-apresentac
 node scripts/export-video.cjs dist/dizzy-apresentacao.html dist/dizzy-apresentacao-4x5.mp4 30 4x5
 node scripts/export-video.cjs dist/reel-monitor.html dist/reel-portfolio-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/reel-monitor.html dist/reel-portfolio-4x5.mp4 60 4x5
+node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-3x4.mp4 30 3x4
+node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-9x16.mp4 30 9x16
 ```
 
 O script captura cada quadro seguindo a timeline (1080 de largura) e junta com a trilha renderizada offline.
