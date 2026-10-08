@@ -4,6 +4,7 @@ import {
   Grain, CubeLogo, SND, renderEventsWav, MotionPlayer,
 } from "./motionKit";
 import { FLOW_SHOTS } from "./flowAssets";
+import { FLOW_VARIANT } from "./flow/variant";
 
 /* =============================================================================
    Estoke ao Cubo — "Venda no automático" (fluxo → projetos → cubo)
@@ -17,30 +18,35 @@ import { FLOW_SHOTS } from "./flowAssets";
    "VENDA" e "no automático".
 ============================================================================= */
 const DURATION = 18;
-const FORMATS = {
+const ALL_FORMATS = {
   "16x9": { w: 800, h: 450, label: "16:9" },
   "9x16": { w: 450, h: 800, label: "9:16" },
+  story: { w: 450, h: 800, label: "Story" },
 };
+const FORMATS = Object.fromEntries(FLOW_VARIANT.formats.map((f) => [f, ALL_FORMATS[f]]));
 // z: zoom base da câmera · R: raio do cubo final · stack: palavras acima/abaixo do cubo
 const LAYOUT = {
   "16x9": { z: 1, R: 62, stack: false, word: 34, cam: "wide" },
   "9x16": { z: 1, R: 70, stack: true, word: 34, cam: "tall" },
+  // Story: fluxo em escadinha vertical (preenche a altura), conteúdo fora das faixas de
+  // interface do Instagram (~14% no topo, ~20% no rodapé) e chamada no final
+  story: { z: 1, R: 74, stack: true, word: 38, cam: "story", nodes: "story", spreadY: 1.7, cy: 0.47, mark: 186, cta: true, ctaY: 84 },
 };
 const T = { morph: 6.1, morphEnd: 7.3, burst: 8.45, round: 10.5, collapse: 11.1, line: 12.2, draw: 12.6, cube: 14.3, words: 14.55, mark: 15.6 };
 
 /* ---------- Fluxo (coordenadas de mundo) ---------- */
-const CW = 320;
+const CW = 340;
 const CHH = 58;
 const DOT = 36;
 const NODES = [
-  { label: "Pedido recebido", pill: "Agora", icon: "bag", x: 0, y: 0, d: [0, 0], t: 0.35 },
-  { label: "Baixa no estoque", pill: "Automático", icon: "box", x: 0, y: 84, d: [0, 58], t: 1.05 },
-  { label: "NF-e emitida", pill: "Em 1 min", icon: "receipt", x: 0, y: 168, d: [0, 116], t: 1.75 },
-  { label: "Etiqueta de envio", pill: "Em 5 min", icon: "tag", x: 360, y: 168, d: [64, 116], t: 2.45 },
-  { label: "Cliente no WhatsApp", pill: "Em 10 min", icon: "chat", x: 360, y: 252, d: [64, 174], t: 3.15 },
-  { label: "Estoque baixo?", pill: "Verificar", icon: "alert", x: 720, y: 252, d: [128, 174], t: 3.85 },
-  { label: "Pedido ao fornecedor", pill: "Automático", icon: "truck", x: 720, y: 336, d: [128, 232], t: 4.55 },
-  { label: "Pedir avaliação", pill: "Após 3 dias", icon: "star", x: 720, y: 420, d: [128, 290], t: 5.25 },
+  { label: "Pedido recebido", pill: "Agora", icon: "bag", x: 0, y: 0, d: [0, 0], t: 0.35, s: [-24, 0] },
+  { label: "Baixa no estoque", pill: "Automático", icon: "box", x: 0, y: 84, d: [0, 58], t: 1.05, s: [-24, 84] },
+  { label: "NF-e emitida", pill: "Em 1 min", icon: "receipt", x: 0, y: 168, d: [0, 116], t: 1.75, s: [-24, 168] },
+  { label: "Etiqueta de envio", pill: "Em 5 min", icon: "tag", x: 360, y: 168, d: [64, 116], t: 2.45, s: [0, 252] },
+  { label: "Cliente no WhatsApp", pill: "Em 10 min", icon: "chat", x: 360, y: 252, d: [64, 174], t: 3.15, s: [0, 336] },
+  { label: "Estoque baixo?", pill: "Verificar", icon: "alert", x: 720, y: 252, d: [128, 174], t: 3.85, s: [24, 420] },
+  { label: "Pedido ao fornecedor", pill: "Automático", icon: "truck", x: 720, y: 336, d: [128, 232], t: 4.55, s: [24, 504] },
+  { label: "Pedir avaliação", pill: "Após 3 dias", icon: "star", x: 720, y: 420, d: [128, 290], t: 5.25, s: [24, 588] },
 ];
 const KEEP = [4, 5, 6, 7]; // viram os 4 pontos brancos que desenham o cubo
 const ICON_PATHS = {
@@ -68,10 +74,10 @@ const CAM = [
   [1.75, 100, 130, 1.42],
   [2.45, 230, 170, 1.32],
   [3.15, 330, 215, 1.25],
-  [3.85, 500, 250, 1.15],
-  [4.55, 580, 300, 1.08],
-  [5.25, 600, 330, 1.02],
-  [6.1, 360, 210, 0.74],
+  [3.85, 545, 250, 1.15],
+  [4.55, 600, 300, 1.08],
+  [5.25, 615, 330, 1.02],
+  [6.1, 360, 210, 0.72],
   [7.3, 64, 145, 1.45],
   [8.3, 128, 300, 1.4],
   [9.3, 115, 390, 1.12],
@@ -93,7 +99,22 @@ const CAM_TALL = [
   [9.3, 118, 400, 0.8],
   [11.1, 120, 390, 0.86],
 ];
-const CAMS = { wide: CAM, tall: CAM_TALL };
+const CAM_STORY = [
+  [0, 0, 70, 1.08],
+  [1.05, 0, 110, 1.08],
+  [1.75, 0, 160, 1.08],
+  [2.45, 0, 225, 1.08],
+  [3.15, 0, 290, 1.08],
+  [3.85, 0, 355, 1.08],
+  [4.55, 0, 420, 1.07],
+  [5.25, 0, 470, 1.06],
+  [6.1, 0, 324, 0.8],
+  [7.3, 64, 150, 1.6],
+  [8.3, 128, 300, 1.5],
+  [9.3, 112, 470, 0.78],
+  [11.1, 116, 460, 0.84],
+];
+const CAMS = { wide: CAM, tall: CAM_TALL, story: CAM_STORY };
 function camAt(t, which = "wide") {
   const K = CAMS[which];
   if (t <= K[0][0]) return { x: K[0][1], y: K[0][2], z: K[0][3] };
@@ -133,16 +154,17 @@ function FlowBg({ t, W, H }) {
 }
 
 /* ---------- Fluxo no mundo (cards → bolinhas) ---------- */
-function nodeGeom(n, t) {
+function nodeGeom(n, t, L) {
   const m = easeInOut(prog(t, T.morph, T.morphEnd));
-  return { m, x: lerp(n.x, n.d[0], m), y: lerp(n.y, n.d[1], m), w: lerp(CW, DOT, m), h: lerp(CHH, DOT, m) };
+  const [bx, by] = L.nodes === "story" ? n.s : [n.x, n.y];
+  return { m, x: lerp(bx, n.d[0], m), y: lerp(by, n.d[1], m), w: lerp(CW, DOT, m), h: lerp(CHH, DOT, m) };
 }
 function Flow({ t, W, H, L }) {
   const cam = camAt(t, L.cam);
   const z = cam.z * L.z;
   const fade = 1 - prog(t, T.collapse - 0.25, T.collapse + 0.1);
   const iconOut = prog(t, T.round, T.collapse - 0.1); // ícones somem, bolinhas ficam brancas lisas
-  const geo = NODES.map((n) => nodeGeom(n, t));
+  const geo = NODES.map((n) => nodeGeom(n, t, L));
   return (
     <div style={{ position: "absolute", left: 0, top: 0, transformOrigin: "0 0", transform: `translate(${W / 2}px, ${H / 2}px) scale(${z}) translate(${-cam.x}px, ${-cam.y}px)` }}>
       {/* conexões */}
@@ -191,7 +213,7 @@ function Flow({ t, W, H, L }) {
             </div>
             {textO > 0 && (
               <>
-                <div style={{ position: "absolute", left: 54, top: 0, height: g.h, display: "flex", alignItems: "center", fontFamily: FONT, fontWeight: 600, fontSize: 15, color: "#FFFFFF", whiteSpace: "nowrap", opacity: textO, letterSpacing: "-0.01em" }}>
+                <div style={{ position: "absolute", left: 54, top: 0, height: g.h, display: "flex", alignItems: "center", fontFamily: FONT, fontWeight: 600, fontSize: 14.5, color: "#FFFFFF", whiteSpace: "nowrap", opacity: textO, letterSpacing: "-0.01em" }}>
                   {n.label}
                 </div>
                 <div style={{
@@ -206,7 +228,7 @@ function Flow({ t, W, H, L }) {
           </div>
         );
       })}
-      <Projects t={t} />
+      <Projects t={t} L={L} />
     </div>
   );
 }
@@ -220,7 +242,7 @@ const SHOTS = [
   { img: "nokaLogo", w: 104, h: 100, dx: 190, dy: 80, rot: 6, ry: -18, d: 0.28 },
   { img: "dizzy", w: 156, h: 98, dx: 58, dy: 92, rot: -2, ry: 6, d: 0.35 },
 ];
-function Projects({ t }) {
+function Projects({ t, L }) {
   if (t < T.burst - 0.05 || t > T.collapse + 0.2) return null;
   const [ox, oy] = NODES[NODES.length - 1].d;
   return SHOTS.map((s, i) => {
@@ -230,7 +252,7 @@ function Projects({ t }) {
     const back = easeIn(prog(t, T.collapse - 0.35 + s.d * 0.2, T.collapse + 0.05));
     const fl = Math.sin(t * 1.6 + i * 1.9) * 5;
     const x = ox + s.dx * clamp(a, 0, 1.1) * (1 - back);
-    const y = oy + (s.dy + fl) * clamp(a, 0, 1.1) * (1 - back);
+    const y = oy + (s.dy * (L.spreadY || 1) + fl) * clamp(a, 0, 1.1) * (1 - back);
     const w = lerp(s.w, 18, q);
     const h = lerp(s.h, 18, q);
     return (
@@ -261,7 +283,7 @@ function hexAlong(cx, cy, R, f) {
 function Finale({ t, W, H, L }) {
   if (t < T.collapse - 0.02) return null;
   const cx = W / 2;
-  const cy = L.stack ? H * 0.48 : H / 2;
+  const cy = L.stack ? H * (L.cy || 0.48) : H / 2;
   const R = L.R;
   const cam = camAt(T.collapse, L.cam);
   const z = cam.z * L.z;
@@ -289,6 +311,7 @@ function Finale({ t, W, H, L }) {
   const wl = wordP(T.words);
   const wr = wordP(T.words + 0.4);
   const mark = easeOut(prog(t, T.mark, T.mark + 0.6));
+  const cta = spring(t - T.mark - 0.35, { stiffness: 150, damping: 13 });
   const drift = 1 + easeOut(prog(t, T.cube, DURATION)) * 0.04;
   const wordStyle = (p) => ({
     clipPath: `inset(-20% ${(1 - p) * 100}% -20% 0)`, filter: p < 1 ? `blur(${(1 - p) * 6}px)` : "none", opacity: clamp(p * 2),
@@ -336,15 +359,28 @@ function Finale({ t, W, H, L }) {
           <div style={{ position: "absolute", left: cx + R + 40, top: cy - L.word * 0.7, fontFamily: FONT, fontWeight: 700, fontSize: L.word, letterSpacing: "-0.03em", color: "#FFFFFF", ...wordStyle(wr) }}>no automático</div>
         </>
       )}
+      {L.cta && cta > 0 && (
+        <div style={{ position: "absolute", left: 0, right: 0, top: cy + R + (L.ctaY || 104), display: "flex", justifyContent: "center", opacity: clamp(cta * 2) }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8, height: 44, padding: "0 22px", borderRadius: 99, background: "#FFFFFF", color: C.ink,
+            fontFamily: FONT, fontWeight: 800, fontSize: 15.5, letterSpacing: "-0.02em", whiteSpace: "nowrap", position: "relative", overflow: "hidden",
+            transform: `scale(${clamp(cta, 0, 1.2)})`, boxShadow: `0 14px 30px rgba(0,20,50,.3), 0 0 30px ${hexA(C.cyan, 0.35)}`,
+          }}>
+            Solicite seu orçamento
+            <svg width="15" height="15" viewBox="0 0 16 16"><path d="M3 8 H12 M8.5 4 L12.5 8 L8.5 12" fill="none" stroke={C.ink} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            <div style={{ position: "absolute", top: -20, bottom: -20, width: 40, left: `${lerp(-20, 120, ((t - T.mark) % 1.8) / 1.8)}%`, transform: "rotate(20deg)", background: `linear-gradient(90deg, ${hexA(C.cyan, 0)}, ${hexA(C.cyan, 0.35)}, ${hexA(C.cyan, 0)})` }} />
+          </div>
+        </div>
+      )}
       <div style={{
-        position: "absolute", left: 0, right: 0, bottom: L.stack ? 90 : 34, textAlign: "center", ...DISP, fontSize: 11, letterSpacing: ".18em",
+        position: "absolute", left: 0, right: 0, bottom: L.mark || (L.stack ? 90 : 34), textAlign: "center", ...DISP, fontSize: 11, letterSpacing: ".18em",
         color: "rgba(255,255,255,.85)", opacity: mark, transform: `translateY(${(1 - mark) * 8}px)`,
       }}>Estoke ao Cubo</div>
     </div>
   );
 }
 
-function Frame({ t, format = "16x9" }) {
+function Frame({ t, format = FLOW_VARIANT.defaultFormat }) {
   const F = FORMATS[format];
   const L = LAYOUT[format];
   const p = { t, W: F.w, H: F.h, L };
@@ -428,6 +464,7 @@ function buildEvents() {
   add(T.words, (A, w) => SND.swipe(A, w, 0.7));
   add(T.words + 0.4, (A, w) => SND.swipe(A, w, 0.7));
   add(T.mark, (A, w) => SND.bell(A, w, 86, 0.6));
+  if (FLOW_VARIANT.defaultFormat === "story") add(T.mark + 0.35, (A, w) => { SND.pop(A, w, 640, 0.14); SND.bell(A, w + 0.05, 91, 0.6, 0.3); });
   return ev.sort((a, b) => a.t - b.t);
 }
 const EVENTS = buildEvents();
@@ -438,7 +475,7 @@ const MOTION = { Frame, duration: DURATION, formats: FORMATS, renderWav };
 
 export default function FlowReveal() {
   return (
-    <MotionPlayer Frame={Frame} duration={DURATION} events={EVENTS} formats={FORMATS} defaultFormat="16x9" renderWav={renderWav}
+    <MotionPlayer Frame={Frame} duration={DURATION} events={EVENTS} formats={FORMATS} defaultFormat={FLOW_VARIANT.defaultFormat} renderWav={renderWav}
       scenes={[
         { name: "Fluxo", from: 0 },
         { name: "Zoom out", from: T.morph },

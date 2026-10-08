@@ -8,7 +8,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
-| "Venda no automático" (fluxo → projetos → cubo) | 18s | 16:9 e 9:16 | `src/FlowReveal.jsx` | `dist/fluxo-automatico-16x9.mp4`, `dist/fluxo-automatico-9x16.mp4` |
+| "Venda no automático" (fluxo → projetos → cubo) | 18s | 16:9, 9:16 e Story | `src/FlowReveal.jsx` + `src/flow/` | `dist/fluxo-automatico-16x9.mp4`, `dist/fluxo-automatico-9x16.mp4`, `dist/fluxo-automatico-story.mp4` |
 | SaaS Gestão de Estoque | 52s + corte de 21s | 9:16 e 4:5 | `src/InventorySaaS.jsx` + `src/saas/` | `dist/saas-estoque-9x16.mp4`, `dist/saas-estoque-4x5.mp4`, `dist/saas-estoque-curto-9x16.mp4`, `dist/saas-estoque-curto-4x5.mp4` |
 | Pasta "Nossos clientes" | 5,2s, loop | 9:16 e 4:5 | `src/FolderReveal.jsx` | `dist/pasta-clientes-9x16.mp4`, `dist/pasta-clientes-4x5.mp4` |
 | Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/misu.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
@@ -28,6 +28,7 @@ Baseado na referência `587c2d7b4c2af98f4c64e2a105233105_720w.mp4` (commit "gere
 - **11–18s Cubo**: tudo colapsa em 4 pontos brancos ligados por uma linha, ondas concêntricas, os pontos desenham o hexágono e o "Y" do cubo e o cubo de vidro da logo se materializa; "VENDA" (Monument) e "no automático" (Open Sauce) se revelam dos lados (em cima/embaixo no 9:16) e "Estoke ao Cubo" assina.
 - Fundo: gradiente navy → azul → sky com manchas de luz gelo/ciano que derivam, e grão.
 - Câmera própria para o 9:16 (segue cada card de perto, já que o fluxo é largo).
+- **Versão Story** (`dist/fluxo-automatico-story.html`, variante em `src/flow/story.js`): o fluxo desce em escadinha vertical e preenche a altura, o panorama mostra o fluxo inteiro legível, todo o conteúdo importante fica fora das faixas de interface do Instagram (~14% no topo, ~20% no rodapé) e o final ganha o botão "Solicite seu orçamento".
 - Som: 100 BPM (Ré maior), pad + batida suave; cada card toca uma nota subindo, whoosh no zoom out, pops nos projetos, queda e ondas graves no colapso, sinos subindo no desenho do cubo e o "plim" de vidro da marca.
 - Imagens dos sites: `src/flowAssets.js`, gerado por `bash scripts/build-flow-assets.sh` a partir das gravações em `dist/media/`.
 
@@ -184,6 +185,7 @@ node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-9x16.
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-4x5.mp4 60 4x5
 node scripts/export-video.cjs dist/fluxo-automatico.html dist/fluxo-automatico-16x9.mp4 60 16x9
 node scripts/export-video.cjs dist/fluxo-automatico.html dist/fluxo-automatico-9x16.mp4 60 9x16
+node scripts/export-video.cjs dist/fluxo-automatico-story.html dist/fluxo-automatico-story.mp4 60 story
 node scripts/export-video.cjs dist/saas-estoque.html dist/saas-estoque-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/saas-estoque.html dist/saas-estoque-4x5.mp4 60 4x5
 node scripts/export-video.cjs dist/saas-estoque-curto.html dist/saas-estoque-curto-9x16.mp4 60 9x16
