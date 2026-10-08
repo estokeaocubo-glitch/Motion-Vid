@@ -10,6 +10,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const ENTRIES = [
   { src: "src/EstokeAoCuboPromo.jsx", name: "EstokeAoCuboPromo", slug: "estoke-ao-cubo", title: "Estoke ao Cubo Promo" },
   { src: "src/PortfolioCarousel.jsx", name: "PortfolioCarousel", slug: "portfolio-carrossel", title: "Carrossel Portfólio" },
+  // Só entra no build depois de capturar um site: node scripts/capture-site.cjs <url> showcase "Nome"
+  { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "showcase", title: "Apresentação de Site", needs: "src/sites/showcase.js" },
 ];
 const IMPORT_RE = /^import\s+([\s\S]+?)\s+from\s+["'](.+?)["'];?[ \t]*$/gm;
 
@@ -48,6 +50,10 @@ function bundle(entry) {
 
 mkdirSync(resolve(root, "dist"), { recursive: true });
 for (const e of ENTRIES) {
+  if (e.needs && !existsSync(resolve(root, e.needs))) {
+    console.log(`(pulando ${e.name}: falta ${e.needs})`);
+    continue;
+  }
   const { hooks, body } = bundle(e);
   const reactLine = `import React${hooks.length ? `, { ${hooks.join(", ")} }` : ""} from "react";`;
   writeFileSync(resolve(root, `dist/${e.name}.artifact.jsx`), `${reactLine}\n\n${body}`);

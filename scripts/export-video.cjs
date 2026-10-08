@@ -64,9 +64,11 @@ document.fonts.ready.then(() => {
   fs.writeFileSync(wav, Buffer.from(await page.evaluate(() => window.__cap.wav()), "base64"));
 
   console.log(`Capturando ${Math.round(duration * fps)} quadros a ${fps}fps (${Math.round(w * 2.4)}×${Math.round(h * 2.4)})…`);
+  // Tamanho final exato e par (yuv420p exige), ex.: 4:5 → 1080×1350
+  const even = (v) => Math.round(v / 2) * 2;
   const ff = spawn("ffmpeg", [
     "-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", String(fps), "-c:v", "mjpeg", "-i", "-", "-i", wav,
-    "-vf", "scale=trunc(iw/2)*2:trunc(ih/2)*2", "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p", "-profile:v", "high", "-r", String(fps),
+    "-vf", `scale=${even(w * 2.4)}:${even(h * 2.4)}:flags=lanczos`, "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p", "-profile:v", "high", "-r", String(fps),
     "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "-shortest", out,
   ], { stdio: ["pipe", "inherit", "inherit"] });
   const N = Math.round(duration * fps);
