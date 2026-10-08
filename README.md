@@ -6,12 +6,22 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 |---|---|---|---|---|
 | Promo (venda de sites e lojas) | 40s | 9:16 | `src/EstokeAoCuboPromo.jsx` | `dist/estoke-ao-cubo-reels.mp4` |
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
+| Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/misu.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
 | Apresentação de site: LCS | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/lcs.js` | `dist/lcs-apresentacao-9x16.mp4`, `dist/lcs-apresentacao-4x5.mp4` |
 | Apresentação de site: Noka | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/noka.js` | `dist/noka-apresentacao-9x16.mp4`, `dist/noka-apresentacao-4x5.mp4` |
 | Apresentação de site: Dizzy | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/dizzy.js` | `dist/dizzy-apresentacao-9x16.mp4`, `dist/dizzy-apresentacao-4x5.mp4` |
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## Reel de portfólio no monitor (MonitorReel)
+
+Baseado na referência `2072e941c9e055b17fd31f443fcd863b_720w.mp4`: monitor numa mesa escura, parede de ripas iluminada na cor do site que está na tela, cortes rápidos e uma parada final num site de destaque.
+
+- Tela: `dist/media/reel-sites.webm` / `.mp4`, montada das quatro gravações: 8 cortes de 0,5s (Misú hero · LCS hero · Noka hero · Dizzy Universe · Misú "Gira o prato" · LCS frota · Noka projetos · Dizzy catálogo), 2,5s da moeda 3D da Dizzy e 1,5s escuro, onde o componente desenha o cartão final da Estoke ("Seu site pode ser o próximo.").
+- A luz da parede troca de cor a cada corte (vermelho Misú, verde LCS, terracota Noka, vermelho Dizzy, azul Estoke), com um flash no corte; câmera na mão periódica no loop, aproximação lenta e "soco" de zoom em cada corte; teclado RGB desfocado em primeiro plano.
+- Trilha a 120 BPM: bumbo e clique em cada corte, clap no contratempo, baixo e arpejo; riser até a parada, drop com impacto e shimmer em 4s, e acorde final no cartão da Estoke.
+- Exportado em 60fps por causa dos cortes rápidos.
 
 ## Apresentações de site (DeviceShowcase)
 
@@ -107,6 +117,8 @@ node scripts/export-video.cjs dist/noka-apresentacao.html dist/noka-apresentacao
 node scripts/export-video.cjs dist/noka-apresentacao.html dist/noka-apresentacao-4x5.mp4 30 4x5
 node scripts/export-video.cjs dist/dizzy-apresentacao.html dist/dizzy-apresentacao-9x16.mp4 30 9x16
 node scripts/export-video.cjs dist/dizzy-apresentacao.html dist/dizzy-apresentacao-4x5.mp4 30 4x5
+node scripts/export-video.cjs dist/reel-monitor.html dist/reel-portfolio-9x16.mp4 60 9x16
+node scripts/export-video.cjs dist/reel-monitor.html dist/reel-portfolio-4x5.mp4 60 4x5
 ```
 
 O script captura cada quadro seguindo a timeline (1080 de largura) e junta com a trilha renderizada offline.

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
 
 /* ---- src/brandAssets.js ---- */
 // Arquivo gerado por scripts/build-assets.mjs — não editar à mão.
@@ -158,6 +158,44 @@ function Grain({ t, opacity = 0.09 }) {
       position: "absolute", inset: -40, zIndex: 85, pointerEvents: "none", backgroundImage: GRAIN_URL, backgroundSize: "180px 180px",
       opacity, mixBlendMode: "overlay", transform: `translate(${(f * 37) % 40}px, ${(f * 53) % 40}px)`,
     }} />
+  );
+}
+
+/* ---------- Vídeo sincronizado com a timeline ---------- */
+// No player: toca normalmente e corrige deriva/pausa junto com a timeline.
+// Na exportação (window.__CAPTURE): busca o quadro exato de cada instante.
+function SyncedVideo({ t, duration, webm, mp4, style }) {
+  const ref = useRef(null);
+  const last = useRef({ t: 0, at: 0 });
+  useLayoutEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    const target = ((t % duration) + duration) % duration;
+    if (typeof window !== "undefined" && window.__CAPTURE) {
+      if (!v.paused) v.pause();
+      if (Math.abs(v.currentTime - target) > 0.0005) v.currentTime = target;
+      return;
+    }
+    last.current = { t: target, at: performance.now() };
+    if (Math.abs(v.currentTime - target) > 0.15) v.currentTime = target;
+    if (v.paused) v.play().catch(() => {});
+  }, [t, duration]);
+  useEffect(() => {
+    const id = setInterval(() => {
+      const v = ref.current;
+      if (!v || window.__CAPTURE) return;
+      if (performance.now() - last.current.at > 150 && !v.paused) {
+        v.pause();
+        v.currentTime = last.current.t;
+      }
+    }, 80);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <video ref={ref} muted playsInline preload="auto" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block", ...style }}>
+      {webm && <source src={webm} type="video/webm" />}
+      {mp4 && <source src={mp4} type="video/mp4" />}
+    </video>
   );
 }
 
