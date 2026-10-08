@@ -13,6 +13,7 @@ const ENTRIES = [
   { src: "src/MonitorReel.jsx", name: "MonitorReel", slug: "reel-monitor", title: "Reel Portfólio" },
   { src: "src/EditorialReel.jsx", name: "EditorialReel", slug: "reel-editorial", title: "Reel Editorial" },
   { src: "src/FolderReveal.jsx", name: "FolderReveal", slug: "pasta-clientes", title: "Pasta de Clientes" },
+  { src: "src/FlowReveal.jsx", name: "FlowReveal", slug: "fluxo-automatico", title: "Venda no Automático" },
   { src: "src/InventorySaaS.jsx", name: "InventorySaaS", slug: "saas-estoque", title: "SaaS Gestão de Estoque" },
   { src: "src/InventorySaaS.jsx", name: "InventorySaaS", slug: "saas-estoque-curto", title: "SaaS Estoque (corte curto)", alias: { "./saas/variant": "src/saas/cut.js" } },
   // Apresentações de site: o mesmo DeviceShowcase com "./sites/current" apontando para cada site

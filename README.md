@@ -8,6 +8,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
+| "Venda no automático" (fluxo → projetos → cubo) | 18s | 16:9 e 9:16 | `src/FlowReveal.jsx` | `dist/fluxo-automatico-16x9.mp4`, `dist/fluxo-automatico-9x16.mp4` |
 | SaaS Gestão de Estoque | 52s + corte de 21s | 9:16 e 4:5 | `src/InventorySaaS.jsx` + `src/saas/` | `dist/saas-estoque-9x16.mp4`, `dist/saas-estoque-4x5.mp4`, `dist/saas-estoque-curto-9x16.mp4`, `dist/saas-estoque-curto-4x5.mp4` |
 | Pasta "Nossos clientes" | 5,2s, loop | 9:16 e 4:5 | `src/FolderReveal.jsx` | `dist/pasta-clientes-9x16.mp4`, `dist/pasta-clientes-4x5.mp4` |
 | Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/misu.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
@@ -16,6 +17,19 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Apresentação de site: Dizzy | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/dizzy.js` | `dist/dizzy-apresentacao-9x16.mp4`, `dist/dizzy-apresentacao-4x5.mp4` |
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## "Venda no automático" (FlowReveal)
+
+Baseado na referência `587c2d7b4c2af98f4c64e2a105233105_720w.mp4` (commit "gere com nosso design"), refeito com a identidade da Estoke ao Cubo:
+
+- **0–6s Fluxo**: cards de vidro surgem um a um, ligados por linhas, com a câmera acompanhando em spline suave e profundidade de campo: Pedido recebido → Baixa no estoque → NF-e emitida → Etiqueta de envio → Cliente no WhatsApp → Estoque baixo? → Pedido ao fornecedor → Pedir avaliação (cada um com selo de tempo: "Agora", "Em 5 min", "Após 3 dias"…).
+- **6–8,4s Zoom out**: panorama do fluxo; os cards encolhem até virar bolinhas brancas com ícone e a câmera desce pela cadeia.
+- **8,4–11s Projetos**: da última bolinha saem, em 3D, quadros dos sites que fizemos (LCS, Misú, Noka, Dizzy); flutuam e viram pontos.
+- **11–18s Cubo**: tudo colapsa em 4 pontos brancos ligados por uma linha, ondas concêntricas, os pontos desenham o hexágono e o "Y" do cubo e o cubo de vidro da logo se materializa; "VENDA" (Monument) e "no automático" (Open Sauce) se revelam dos lados (em cima/embaixo no 9:16) e "Estoke ao Cubo" assina.
+- Fundo: gradiente navy → azul → sky com manchas de luz gelo/ciano que derivam, e grão.
+- Câmera própria para o 9:16 (segue cada card de perto, já que o fluxo é largo).
+- Som: 100 BPM (Ré maior), pad + batida suave; cada card toca uma nota subindo, whoosh no zoom out, pops nos projetos, queda e ondas graves no colapso, sinos subindo no desenho do cubo e o "plim" de vidro da marca.
+- Imagens dos sites: `src/flowAssets.js`, gerado por `bash scripts/build-flow-assets.sh` a partir das gravações em `dist/media/`.
 
 ## SaaS Gestão de Estoque (InventorySaaS)
 
@@ -168,6 +182,8 @@ node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-3x4.m
 node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-4x5.mp4 60 4x5
+node scripts/export-video.cjs dist/fluxo-automatico.html dist/fluxo-automatico-16x9.mp4 60 16x9
+node scripts/export-video.cjs dist/fluxo-automatico.html dist/fluxo-automatico-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/saas-estoque.html dist/saas-estoque-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/saas-estoque.html dist/saas-estoque-4x5.mp4 60 4x5
 node scripts/export-video.cjs dist/saas-estoque-curto.html dist/saas-estoque-curto-9x16.mp4 60 9x16
