@@ -8,7 +8,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
-| SaaS Gestão de Estoque | 39,5s + corte de 16s | 9:16 e 4:5 | `src/InventorySaaS.jsx` + `src/saas/` | `dist/saas-estoque-9x16.mp4`, `dist/saas-estoque-4x5.mp4`, `dist/saas-estoque-curto-9x16.mp4`, `dist/saas-estoque-curto-4x5.mp4` |
+| SaaS Gestão de Estoque | 52s + corte de 21s | 9:16 e 4:5 | `src/InventorySaaS.jsx` + `src/saas/` | `dist/saas-estoque-9x16.mp4`, `dist/saas-estoque-4x5.mp4`, `dist/saas-estoque-curto-9x16.mp4`, `dist/saas-estoque-curto-4x5.mp4` |
 | Pasta "Nossos clientes" | 5,2s, loop | 9:16 e 4:5 | `src/FolderReveal.jsx` | `dist/pasta-clientes-9x16.mp4`, `dist/pasta-clientes-4x5.mp4` |
 | Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/misu.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
 | Apresentação de site: LCS | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/lcs.js` | `dist/lcs-apresentacao-9x16.mp4`, `dist/lcs-apresentacao-4x5.mp4` |
@@ -22,10 +22,12 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 Motion de produto (prompt mestre "Vídeo Motion Graphics SaaS - Sistema de Gestão de Estoque"), estética Apple/Linear com a identidade da Estoke ao Cubo: ícones 3D soft-matte desenhados em SVG (extrusão + luz especular), UI em glassmorphism, fundos alternando navy/preto e claro, feixes de luz azul e ciano, grão, títulos em Monument e textos em Open Sauce.
 
 Duas versões do mesmo código (`src/saas/variant.js` escolhe):
-- **Completa (39,5s)**: `dist/saas-estoque.html`.
-- **Corte curto (16s)** para Reels/anúncios: `dist/saas-estoque-curto.html`, montado com trechos da timeline completa listados em `src/saas/cut.js` (gancho, cubo, dashboard, automação, logo + CTA), todos em tempo de batida; a trilha é a da versão completa recortada nos mesmos pontos.
+- **Completa (52s)**: `dist/saas-estoque.html`.
+- **Corte curto (21s)** para Reels/anúncios: `dist/saas-estoque-curto.html`, montado com trechos da timeline completa listados em `src/saas/cut.js` (gancho, cubo, dashboard, automação, logo + CTA), todos em tempo de batida; a trilha é a da versão completa recortada nos mesmos pontos.
 
-Roteiro (versão completa):
+Ritmo: as cenas são desenhadas numa timeline de 39,5s ("história") e reproduzidas com uma curva de velocidade (`PACE`): trechos de leitura a 0,6–0,75× e transições a 1×, para todo texto ficar pelo menos ~1,5s parado na tela. A música é gerada direto no tempo final (120 BPM constantes); os efeitos seguem a curva.
+
+Roteiro (tempos da história; no vídeo final cada trecho fica ~1,3× mais longo):
 - **0–2s Gancho**: alerta e contador "−R$ 18.240 em vendas perdidas por falta de estoque" + "Cada ruptura é uma venda perdida."
 - **2–7s Do caos ao cubo**: planilhas, caixas, códigos de barras e notas flutuam inclinando em 3D e são sugados em espiral para dentro do cubo de vidro da logo, que pulsa e abre como portal. Texto: "Transforme o estoque bagunçado em um sistema fluido."
 - **7–14s Módulos**: o cubo vira um prisma 3D com a logo no topo; cada face é um módulo (Compras, Armazém, Vendas, Logística), com paradas elásticas, brilho de vidro na face ativa e rastro de movimento no giro. Texto: "Compras, Armazém, Vendas e Logística. Tudo em um só lugar."

@@ -15,7 +15,46 @@ import { VARIANT } from "./saas/variant";
    equipe abre o fundo escuro (4→5) e as barras sobem para o fundo final com a logo.
 ============================================================================= */
 const HOOK = 2.0; // gancho antes da cena 1: as cenas abaixo usam tempo local (t - HOOK)
-const FULL_DURATION = HOOK + 37.5;
+const STORY = HOOK + 37.5; // duração da "história" (tempo em que as cenas foram desenhadas)
+/* Ritmo: velocidade da história em cada trecho (tempo global da história; 1 = original).
+   Leituras ficam mais calmas (0,6–0,75), transições seguem rápidas (1). O vídeo final é a
+   história reproduzida com essa velocidade; a música é gerada direto no tempo final. */
+const PACE = [
+  [0, 0.6], [2.0, 0.6], [2.25, 0.72], [4.4, 0.72], [4.6, 0.85], [7.0, 0.85], [7.2, 0.72], [13.1, 0.72], [13.25, 1], [14.0, 1],
+  [14.15, 0.75], [21.25, 0.75], [21.35, 1], [22.0, 1], [22.15, 0.72], [29.25, 0.72], [29.35, 1], [30.15, 1], [30.3, 0.85],
+  [33.55, 0.85], [33.6, 1], [34.1, 1], [34.25, 0.75], [STORY, 0.75],
+];
+const PACE_H = 0.002;
+const PACE_OUT = (() => {
+  const speed = (u) => {
+    for (let i = 1; i < PACE.length; i++) if (u <= PACE[i][0]) return lerp(PACE[i - 1][1], PACE[i][1], (u - PACE[i - 1][0]) / Math.max(1e-6, PACE[i][0] - PACE[i - 1][0]));
+    return PACE[PACE.length - 1][1];
+  };
+  const n = Math.ceil(STORY / PACE_H);
+  const out = new Float64Array(n + 1);
+  for (let i = 1; i <= n; i++) out[i] = out[i - 1] + PACE_H / speed((i - 0.5) * PACE_H);
+  return out;
+})();
+// história → tempo do vídeo
+const W = (u) => {
+  const x = clamp(u / PACE_H, 0, PACE_OUT.length - 1);
+  const i = Math.min(Math.floor(x), PACE_OUT.length - 2);
+  return lerp(PACE_OUT[i], PACE_OUT[i + 1], x - i);
+};
+// tempo do vídeo → história
+const unW = (o) => {
+  let a = 0;
+  let b = PACE_OUT.length - 1;
+  if (o <= 0) return 0;
+  if (o >= PACE_OUT[b]) return STORY;
+  while (b - a > 1) {
+    const m = (a + b) >> 1;
+    if (PACE_OUT[m] <= o) a = m;
+    else b = m;
+  }
+  return (a + (o - PACE_OUT[a]) / (PACE_OUT[b] - PACE_OUT[a])) * PACE_H;
+};
+const FULL_DURATION = W(STORY);
 const FORMATS = {
   "9x16": { w: 450, h: 800, label: "9:16" },
   "4x5": { w: 450, h: 562.5, label: "4:5" },
@@ -409,7 +448,7 @@ function Scene2({ t, W, H, L }) {
                     <Icon3D kind={m.kind} size={86 * k} shadow={0.22} />
                   </div>
                   <div style={{ ...DISP, fontSize: 15 * k, color: P.ink }}>{m.title}</div>
-                  <div style={{ fontFamily: FONT, fontWeight: 600, fontSize: 11.5 * k, color: P.inkSoft, marginTop: -5 * k }}>{m.sub}</div>
+                  <div style={{ fontFamily: FONT, fontWeight: 600, fontSize: 12.5 * k, color: P.inkSoft, marginTop: -5 * k }}>{m.sub}</div>
                   {/* brilho de vidro que percorre a face ativa */}
                   {front > 0 && <div style={{ position: "absolute", top: -40 * k, bottom: -40 * k, width: 40 * k, left: `${lerp(-30, 130, ((t * 0.55 + i * 0.3) % 1.6) / 1.6)}%`, transform: "rotate(18deg)", background: "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.75), rgba(255,255,255,0))", opacity: front * 0.8 }} />}
                   {/* sombreamento: a face escurece ao virar de lado */}
@@ -522,11 +561,11 @@ function StockCard({ t, k }) {
       <div style={{ display: "flex", alignItems: "flex-end", gap: 14 * k, marginTop: 10 * k }}>
         <div>
           <div style={{ fontWeight: 800, fontSize: 34 * k, letterSpacing: "-0.04em", color: P.ink, lineHeight: 1 }}>{Math.round(cnt).toLocaleString("pt-BR")}</div>
-          <div style={{ fontWeight: 600, fontSize: 10.5 * k, color: P.inkSoft, marginTop: 3 * k }}>itens em estoque</div>
+          <div style={{ fontWeight: 600, fontSize: 11.5 * k, color: P.inkSoft, marginTop: 3 * k }}>itens em estoque</div>
         </div>
         <div style={{ marginLeft: "auto", textAlign: "right" }}>
           <div style={{ fontWeight: 800, fontSize: 20 * k, letterSpacing: "-0.03em", color: P.elec, lineHeight: 1 }}>{giro.toFixed(1).replace(".", ",")}x</div>
-          <div style={{ fontWeight: 600, fontSize: 10.5 * k, color: P.inkSoft, marginTop: 3 * k }}>giro / mês</div>
+          <div style={{ fontWeight: 600, fontSize: 11.5 * k, color: P.inkSoft, marginTop: 3 * k }}>giro / mês</div>
         </div>
       </div>
       <svg width={chW} height={chH} style={{ position: "absolute", left: 20 * k, bottom: 18 * k, overflow: "visible" }}>
@@ -765,7 +804,7 @@ function Scene4({ t, W, H, L }) {
               }}>
                 <Icon3D kind={n.kind} size={30 * k} shadow={0.18} />
               </div>
-              <div style={{ textAlign: "center", marginTop: 6 * k, marginLeft: -20, marginRight: -20, fontFamily: FONT, fontWeight: 700, fontSize: 11 * k, color: P.inkSoft }}>{n.label}</div>
+              <div style={{ textAlign: "center", marginTop: 6 * k, marginLeft: -20, marginRight: -20, fontFamily: FONT, fontWeight: 700, fontSize: 12.5 * k, color: P.inkSoft }}>{n.label}</div>
             </div>
           );
         })}
@@ -778,7 +817,7 @@ function Scene4({ t, W, H, L }) {
             background: "linear-gradient(160deg, rgba(255,255,255,.95), rgba(255,255,255,.7))", border: "1px solid #fff", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
             boxShadow: "0 30px 60px rgba(0,36,80,.16), inset 0 1px 0 #fff", fontFamily: FONT,
           }}>
-            <div style={{ fontWeight: 600, fontSize: 10.5 * k, color: P.inkSoft, letterSpacing: ".02em" }}>Pedidos de compra</div>
+            <div style={{ fontWeight: 600, fontSize: 12 * k, color: P.inkSoft, letterSpacing: ".02em" }}>Pedidos de compra</div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 6 * k }}>
               <div style={{ fontWeight: 800, fontSize: 17 * k, letterSpacing: "-0.03em", color: P.ink }}>Reposição Automática</div>
               <div style={{ position: "relative", width: 50 * k, height: 28 * k, borderRadius: 99, background: on > 0.5 ? `linear-gradient(90deg, ${P.neonDeep}, #2FD4FF)` : "#D5DDE6", boxShadow: on > 0.5 ? `0 0 ${18 * clamp(on)}px ${hexA(P.neon, 0.7)}` : "inset 0 1px 3px rgba(0,0,0,.15)" }}>
@@ -835,7 +874,7 @@ function Scene4({ t, W, H, L }) {
               </div>
               <div style={{
                 position: "absolute", left: x - 70 * k, width: 140 * k, top: cy + sz / 2 + 14 * k, textAlign: "center", opacity: clamp((sp - 0.3) * 2),
-                fontFamily: FONT, fontWeight: 700, fontSize: 12.5 * k, color: P.ink, letterSpacing: "-0.01em",
+                fontFamily: FONT, fontWeight: 700, fontSize: 14 * k, color: P.ink, letterSpacing: "-0.01em",
               }}>{s.label}</div>
             </React.Fragment>
           );
@@ -1082,7 +1121,7 @@ function Hook({ t, W, H, L }) {
         <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 52 * k, letterSpacing: "-0.045em", color: "#FFFFFF", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
           <span style={{ color: TINT.amber[1] }}>−</span>R$ {cnt.toLocaleString("pt-BR")}
         </div>
-        <div style={{ fontFamily: FONT, fontWeight: 600, fontSize: 13 * k, color: "rgba(234,244,252,.65)", marginTop: 8 * k }}>em vendas perdidas por falta de estoque</div>
+        <div style={{ fontFamily: FONT, fontWeight: 600, fontSize: 14.5 * k, color: "rgba(234,244,252,.75)", marginTop: 8 * k }}>em vendas perdidas por falta de estoque</div>
       </div>
       <TextBlock L={L}>
         <Words disp text="Cada ruptura é uma venda perdida." t={t} t0={0.15} size={25 * L.txt} color="#EAF4FC" hl={[3, 4]} hlBg={`linear-gradient(90deg, ${TINT.amber[0]}, ${TINT.amber[1]})`} stagger={0.07} />
@@ -1124,47 +1163,67 @@ function cubeChime(A, w, v = 1) {
   tone(A, w, { type: "triangle", f: midi(108), dur: 0.25, v: 0.02 * v, send: 0.5 });
   SND.shimmer(A, w + 0.04, 0.6 * v);
 }
-function buildEvents() {
-  const ev = [];
-  const add = (t, fn) => ev.push({ t, fn });
+const CH = [
+  { b: 36, n: [48, 52, 55, 59] },
+  { b: 43, n: [47, 50, 55, 59] },
+  { b: 45, n: [45, 48, 52, 55] },
+  { b: 41, n: [45, 48, 52, 53] },
+];
+// Música (pad, bateria, baixo, arpejo) gerada no tempo do vídeo: o andamento fica constante em 120 BPM
+function buildMusic() {
+  const m = [];
+  const addM = (t, fn) => m.push({ t, fn });
   const B = 0.5;
-  const CH = [
-    { b: 36, n: [48, 52, 55, 59] },
-    { b: 43, n: [47, 50, 55, 59] },
-    { b: 45, n: [45, 48, 52, 55] },
-    { b: 41, n: [45, 48, 52, 53] },
-  ];
-  const chordAt = (tt) => CH[Math.floor(tt / 2) % 4];
-  for (let tb = 0; tb < 32; tb += 2) {
+  const L = (u) => W(HOOK + u);
+  const g0 = L(0);
+  const end = L(32.05);
+  const chordAt = (tt) => CH[Math.floor(Math.max(0, tt - g0 + 1e-6) / 2) % 4];
+  for (let tb = g0; tb < end - 0.3; tb += 2) {
     const ch = chordAt(tb);
-    const v = tb < 4 ? 1.9 : tb >= 28 ? 2.3 : 1.3;
-    add(tb, (A, w) => SND.pad(A, w, ch.n, 2.1, tb < 4 ? 1100 : 1900, v));
+    const u = unW(tb) - HOOK;
+    const v = u < 4 ? 1.9 : u >= 28 ? 2.3 : 1.3;
+    // cada acorde dura 2,7s e se sobrepõe ao próximo: sem "respiro" entre compassos
+    addM(tb, (A, w) => SND.pad(A, w, ch.n, Math.min(2.7, end - tb + 0.1), u < 4 ? 1100 : 1900, v));
   }
-  const quiet = [[11.2, 12.0], [19.3, 20.0], [27.45, 28.0]];
+  const quiet = [[L(11.2), L(12.0)], [L(19.3), L(20.0)], [L(27.2), L(28.0)]];
   const isQuiet = (tt) => quiet.some(([a, b]) => tt >= a && tt < b);
-  let k = 0;
-  for (let tb = 5.0; tb < 28; tb += B, k++) {
+  const dStart = g0 + Math.ceil((L(5.0) - g0) / B - 1e-6) * B;
+  const arpFrom = L(12);
+  let k = Math.round((dStart - g0) / B);
+  for (let tb = dStart; tb < L(28); tb += B, k++) {
     if (isQuiet(tb)) continue;
     const ch = chordAt(tb);
-    add(tb, (A, w) => SND.kick(A, w, 0.75));
-    if (tb % 1 === 0.5) add(tb, (A, w) => SND.clap(A, w, 0.65));
-    add(tb + B / 2, (A, w) => SND.hat(A, w, 0.7, 0.25));
-    if (tb >= 12) add(tb + B / 4, (A, w) => SND.hat(A, w, 0.3, -0.3));
-    add(tb, (A, w) => SND.bass(A, w, ch.b, B * 0.45, 0.9));
-    add(tb + B * 0.75, (A, w) => SND.bass(A, w, ch.b + 12, B * 0.2, 0.5));
-    if (tb >= 12) {
+    const kk = k;
+    add4(tb, ch, kk, tb >= arpFrom);
+  }
+  function add4(tb, ch, kk, busy) {
+    addM(tb, (A, w) => SND.kick(A, w, 0.75));
+    if (kk % 2 === 1) addM(tb, (A, w) => SND.clap(A, w, 0.65));
+    addM(tb + B / 2, (A, w) => SND.hat(A, w, 0.7, 0.25));
+    if (busy) addM(tb + B / 4, (A, w) => SND.hat(A, w, 0.3, -0.3));
+    addM(tb, (A, w) => SND.bass(A, w, ch.b, B * 0.45, 0.9));
+    addM(tb + B * 0.75, (A, w) => SND.bass(A, w, ch.b + 12, B * 0.2, 0.5));
+    if (busy) {
       const arp = [0, 1, 2, 3, 2, 1];
       [0, B / 2].forEach((o, j) => {
-        const n = ch.n[arp[(k * 2 + j) % arp.length]] + 24;
-        add(tb + o, (A, w) => SND.pluck(A, w, n, 0.55, j ? 0.35 : -0.35));
+        const n = ch.n[arp[(kk * 2 + j) % arp.length]] + 24;
+        addM(tb + o, (A, w) => SND.pluck(A, w, n, 0.55, j ? 0.35 : -0.35));
       });
     }
   }
+  return m;
+}
+// duração no vídeo de um trecho da história (tempo local das cenas)
+const outDur = (t0, dur) => W(HOOK + t0 + dur) - W(HOOK + t0);
+function buildEvents() {
+  const ev = [];
+  const add = (t, fn) => ev.push({ t, fn });
   const click = (A, w, v = 1) => {
     hiss(A, w, { type: "highpass", f: 3500, dur: 0.018, v: 0.28 * v });
     tone(A, w, { type: "square", f: 2200, dur: 0.015, v: 0.04 * v });
   };
-  const riser = (t0, dur, v = 0.13) => add(t0, (A, w) => {
+  const riser = (t0, d, v = 0.13) => add(t0, (A, w) => {
+    const dur = outDur(t0, d);
     hiss(A, w, { f: 400, f2: 7000, q: 1.2, dur, v, shape: "rise", send: 0.3 });
     tone(A, w, { f: 180, f2: 900, glide: dur, dur, a: dur * 0.85, v: 0.04, send: 0.4 });
   });
@@ -1196,7 +1255,7 @@ function buildEvents() {
   add(13.0, (A, w) => SND.pop(A, w, 520, 0.08));
   add(14.3, (A, w) => { SND.pop(A, w, 700, 0.16); SND.shimmer(A, w, 0.55); SND.whoosh(A, w, { dur: 0.45, from: 600, to: 4000, v: 0.12 }); });
   for (let tt = 15.0, i = 0; tt < 18.4; tt += 0.075 + i * 0.0012, i++) add(tt, (A, w) => SND.tick(A, w, 2400 + i * 30, 0.8));
-  add(15.0, (A, w) => tone(A, w, { f: 300, f2: 900, glide: 3.4, dur: 3.4, a: 1.6, v: 0.025, send: 0.4 }));
+  add(15.0, (A, w) => { const d = outDur(15.0, 3.4); tone(A, w, { f: 300, f2: 900, glide: d, dur: d, a: d * 0.47, v: 0.025, send: 0.4 }); });
   PILLS.forEach((p, i) => add(p.t, (A, w) => { SND.bell(A, w, [84, 88, 91][i], 1, [-0.5, 0.5, -0.2][i]); SND.pop(A, w, 900 + i * 120, 0.08); }));
   riser(19.3, 0.7, 0.15);
   // Cena 4: linha, mão, pedido, sequência
@@ -1242,7 +1301,7 @@ function buildEvents() {
   // Final: corte claro, logo, digitação
   add(T.fin, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 300, to: 6000, v: 0.18, pan: 0, panTo: 0 }));
   hit(32.05, 1.1);
-  add(32.05, (A, w) => { SND.pad(A, w, [48, 52, 55, 59, 62], 5.4, 2600, 2.6); SND.sub(A, w, 36, 1.6, 1); cubeChime(A, w); });
+  add(32.05, (A, w) => { SND.pad(A, w, [48, 52, 55, 59, 62], (FULL_DURATION - W(HOOK + 32.05)) * 1.25, 2600, 2.6); SND.sub(A, w, 36, 1.6, 1); cubeChime(A, w); });
   [...WORDMARK].forEach((ch, i) => {
     if (ch !== " ") add(TYPE.w0 + i * TYPE.wd, (A, w) => { hiss(A, w, { type: "highpass", f: 5000, dur: 0.02, v: 0.09 }); tone(A, w, { type: "square", f: 1700 + (i % 4) * 140, dur: 0.008, v: 0.02 }); });
   });
@@ -1258,39 +1317,46 @@ function buildEvents() {
   add(CTA.tap + 0.04, (A, w) => [79, 84, 88, 91].forEach((n, i) => SND.bell(A, w + i * 0.05, n, 0.8, i / 1.5 - 1)));
   add(CTA.tap + 0.05, (A, w) => SND.shimmer(A, w, 0.7));
   // tudo acima é tempo local; o gancho vem antes
-  const out = ev.map((e) => ({ t: e.t + HOOK, fn: e.fn }));
-  const addG = (t, fn) => out.push({ t, fn });
-  addG(0, (A, w) => { tone(A, w, { f: 58, f2: 46, glide: 2, dur: 2.1, a: 0.25, v: 0.3, send: 0.3 }); hiss(A, w, { type: "lowpass", f: 600, dur: 2, v: 0.05, shape: "swell" }); SND.kick(A, w, 0.9); });
+  const out = ev.map((e) => ({ t: W(e.t + HOOK), fn: e.fn }));
+  const addG = (t, fn) => out.push({ t: W(t), fn });
+  const hookOut = W(HOOK);
+  addG(0, (A, w) => { SND.pad(A, w, [21, 28, 33], hookOut + 1.4, 700, 2.6); tone(A, w, { f: 58, f2: 46, glide: hookOut, dur: hookOut + 0.1, a: 0.25, v: 0.3, send: 0.3 }); hiss(A, w, { type: "lowpass", f: 600, dur: hookOut, v: 0.05, shape: "swell" }); SND.kick(A, w, 0.9); });
   [0.15, 0.32, 0.5, 0.67].forEach((tt, i) => addG(tt, (A, w) => tone(A, w, { type: "square", f: i % 2 ? 784 : 988, dur: 0.09, v: 0.04, lp: 2600, pan: i % 2 ? 0.3 : -0.3 })));
   for (let tt = 0.3, i = 0; tt < 1.45; tt += 0.05 + i * 0.002, i++) addG(tt, (A, w) => SND.tick(A, w, 3200 - i * 40, 0.8));
   addG(0.2, (A, w) => SND.clap(A, w, 0.5));
   // tensão contínua: pulso grave tipo batimento + riser até a virada para o caos
   [0, 0.5, 1.0, 1.25, 1.5].forEach((tt, i) => addG(tt, (A, w) => { SND.kick(A, w, 0.55 + i * 0.08); SND.sub(A, w, 31, 0.35, 0.9); }));
-  addG(0.6, (A, w) => { hiss(A, w, { f: 300, f2: 5000, q: 1.2, dur: 1.0, v: 0.14, shape: "rise", send: 0.3 }); tone(A, w, { type: "sawtooth", f: 110, f2: 330, glide: 1.0, dur: 1.0, a: 0.9, v: 0.035, lp: 1400 }); });
+  addG(0.6, (A, w) => { const d = W(1.62) - W(0.6); hiss(A, w, { f: 300, f2: 5000, q: 1.2, dur: d, v: 0.14, shape: "rise", send: 0.3 }); tone(A, w, { type: "sawtooth", f: 110, f2: 330, glide: d, dur: d, a: d * 0.9, v: 0.035, lp: 1400 }); });
   addG(1.45, (A, w) => tone(A, w, { f: 300, f2: 110, glide: 0.4, dur: 0.5, v: 0.12 }));
   addG(1.6, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 4000, to: 300, v: 0.16, pan: 0, panTo: 0 }));
+  out.push(...buildMusic());
   return out.sort((a, b) => a.t - b.t);
 }
 const FULL_EVENTS = buildEvents();
 const FULL_SCENES = [
   { name: "Gancho", from: 0 },
-  { name: "Caos → cubo", from: HOOK },
-  { name: "Módulos", from: HOOK + T.s2 },
-  { name: "Dashboard", from: HOOK + T.s3 },
-  { name: "Automação", from: HOOK + T.s4 },
-  { name: "Segurança", from: HOOK + T.s5 },
-  { name: "Logo + CTA", from: HOOK + T.fin },
+  { name: "Caos → cubo", from: W(HOOK) },
+  { name: "Módulos", from: W(HOOK + T.s2) },
+  { name: "Dashboard", from: W(HOOK + T.s3) },
+  { name: "Automação", from: W(HOOK + T.s4) },
+  { name: "Segurança", from: W(HOOK + T.s5) },
+  { name: "Logo + CTA", from: W(HOOK + T.fin) },
 ];
+// vídeo completo: tempo do vídeo → história
+const PacedFrame = ({ t, format }) => <FullFrame t={unW(t)} format={format} />;
 
 /* ---------- Variante: completo ou corte curto (trechos da timeline completa) ---------- */
-const SEGS = VARIANT.segments;
+// trechos do corte: definidos na história, convertidos para o tempo do vídeo e alinhados à batida
+const BEAT0 = W(HOOK);
+const snapBeat = (o) => (o <= BEAT0 + 1e-6 ? o : BEAT0 + Math.round((o - BEAT0) / 0.5) * 0.5);
+const SEGS = VARIANT.segments && VARIANT.segments.map((sg) => ({ name: sg.name, from: snapBeat(W(sg.from)), to: snapBeat(W(sg.to)) }));
 const OFFS = SEGS ? SEGS.reduce((acc, sg) => [...acc, acc[acc.length - 1] + sg.to - sg.from], [0]) : null;
 const DURATION = SEGS ? OFFS[OFFS.length - 1] : FULL_DURATION;
 const mapTime = (u) => {
   for (let i = 0; i < SEGS.length; i++) if (u < OFFS[i + 1]) return SEGS[i].from + (u - OFFS[i]);
   return SEGS[SEGS.length - 1].to;
 };
-const Frame = SEGS ? ({ t, format }) => <FullFrame t={mapTime(Math.min(t, DURATION - 1e-4))} format={format} /> : FullFrame;
+const Frame = SEGS ? ({ t, format }) => <PacedFrame t={mapTime(Math.min(t, DURATION - 1e-4))} format={format} /> : PacedFrame;
 const EVENTS = SEGS
   ? SEGS.flatMap((sg, i) => FULL_EVENTS.filter((e) => e.t >= sg.from && e.t < sg.to).map((e) => ({ t: OFFS[i] + e.t - sg.from, fn: e.fn })))
   : FULL_EVENTS;
