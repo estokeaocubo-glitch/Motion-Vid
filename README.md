@@ -2,8 +2,17 @@
 
 Vídeo promocional vertical (Reels/TikTok, 40s) em React, para a venda de sites e lojas virtuais da Estoke ao Cubo.
 
-- `src/EstokeAoCuboPromo.jsx`: componente único (`export default`), só depende de `react`. Cole direto num Claude Artifact (React).
-- `dist/estoke-ao-cubo.html`: preview standalone (React UMD + Babel via CDN). Regenerar com `node scripts/build-html.mjs`.
+- `dist/EstokeAoCuboPromo.artifact.jsx`: arquivo único, com fontes e logo embutidos. Cole direto num Claude Artifact (React).
+- `dist/estoke-ao-cubo.html`: preview standalone (React UMD + Babel via CDN).
+- `src/EstokeAoCuboPromo.jsx` + `src/brandAssets.js`: código-fonte. Depois de editar, rode `node scripts/build-assets.mjs` (se mudou algo em `assets/`) e `node scripts/build-html.mjs`.
+
+## Identidade aplicada (v2, a partir de `design` e `deesign.pdf`)
+
+- Cores: preto-azulado `#000A1E`, azul-marinho `#002450` (logotipo), azul vibrante `#008ACC`, ciano `#2FD4FF`, azul claro `#4FB3E8`. Vermelho só em sinais de erro/perda na cena da dor.
+- Símbolo: o cubo isométrico de vidro do manual (`assets/cube-logo.webp`, extraído do PDF).
+- Tipografia: títulos em caixa alta larga. A Monument Extended é comercial, então o vídeo usa a Archivo no eixo de largura 125% como substituta aberta. Textos em Open Sauce Sans. As duas fontes são OFL e vão embutidas. Para usar a Monument licenciada, troque `assets/archivo-latin-standard-normal.woff2` pelo arquivo dela e rode os scripts.
+- Fundos: feixes de luz azul em diagonal sobre preto (como as capas do manual), versão clara com feixes suaves, e textura de grão animada sobre todo o frame.
+- Texto da cena 5 inclui o propósito da marca: "sem ferramentas caras e sem dor de cabeça técnica".
 
 ## Roteiro
 
@@ -13,7 +22,7 @@ Vídeo promocional vertical (Reels/TikTok, 40s) em React, para a venda de sites 
 | 4–11s | A dor: direct, links quebrados, 404, planilha, carrinho abandonado, dinheiro voando, vendas −38% | Escuro (revelação circular a partir do clique) |
 | 11–16s | Revelação: flash, logo, mockup de e-commerce, "Sites pensados para vender." | Claro |
 | 16–26s | Câmera viajando por 4 cards: Design Premium, Checkout Rápido, 100% Responsivo (light→dark), Alta Conversão | Claro |
-| 26–33s | "A melhor parte?", explosão de ícones, cubo 3D, "sem dor de cabeça técnica" grifado | Escuro neon |
+| 26–33s | "A melhor parte?", explosão de ícones, cubo da marca, "sem dor de cabeça técnica" grifado | Escuro com feixe azul |
 | 33–40s | CTA: logo, site + celular, "Coloque sua marca no ar hoje", botão pulsante clicado | Claro |
 
 ## Como funciona

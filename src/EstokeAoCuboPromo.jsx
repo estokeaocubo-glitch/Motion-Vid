@@ -1,29 +1,45 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { BRAND_FONT_CSS, CUBE_LOGO_SRC } from "./brandAssets";
 
 /* =============================================================================
-   Estoke ao Cubo — Promo vertical 9:16 (40s)
+   Estoke ao Cubo — Promo vertical 9:16 (40s) · v2 com a identidade da marca
    Motor de timeline determinístico: um único relógio `t` (segundos) e cada
    elemento calcula sua posição/escala/opacidade a partir dele, com física de
-   mola analítica. Resultado: animação "seekável" como um vídeo de verdade,
-   sem dependências externas além do React (funciona em Claude Artifacts).
+   mola analítica. A animação é "seekável" como um vídeo de verdade.
+
+   Identidade (manual da marca):
+   - Preto/azul-marinho como fundo principal, azul vibrante/ciano em feixes de luz
+   - Cubo isométrico de vidro como símbolo, textura de grão sobre as superfícies
+   - Títulos: Monument (aqui Archivo Expanded, substituto aberto e embutido)
+   - Textos: Open Sauce Sans
 ============================================================================= */
 
 /* ---------- Marca ---------- */
 const C = {
-  ink: "#0B0D14",
-  paper: "#F6F7FB",
-  slate: "#5B6275",
-  mist: "#E7EAF3",
-  orange: "#FF6B2C",
-  pink: "#FF3D7F",
-  cobalt: "#3D5AFE",
-  mint: "#1ED6A0",
-  red: "#FF4D5E",
-  night: "#07080D",
-  violet: "#7C5CFF",
+  ink: "#002450", // azul-marinho do logotipo (texto sobre claro)
+  night: "#000A1E", // preto-azulado de fundo
+  deep: "#00396F",
+  blue: "#008ACC", // azul vibrante dos feixes
+  sky: "#4FB3E8",
+  cyan: "#2FD4FF", // brilho ciano
+  ice: "#CFEAF8",
+  paper: "#F5F9FD",
+  slate: "#4A5B76",
+  mist: "#E3ECF5",
+  red: "#FF4D5E", // só para erros/perdas (semântico)
 };
-const FONT = `'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif`;
-const GRAD = `linear-gradient(95deg, ${C.orange} 0%, ${C.pink} 48%, ${C.cobalt} 100%)`;
+const FONT = `'Open Sauce Sans', 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif`;
+const DISPLAY_FONT = `'EAC Display', 'Monument Extended', 'Archivo', 'Arial Black', system-ui, sans-serif`;
+const DISP = {
+  fontFamily: DISPLAY_FONT,
+  fontWeight: 800,
+  fontStretch: "125%",
+  fontVariationSettings: "'wdth' 125",
+  letterSpacing: "-0.01em",
+  textTransform: "uppercase",
+};
+const GRAD = `linear-gradient(95deg, ${C.deep} 0%, ${C.blue} 50%, ${C.cyan} 100%)`;
+const GRAD_LIGHT = `linear-gradient(95deg, ${C.sky} 0%, ${C.cyan} 55%, #FFFFFF 100%)`;
 const W = 450;
 const H = 800;
 const DURATION = 40;
@@ -115,22 +131,30 @@ function dragSel(t, { t0, from, t1, box, dur = 0.35, t2, to }) {
 }
 
 /* ---------- Medição de texto (para caixas de seleção exatas) ---------- */
+// Mede no DOM com o mesmo estilo do render (largura expandida, variação, tracking).
 const _mc = new Map();
-let _cv = null;
-function measure(str, size, weight = 800, ls = -0.03) {
-  const key = `${weight}|${size}|${str}`;
+let _probe = null;
+function measure(str, size, display = true, weight = 800) {
+  const key = `${display ? "D" : "B"}|${weight}|${size}|${str}`;
   if (_mc.has(key)) return _mc.get(key);
-  if (typeof document === "undefined") return str.length * size * 0.56;
-  _cv = _cv || document.createElement("canvas");
-  const ctx = _cv.getContext("2d");
-  ctx.font = `${weight} ${size}px ${FONT}`;
-  const w = ctx.measureText(str).width + ls * size * str.length;
+  if (typeof document === "undefined") return str.length * size * (display ? 0.8 : 0.56);
+  if (!_probe) {
+    _probe = document.createElement("span");
+    Object.assign(_probe.style, { position: "absolute", left: "-9999px", top: "0", whiteSpace: "pre", visibility: "hidden", lineHeight: "1" });
+    document.body.appendChild(_probe);
+  }
+  const st = display ? DISP : { fontFamily: FONT, fontWeight: weight, fontStretch: "100%", fontVariationSettings: "normal", letterSpacing: "-0.02em", textTransform: "none" };
+  Object.assign(_probe.style, st, { fontSize: `${size}px`, fontWeight: String(display ? DISP.fontWeight : weight) });
+  _probe.textContent = str;
+  const w = _probe.getBoundingClientRect().width;
   _mc.set(key, w);
   return w;
 }
-function layoutLine(words, size, cx, weight = 800) {
-  const gap = size * 0.24;
-  const ws = words.map((w) => measure(w, size, weight));
+// Maior tamanho (até `max`) em que o texto cabe em `maxW`
+const fitSize = (str, maxW, max, display = true) => Math.min(max, (max * maxW) / measure(str, max, display));
+function layoutLine(words, size, cx, display = true) {
+  const gap = size * (display ? 0.3 : 0.24);
+  const ws = words.map((w) => measure(w, size, display));
   const total = ws.reduce((a, b) => a + b, 0) + gap * (words.length - 1);
   let x = cx - total / 2;
   return ws.map((w, i) => {
@@ -141,18 +165,16 @@ function layoutLine(words, size, cx, weight = 800) {
 }
 
 /* ---------- Estilos derivados ---------- */
-const gradText = {
-  backgroundImage: GRAD,
+const clipText = (bg) => ({
+  backgroundImage: bg,
   WebkitBackgroundClip: "text",
   backgroundClip: "text",
   color: "transparent",
   WebkitTextFillColor: "transparent",
   paddingRight: "0.04em",
-};
-const hotText = {
-  ...gradText,
-  backgroundImage: `linear-gradient(90deg, ${C.red}, #FF9A3D)`,
-};
+});
+const gradText = clipText(GRAD);
+const gradLight = clipText(GRAD_LIGHT);
 function popStyle(s, from = 34) {
   const b = (1 - clamp(s)) * 8;
   return {
@@ -278,7 +300,7 @@ function Icon({ name, size = 20, color = "currentColor", stroke = 2, style, fill
 }
 
 /* ---------- Peças compartilhadas ---------- */
-function Cursor({ x, y, p = 0, r = null, opacity = 1, ringColor = C.cobalt }) {
+function Cursor({ x, y, p = 0, r = null, opacity = 1, ringColor = C.blue }) {
   return (
     <div style={{ position: "absolute", left: x - 4, top: y - 2, zIndex: 60, pointerEvents: "none", opacity }}>
       {r != null && (
@@ -295,7 +317,7 @@ function Cursor({ x, y, p = 0, r = null, opacity = 1, ringColor = C.cobalt }) {
   );
 }
 
-function SelBox({ x, y, w, h, color = C.cobalt, glow = false, opacity = 1 }) {
+function SelBox({ x, y, w, h, color = C.blue, glow = false, opacity = 1 }) {
   const hs = 9;
   return (
     <div style={{
@@ -313,11 +335,12 @@ function SelBox({ x, y, w, h, color = C.cobalt, glow = false, opacity = 1 }) {
   );
 }
 
-function Kinetic({ t, start, tokens, stagger = 0.07, size, color, weight = 800, style, lineHeight = 1.1, cfg, from = 34, justify = "center" }) {
+function Kinetic({ t, start, tokens, stagger = 0.07, size, color, weight = 800, style, lineHeight = 1.1, cfg, from = 34, justify = "center", display = false }) {
   return (
     <div style={{
       position: "absolute", display: "flex", flexWrap: "wrap", justifyContent: justify, alignContent: "flex-start",
-      columnGap: "0.24em", fontSize: size, fontWeight: weight, color, lineHeight, letterSpacing: "-0.03em", ...style,
+      columnGap: display ? "0.3em" : "0.24em", fontSize: size, fontWeight: weight, color, lineHeight,
+      letterSpacing: "-0.02em", ...(display ? DISP : null), ...style,
     }}>
       {tokens.map((tk, i) => {
         const o = typeof tk === "string" ? { w: tk } : tk;
@@ -330,47 +353,35 @@ function Kinetic({ t, start, tokens, stagger = 0.07, size, color, weight = 800, 
   );
 }
 
-function AbsWord({ x, y, size, s, children, style }) {
+function AbsWord({ x, y, size, s, children, style, display = true }) {
   return (
     <div style={{
-      position: "absolute", left: x, top: y, fontSize: size, fontWeight: 800, letterSpacing: "-0.03em",
-      lineHeight: 1, whiteSpace: "pre", ...popStyle(s), ...style,
+      position: "absolute", left: x, top: y, fontSize: size, fontWeight: 800, letterSpacing: "-0.02em",
+      lineHeight: 1, whiteSpace: "pre", ...(display ? DISP : null), ...popStyle(s), ...style,
     }}>{children}</div>
   );
 }
 
-function CubeLogo({ size = 48 }) {
+// Símbolo oficial: cubo isométrico de vidro (extraído do manual da marca)
+function CubeLogo({ size = 48, glow = 0, style }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" style={{ display: "block", overflow: "visible" }}>
-      <defs>
-        <linearGradient id="eacTop" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#FFB08A" />
-          <stop offset="1" stopColor={C.orange} />
-        </linearGradient>
-        <linearGradient id="eacL" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={C.orange} />
-          <stop offset="1" stopColor={C.pink} />
-        </linearGradient>
-        <linearGradient id="eacR" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#6E86FF" />
-          <stop offset="1" stopColor={C.cobalt} />
-        </linearGradient>
-      </defs>
-      <polygon points="32,5 57,19 32,33 7,19" fill="url(#eacTop)" />
-      <polygon points="7,19 32,33 32,60 7,46" fill="url(#eacL)" />
-      <polygon points="57,19 57,46 32,60 32,33" fill="url(#eacR)" />
-      <text x="45" y="45" fontSize="15" fontWeight="800" fill="#fff" textAnchor="middle" fontFamily={FONT}>3</text>
-    </svg>
+    <img src={CUBE_LOGO_SRC} alt="" width={size * 0.908} height={size} draggable={false}
+      style={{
+        display: "block", width: size * 0.908, height: size, userSelect: "none",
+        filter: glow ? `drop-shadow(0 0 ${12 * glow}px ${hexA(C.cyan, 0.55 * glow)}) drop-shadow(0 ${10 * glow}px ${24 * glow}px ${hexA(C.blue, 0.45 * glow)})` : "none",
+        ...style,
+      }} />
   );
 }
 
-function Wordmark({ size = 22, color = C.ink }) {
+// Logotipo: símbolo + "ESTOKE / AO CUBO" em duas linhas, como no manual
+function Wordmark({ size = 20, color = C.ink, inline = false }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: size * 0.45 }}>
-      <CubeLogo size={size * 1.55} />
-      <span style={{ fontSize: size, fontWeight: 800, letterSpacing: "-0.03em", color, whiteSpace: "nowrap" }}>
-        Estoke <span style={gradText}>ao Cubo</span>
-      </span>
+    <div style={{ display: "flex", alignItems: "center", gap: size * 0.5 }}>
+      <CubeLogo size={inline ? size * 1.5 : size * 2.3} />
+      <div style={{ ...DISP, fontSize: size, lineHeight: 0.95, color, whiteSpace: "nowrap" }}>
+        {inline ? "Estoke ao Cubo" : <>Estoke<br />ao Cubo</>}
+      </div>
     </div>
   );
 }
@@ -389,8 +400,8 @@ function ProductArt({ kind, size = 60 }) {
     case "shoe":
       return (
         <svg {...p}>
-          <path d="M6 40c0-6 4-10 9-11l9-11c4 3 9 6 16 8 8 2 16 4 18 10 1 3 0 5-2 5H8c-1 0-2-.5-2-1z" fill={C.cobalt} />
-          <path d="M40 26c8 2 16 4 18 10 1 3 0 5-2 5H44z" fill="#2B44D8" />
+          <path d="M6 40c0-6 4-10 9-11l9-11c4 3 9 6 16 8 8 2 16 4 18 10 1 3 0 5-2 5H8c-1 0-2-.5-2-1z" fill={C.blue} />
+          <path d="M40 26c8 2 16 4 18 10 1 3 0 5-2 5H44z" fill="#00396F" />
           <rect x="5" y="41" width="54" height="7" rx="3.5" fill="#F4F5FA" stroke="#D3D7E6" />
           <path d="M24 24l4 4M28 21l4 4M32 23l3 3" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
         </svg>
@@ -436,26 +447,26 @@ function StoreMockup({ lt = 99, dark = 0, style }) {
       <div style={{ height: 30, background: chrome, display: "flex", alignItems: "center", padding: "0 12px", gap: 6 }}>
         {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => <span key={c} style={{ width: 9, height: 9, borderRadius: 9, background: c }} />)}
         <div style={{ margin: "0 auto", display: "flex", alignItems: "center", gap: 5, background: bg, borderRadius: 8, padding: "3px 14px", fontSize: 10, fontWeight: 600, color: sub }}>
-          <Icon name="lock" size={10} color={C.mint} stroke={2.6} />suamarca.com.br
+          <Icon name="lock" size={10} color={C.cyan} stroke={2.6} />suamarca.com.br
         </div>
         <span style={{ width: 39 }} />
       </div>
       <div style={{ ...rise(S(0.05)), display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px" }}>
         <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: ".14em", color: ink }}>SUA MARCA</span>
         <span style={{ display: "flex", gap: 12, fontSize: 10, fontWeight: 600, color: sub }}>
-          <span>Novidades</span><span>Coleções</span><span style={{ color: C.orange }}>Sale</span>
+          <span>Novidades</span><span>Coleções</span><span style={{ color: C.blue }}>Sale</span>
         </span>
         <span style={{ position: "relative", color: ink }}>
           <Icon name="cart" size={17} />
-          <span style={{ position: "absolute", top: -5, right: -7, background: C.orange, color: "#fff", fontSize: 8, fontWeight: 800, borderRadius: 8, padding: "1px 4px" }}>2</span>
+          <span style={{ position: "absolute", top: -5, right: -7, background: C.blue, color: "#fff", fontSize: 8, fontWeight: 800, borderRadius: 8, padding: "1px 4px" }}>2</span>
         </span>
       </div>
       <div style={{
         ...rise(S(0.15)), margin: "0 14px", height: 118, borderRadius: 14, display: "flex", alignItems: "center", padding: "0 16px", overflow: "hidden",
-        background: `linear-gradient(120deg, ${mix("#FFE6D6", "#2A1A22", dark)}, ${mix("#FFD9E6", "#24183A", dark)} 55%, ${mix("#DCE3FF", "#16204A", dark)})`,
+        background: `linear-gradient(120deg, ${mix("#E3F2FC", "#0A1E3D", dark)}, ${mix("#CFEAF8", "#0B2A52", dark)} 55%, ${mix("#B9DDF5", "#06152E", dark)})`,
       }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: ".16em", color: C.orange }}>NOVA COLEÇÃO</div>
+          <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: ".16em", color: C.blue }}>NOVA COLEÇÃO</div>
           <div style={{ fontSize: 19, fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.03em", color: ink, marginTop: 5 }}>Estilo que<br />vende sozinho</div>
           <div style={{ display: "inline-flex", marginTop: 9, background: ink, color: bg, fontSize: 9.5, fontWeight: 700, padding: "6px 11px", borderRadius: 20 }}>Comprar agora →</div>
         </div>
@@ -468,7 +479,7 @@ function StoreMockup({ lt = 99, dark = 0, style }) {
             <div style={{ fontSize: 9.5, fontWeight: 600, color: sub, marginTop: 5 }}>{p.n}</div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontSize: 11.5, fontWeight: 800, color: ink }}>{p.p}</span>
-              <span style={{ width: 16, height: 16, borderRadius: 8, background: C.cobalt, color: "#fff", display: "grid", placeItems: "center", fontSize: 11, fontWeight: 800, lineHeight: 1 }}>+</span>
+              <span style={{ width: 16, height: 16, borderRadius: 8, background: C.blue, color: "#fff", display: "grid", placeItems: "center", fontSize: 11, fontWeight: 800, lineHeight: 1 }}>+</span>
             </div>
           </div>
         ))}
@@ -489,7 +500,7 @@ function PhoneMockup({ dark = 0 }) {
           <span style={{ fontSize: 6.5, fontWeight: 800, letterSpacing: ".14em" }}>SUA MARCA</span>
           <Icon name="cart" size={9} />
         </div>
-        <div style={{ marginTop: 6, height: 64, borderRadius: 9, background: "linear-gradient(120deg,#FFE6D6,#FFD9E6 55%,#DCE3FF)", display: "flex", alignItems: "center", padding: "0 6px" }}>
+        <div style={{ marginTop: 6, height: 64, borderRadius: 9, background: "linear-gradient(120deg,#E3F2FC,#CFEAF8 55%,#B9DDF5)", display: "flex", alignItems: "center", padding: "0 6px" }}>
           <div style={{ fontSize: 8, fontWeight: 800, lineHeight: 1.05, color: C.ink, flex: 1 }}>Nova<br />coleção</div>
           <div style={{ transform: "rotate(-14deg)" }}><ProductArt kind="shoe" size={46} /></div>
         </div>
@@ -501,42 +512,29 @@ function PhoneMockup({ dark = 0 }) {
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 7, background: C.cobalt, color: "#fff", fontSize: 7.5, fontWeight: 800, textAlign: "center", padding: "6px 0", borderRadius: 8 }}>Comprar agora</div>
+        <div style={{ marginTop: 7, background: C.blue, color: "#fff", fontSize: 7.5, fontWeight: 800, textAlign: "center", padding: "6px 0", borderRadius: 8 }}>Comprar agora</div>
       </div>
     </div>
   );
 }
 
-function Cube3D({ size = 56, rx, ry }) {
-  const faces = ["rotateY(0deg)", "rotateY(90deg)", "rotateY(180deg)", "rotateY(-90deg)", "rotateX(90deg)", "rotateX(-90deg)"];
+/* ---------- Fundos (feixes de luz azul + grão, como no manual) ---------- */
+// Feixe: elipse suave e rotacionada, como as faixas de luz azul das capas da marca
+function Beam({ x, y, w, h, rot, color, a }) {
   return (
-    <div style={{ width: size, height: size, perspective: 420 }}>
-      <div style={{ width: size, height: size, position: "relative", transformStyle: "preserve-3d", transform: `rotateX(${rx}deg) rotateY(${ry}deg)` }}>
-        {faces.map((f, i) => (
-          <div key={i} style={{
-            position: "absolute", inset: 0, borderRadius: 6, transform: `${f} translateZ(${size / 2}px)`,
-            background: `linear-gradient(135deg, ${hexA(i % 2 ? C.cobalt : C.orange, 0.6)}, ${hexA(C.mint, 0.22)})`,
-            border: `1.5px solid ${hexA("#FFFFFF", 0.55)}`, boxShadow: `inset 0 0 18px ${hexA(C.cobalt, 0.6)}`,
-          }} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ---------- Fundos ---------- */
-function BgLight({ t }) {
-  const blob = (x, y, size, color, a) => (
     <div style={{
-      position: "absolute", left: x - size / 2, top: y - size / 2, width: size, height: size, borderRadius: "50%",
-      background: `radial-gradient(circle, ${hexA(color, a)} 0%, ${hexA(color, 0)} 68%)`,
+      position: "absolute", left: x - w / 2, top: y - h / 2, width: w, height: h, borderRadius: "50%", transform: `rotate(${rot}deg)`,
+      background: `radial-gradient(ellipse at center, ${hexA(color, a)} 0%, ${hexA(color, a * 0.55)} 38%, ${hexA(color, 0)} 70%)`,
     }} />
   );
+}
+
+function BgLight({ t }) {
   return (
-    <div style={{ position: "absolute", inset: 0, background: C.paper, overflow: "hidden" }}>
-      {blob(70 + Math.sin(t * 0.3) * 40, 110 + Math.cos(t * 0.25) * 40, 520, C.orange, 0.26)}
-      {blob(400 + Math.cos(t * 0.28) * 40, 420 + Math.sin(t * 0.22) * 50, 520, C.cobalt, 0.2)}
-      {blob(120 + Math.sin(t * 0.2) * 30, 740 + Math.cos(t * 0.3) * 30, 460, C.mint, 0.18)}
+    <div style={{ position: "absolute", inset: 0, background: "#FFFFFF", overflow: "hidden" }}>
+      <Beam x={40 + Math.sin(t * 0.3) * 30} y={120 + Math.cos(t * 0.25) * 30} w={760} h={300} rot={-24} color={C.blue} a={0.16} />
+      <Beam x={430 + Math.cos(t * 0.28) * 30} y={470 + Math.sin(t * 0.22) * 40} w={620} h={240} rot={-24} color={C.sky} a={0.16} />
+      <Beam x={120 + Math.sin(t * 0.2) * 30} y={760} w={560} h={220} rot={-18} color={C.cyan} a={0.1} />
     </div>
   );
 }
@@ -550,22 +548,30 @@ function BgDark({ t }) {
   if (!s) return null;
   const r = 150 * easeInOut(prog(t, s.a, s.a + 0.75));
   const op = 1 - easeOut(prog(t, s.b, s.b + 0.5));
-  const g1 = s.pain ? C.red : C.cobalt;
-  const g2 = s.pain ? C.orange : C.mint;
-  const mask = "radial-gradient(circle at 50% 45%, #000 0%, transparent 75%)";
+  // Na "dor" o feixe é contido e frio; no "diferencial" ele abre com força total
+  const k = s.pain ? 0.55 : 1;
+  const sweep = Math.sin(t * 0.35) * 30;
   return (
-    <div style={{ position: "absolute", inset: 0, background: C.night, clipPath: `circle(${r}% at ${s.cx}px ${s.cy}px)`, opacity: op }}>
-      <div style={{
-        position: "absolute", inset: 0,
-        background: `radial-gradient(520px 420px at ${350 + Math.sin(t * 0.4) * 40}px ${140 + Math.cos(t * 0.3) * 30}px, ${hexA(g1, 0.3)}, transparent 70%),
-          radial-gradient(480px 420px at ${90 + Math.cos(t * 0.35) * 40}px ${700 + Math.sin(t * 0.3) * 30}px, ${hexA(g2, 0.22)}, transparent 70%),
-          radial-gradient(420px 360px at 225px 400px, ${hexA(C.violet, 0.16)}, transparent 70%)`,
-      }} />
-      <div style={{
-        position: "absolute", inset: 0, backgroundImage: "radial-gradient(rgba(255,255,255,.09) 1px, transparent 1px)",
-        backgroundSize: "22px 22px", WebkitMaskImage: mask, maskImage: mask,
-      }} />
+    <div style={{ position: "absolute", inset: 0, background: C.night, clipPath: `circle(${r}% at ${s.cx}px ${s.cy}px)`, opacity: op, overflow: "hidden" }}>
+      <Beam x={60 + sweep} y={560 - sweep} w={1000} h={420} rot={-30} color={C.blue} a={0.85 * k} />
+      <Beam x={90 + sweep} y={540 - sweep} w={760} h={120} rot={-30} color={C.sky} a={0.4 * k} />
+      <Beam x={430 - sweep} y={110} w={640} h={260} rot={-30} color={C.deep} a={0.7} />
+      {!s.pain && <Beam x={225} y={386} w={360} h={360} rot={0} color={C.cyan} a={0.12 + 0.06 * Math.sin(t * 2)} />}
     </div>
+  );
+}
+
+// Textura de grão animada (ruído fractal), aplicada sobre todo o frame
+const GRAIN_URL = `url("data:image/svg+xml;utf8,${encodeURIComponent(
+  "<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(#n)'/></svg>",
+)}")`;
+function Grain({ t }) {
+  const f = Math.floor(t * 24);
+  return (
+    <div style={{
+      position: "absolute", inset: -40, zIndex: 85, pointerEvents: "none", backgroundImage: GRAIN_URL, backgroundSize: "180px 180px",
+      opacity: 0.09, mixBlendMode: "overlay", transform: `translate(${(f * 37) % 40}px, ${(f * 53) % 40}px)`,
+    }} />
   );
 }
 
@@ -575,7 +581,7 @@ function Flash({ t }) {
   return (
     <div style={{
       position: "absolute", inset: 0, zIndex: 80, opacity: f, pointerEvents: "none",
-      background: "radial-gradient(circle at 50% 59%, #FFFFFF 0%, #FFF8F2 45%, #F6F7FB 100%)",
+      background: `radial-gradient(circle at 50% 59%, #FFFFFF 0%, #F2FAFF 45%, ${C.ice} 100%)`,
     }} />
   );
 }
@@ -583,7 +589,7 @@ function Flash({ t }) {
 function EndFade({ t }) {
   const f = easeInOut(prog(t, 39.5, 40));
   if (f <= 0) return null;
-  return <div style={{ position: "absolute", inset: 0, zIndex: 90, background: C.paper, opacity: f }} />;
+  return <div style={{ position: "absolute", inset: 0, zIndex: 90, background: "#FFFFFF", opacity: f }} />;
 }
 
 /* =============================================================================
@@ -591,11 +597,13 @@ function EndFade({ t }) {
 ============================================================================= */
 function Scene1({ t }) {
   if (t > 4.4) return null;
-  const F = 54;
-  const PAD = 18;
-  const BH = 78;
-  const words = ["Loja", "Marca", "Empresa"];
+  const PAD = 16;
+  const words = ["LOJA", "MARCA", "EMPRESA"];
   const swaps = [1.25, 2.2, 3.05];
+  // Tamanho que garante "EMPRESA ?" dentro da largura do frame
+  const F = Math.min(50, fitSize("EMPRESA?", 400 - PAD * 2 - 14, 50));
+  const F1 = fitSize("VOCÊ TEM UMA", 376, 42);
+  const BH = Math.round(F * 1.42);
   const ws = words.map((w) => measure(w, F));
   const qW = measure("?", F);
 
@@ -607,7 +615,7 @@ function Scene1({ t }) {
   const drag = easeOut(prog(t, 1.0, 1.35));
   const dW = boxW * drag;
   const dH = BH * drag;
-  const line1 = layoutLine(["Você", "tem", "uma"], F, 225);
+  const line1 = layoutLine(["VOCÊ", "TEM", "UMA"], F1, 225);
   const ex = easeIn(prog(t, 3.98, 4.3));
   const after = spring(t - 1.38);
 
@@ -633,7 +641,7 @@ function Scene1({ t }) {
   return (
     <div style={{ position: "absolute", inset: 0, ...exitStyle(ex, { y: 0, scale: 0.06, blur: 6 }) }}>
       {line1.map((it, i) => (
-        <AbsWord key={i} x={it.x} y={290} size={F} s={spring(t - 0.15 - i * 0.12)} style={{ color: C.ink }}>{it.text}</AbsWord>
+        <AbsWord key={i} x={it.x} y={300} size={F1} s={spring(t - 0.15 - i * 0.12)} style={{ color: C.ink }}>{it.text}</AbsWord>
       ))}
 
       {t >= 1.0 && (
@@ -646,21 +654,21 @@ function Scene1({ t }) {
               if (s <= 0 || e >= 1) return null;
               return (
                 <div key={w} style={{
-                  position: "absolute", left: (boxW - ws[k]) / 2, top: (BH - F) / 2 - 1, fontSize: F, fontWeight: 800,
-                  letterSpacing: "-0.03em", lineHeight: 1, whiteSpace: "pre", ...gradText,
+                  position: "absolute", left: (boxW - ws[k]) / 2, top: (BH - F) / 2, fontSize: F,
+                  lineHeight: 1, whiteSpace: "pre", ...DISP, ...gradText,
                   transform: `translateY(${(1 - s) * BH * 0.9 - e * BH * 0.9}px)`, opacity: clamp(s * 2) * (1 - e),
                 }}>{w}</div>
               );
             })}
           </div>
-          <AbsWord x={x0 + boxW + 10} y={boxTop + (BH - F) / 2 - 1} size={F} s={spring(t - 1.4)} style={{ color: C.ink }}>?</AbsWord>
+          <AbsWord x={x0 + boxW + 10} y={boxTop + (BH - F) / 2} size={F} s={spring(t - 1.4)} style={{ color: C.ink }}>?</AbsWord>
           <div style={{
-            position: "absolute", left: x0 - 1, top: boxTop - 27, ...rise(after, 8), background: C.cobalt, color: "#fff",
-            fontSize: 11, fontWeight: 700, padding: "4px 9px", borderRadius: 6, letterSpacing: ".02em",
-          }}>Seu negócio</div>
+            position: "absolute", left: x0 - 1, top: boxTop - 27, ...rise(after, 8), background: C.blue, color: "#fff",
+            fontSize: 10.5, fontWeight: 800, padding: "4px 9px", borderRadius: 6, letterSpacing: ".08em",
+          }}>SEU NEGÓCIO</div>
           <div style={{
             position: "absolute", left: x0 + boxW / 2 - 40, width: 80, top: boxTop + BH + 12, textAlign: "center", ...rise(after, -8),
-            fontSize: 11, fontWeight: 700, color: C.cobalt, fontVariantNumeric: "tabular-nums",
+            fontSize: 11, fontWeight: 700, color: C.blue, fontVariantNumeric: "tabular-nums",
           }}>{Math.round(boxW)} × {BH}</div>
         </>
       )}
@@ -674,22 +682,22 @@ function Scene1({ t }) {
    CENA 2 — A dor / caos (4–11s)
 ============================================================================= */
 const CHAOS = [
-  { k: "msg", text: "Tem catálogo?", who: "Ana · 23:47", dot: C.orange, x: 26, y: 352, w: 160, h: 64, r: -7, t0: 5.25 },
+  { k: "msg", text: "Tem catálogo?", who: "Ana · 23:47", dot: C.blue, x: 26, y: 352, w: 160, h: 64, r: -7, t0: 5.25 },
   { k: "cart", x: 304, y: 336, w: 122, h: 108, r: 9, t0: 5.5 },
-  { k: "msg", text: "Demora pra responder...", who: "Lucas · 00:12", dot: C.cobalt, x: 128, y: 446, w: 230, h: 64, r: 5, t0: 5.75 },
+  { k: "msg", text: "Demora pra responder...", who: "Lucas · 00:12", dot: C.blue, x: 128, y: 446, w: 230, h: 64, r: 5, t0: 5.75 },
   { k: "badge", x: 372, y: 470, w: 50, h: 50, r: 0, t0: 6.0 },
   { k: "link", x: 22, y: 534, w: 190, h: 70, r: -4, t0: 6.2 },
-  { k: "msg", text: "Qual o valor?", who: "Bia · 09:03", dot: C.pink, x: 258, y: 560, w: 150, h: 64, r: 8, t0: 6.45 },
+  { k: "msg", text: "Qual o valor?", who: "Bia · 09:03", dot: C.cyan, x: 258, y: 560, w: 150, h: 64, r: 8, t0: 6.45 },
   { k: "404", x: 34, y: 640, w: 170, h: 84, r: -9, t0: 6.7 },
   { k: "sheet", x: 176, y: 664, w: 250, h: 42, r: 4, t0: 6.95 },
   { k: "msg", text: "Desisti, comprei em outro lugar", who: "Rafa · 10:41", dot: C.red, x: 120, y: 726, w: 290, h: 64, r: -3, t0: 7.2 },
 ];
-const darkCard = { background: "#151927", border: "1px solid rgba(255,255,255,.07)", boxShadow: "0 18px 40px -12px rgba(0,0,0,.6)" };
+const darkCard = { background: "#071A36", border: "1px solid rgba(255,255,255,.07)", boxShadow: "0 18px 40px -12px rgba(0,0,0,.6)" };
 
 function ChaosItem({ it }) {
   if (it.k === "msg" || it.k === "link") {
     return (
-      <div style={{ ...darkCard, background: "#1A1F2C", borderRadius: "18px 18px 18px 6px", padding: "10px 14px 8px", color: "#EEF0F6", whiteSpace: "nowrap" }}>
+      <div style={{ ...darkCard, background: "#0A1E3D", borderRadius: "18px 18px 18px 6px", padding: "10px 14px 8px", color: "#E6F0FA", whiteSpace: "nowrap" }}>
         {it.k === "msg" ? (
           <div style={{ fontSize: 15, fontWeight: 600 }}>{it.text}</div>
         ) : (
@@ -697,15 +705,15 @@ function ChaosItem({ it }) {
             <div style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 15, fontWeight: 600 }}>
               <Icon name="link" size={16} color={C.red} stroke={2.4} />Link não abre
             </div>
-            <div style={{ fontSize: 11, color: "#7D849B", textDecoration: "line-through", marginTop: 2 }}>bit.ly/catalogo-final2</div>
+            <div style={{ fontSize: 11, color: "#6E83A3", textDecoration: "line-through", marginTop: 2 }}>bit.ly/catalogo-final2</div>
           </>
         )}
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, fontSize: 10.5, color: "#8A90A3" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, fontSize: 10.5, color: "#7F93B0" }}>
           <span style={{ width: 6, height: 6, borderRadius: 6, background: it.dot || C.red }} />
           {it.who || "Cliente · 14:20"}
           <span style={{ marginLeft: "auto", display: "flex" }}>
-            <Icon name="check" size={12} color="#6B7186" stroke={2.4} />
-            <Icon name="check" size={12} color="#6B7186" stroke={2.4} style={{ marginLeft: -7 }} />
+            <Icon name="check" size={12} color="#5C7090" stroke={2.4} />
+            <Icon name="check" size={12} color="#5C7090" stroke={2.4} style={{ marginLeft: -7 }} />
           </span>
         </div>
       </div>
@@ -720,7 +728,7 @@ function ChaosItem({ it }) {
             <Icon name="x" size={10} color="#fff" stroke={3} />
           </span>
         </div>
-        <div style={{ fontSize: 11, fontWeight: 700, color: "#EEF0F6", textAlign: "center", lineHeight: 1.15 }}>Carrinho<br />abandonado</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: "#E6F0FA", textAlign: "center", lineHeight: 1.15 }}>Carrinho<br />abandonado</div>
       </div>
     );
   }
@@ -728,15 +736,15 @@ function ChaosItem({ it }) {
     return (
       <div style={{ ...darkCard, width: it.w, height: it.h, borderRadius: 16, border: `1px solid ${hexA(C.red, 0.4)}`, padding: "10px 14px" }}>
         <div style={{ fontSize: 34, fontWeight: 800, color: C.red, letterSpacing: "-0.04em", lineHeight: 1 }}>404</div>
-        <div style={{ fontSize: 11.5, color: "#9AA0B4", fontWeight: 600, marginTop: 6 }}>Página não encontrada</div>
+        <div style={{ fontSize: 11.5, color: "#93A6C0", fontWeight: 600, marginTop: 6 }}>Página não encontrada</div>
       </div>
     );
   }
   if (it.k === "sheet") {
     return (
-      <div style={{ ...darkCard, background: "#0F2E22", border: `1px solid ${hexA(C.mint, 0.25)}`, borderRadius: 12, padding: "11px 12px", display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>
-        <Icon name="sheet" size={17} color={C.mint} />
-        <span style={{ fontSize: 12, fontWeight: 600, color: "#C5F3E2", fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}>planilha_estoque_FINAL_v3.xlsx</span>
+      <div style={{ ...darkCard, background: "#062244", border: `1px solid ${hexA(C.cyan, 0.25)}`, borderRadius: 12, padding: "11px 12px", display: "flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}>
+        <Icon name="sheet" size={17} color={C.cyan} />
+        <span style={{ fontSize: 12, fontWeight: 600, color: "#CFEAF8", fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}>planilha_estoque_FINAL_v3.xlsx</span>
       </div>
     );
   }
@@ -761,9 +769,9 @@ function FlyingMoney({ t, t0, x0, x1, i }) {
         <g style={{ transformOrigin: "70px 22px", transform: `scaleY(${flap})` }}>
           <path d="M70 20 C82 2, 95 4, 95 13 C88 13, 84 17, 86 22 C80 19, 76 24, 70 24 Z" fill="#fff" fillOpacity=".92" />
         </g>
-        <rect x="24" y="12" width="48" height="27" rx="5" fill="#2BC48A" stroke="#0E7A52" strokeWidth="2" />
-        <circle cx="48" cy="25.5" r="8" fill="none" stroke="#0E7A52" strokeWidth="1.8" />
-        <text x="48" y="29" fontSize="9.5" fontWeight="800" textAnchor="middle" fill="#0E7A52" fontFamily={FONT}>R$</text>
+        <rect x="24" y="12" width="48" height="27" rx="5" fill="#7FC4EC" stroke="#00396F" strokeWidth="2" />
+        <circle cx="48" cy="25.5" r="8" fill="none" stroke="#00396F" strokeWidth="1.8" />
+        <text x="48" y="29" fontSize="9.5" fontWeight="800" textAnchor="middle" fill="#00396F" fontFamily={FONT}>R$</text>
       </svg>
     </div>
   );
@@ -778,23 +786,24 @@ function Scene2({ t }) {
   const lineP = easeInOut(prog(t, 9.1, 9.9));
   const shake = 5 * easeIn(prog(t, 9.7, 10.35));
   const orb = easeIn(prog(t, 10.45, 11.0));
+  const h2Size = fitSize("PERDENDO VENDAS", 400, 34);
 
   return (
     <div style={{ position: "absolute", inset: 0, color: "#fff" }}>
       {h1Out < 1 && (
         <div style={{ position: "absolute", inset: 0, ...exitStyle(h1Out) }}>
-          <Kinetic t={t} start={4.45} stagger={0.055} size={36} color="#fff" lineHeight={1.12} style={{ left: 30, top: 96, width: 390 }}
-            tokens={["Que", "ainda", "tenta", "vender", "só", "pelo", { w: "direct", style: hotText }, "e", { w: "links", style: hotText }, { w: "improvisados?", style: hotText }]} />
+          <Kinetic t={t} start={4.45} stagger={0.055} size={33} color="#fff" lineHeight={1.12} style={{ left: 30, top: 100, width: 390 }}
+            tokens={["Que", "ainda", "tenta", "vender", "só", "pelo", { w: "direct", style: gradLight }, "e", { w: "links", style: gradLight }, { w: "improvisados?", style: gradLight }]} />
         </div>
       )}
 
       {t > 8.3 && h2Out < 1 && (
         <div style={{ position: "absolute", inset: 0, ...exitStyle(h2Out) }}>
-          <Kinetic t={t} start={8.45} stagger={0.08} size={40} color="#fff" style={{ left: 30, top: 110, width: 390 }}
+          <Kinetic t={t} start={8.45} stagger={0.08} size={h2Size} color="#fff" display lineHeight={1.08} style={{ left: 20, top: 112, width: 410 }}
             tokens={["Perdendo", {
               w: (
                 <span style={{ position: "relative", color: C.red }}>
-                  vendas
+                  VENDAS
                   <span style={{ position: "absolute", left: -2, top: "52%", height: 4, borderRadius: 2, background: C.red, width: `calc(${strike * 100}% + 4px)` }} />
                 </span>
               ),
@@ -804,7 +813,7 @@ function Scene2({ t }) {
             background: "rgba(255,255,255,.05)", border: `1px solid ${hexA(C.red, 0.35)}`, ...popStyle(chartS, 20),
           }}>
             <div>
-              <div style={{ fontSize: 10.5, color: "#8C93AD", fontWeight: 600 }}>Vendas este mês</div>
+              <div style={{ fontSize: 10.5, color: "#7F93B0", fontWeight: 600 }}>Vendas este mês</div>
               <div style={{ display: "flex", alignItems: "center", gap: 6, color: C.red, fontSize: 22, fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>
                 <Icon name="down" size={18} color={C.red} stroke={2.6} />−{Math.round(38 * lineP)}%
               </div>
@@ -847,7 +856,7 @@ function Scene2({ t }) {
         <div style={{
           position: "absolute", left: 225 - 200, top: 470 - 200, width: 400, height: 400, borderRadius: "50%", zIndex: 40,
           transform: `scale(${0.05 + orb * 1.4})`, opacity: orb,
-          background: `radial-gradient(circle, #FFFFFF 0%, ${hexA("#BFD0FF", 0.9)} 25%, ${hexA(C.cobalt, 0.35)} 55%, transparent 72%)`,
+          background: `radial-gradient(circle, #FFFFFF 0%, ${hexA("#BFD0FF", 0.9)} 25%, ${hexA(C.blue, 0.35)} 55%, transparent 72%)`,
         }} />
       )}
     </div>
@@ -864,19 +873,25 @@ function Scene3({ t }) {
   const mk = spring(t - 12.15, { stiffness: 120, damping: 15 });
   const speed = spring(t - 13.2, { stiffness: 220, damping: 14 });
   const ps = spring(t - 13.45, { stiffness: 220, damping: 14 });
-  const tag = layoutLine(["Sites", "pensados", "para", "vender."], 31, 225);
+  const tag = layoutLine(["Sites", "pensados", "para", "vender."], 31, 225, false);
   const v = tag[3];
-  const box = { x: v.x - 8, y: 693, w: v.w + 16, h: 46 };
+  const box = { x: v.x - 8, y: 692, w: v.w + 16, h: 46 };
+  const wm = fitSize("AO CUBO", 340, 40);
   const cur = dragSel(t, { t0: 14.05, from: [470, 840], t1: 14.45, box, dur: 0.32, t2: 15.15, to: [470, 860] });
 
   return (
     <div style={{ position: "absolute", inset: 0, ...exitStyle(ex, { y: -10, scale: 0.1, blur: 6 }) }}>
-      <div style={{ position: "absolute", left: 225 - 32, top: 88, transform: `scale(${logo}) rotate(${(1 - logo) * -120}deg)`, opacity: clamp(logo * 2) }}>
-        <CubeLogo size={64} />
+      <div style={{
+        position: "absolute", left: 225 - 33, top: 58, opacity: clamp(logo * 2),
+        transform: `scale(${logo}) rotate(${(1 - logo) * -180}deg) translateY(${Math.sin(t * 1.8) * 3}px)`,
+      }}>
+        <CubeLogo size={74} glow={1} />
       </div>
-      <Kinetic t={t} start={11.42} tokens={["Conheça", "a"]} size={24} weight={600} color={C.slate} style={{ left: 0, top: 166, width: W }} />
-      <Kinetic t={t} start={11.6} stagger={0.09} size={50} color={C.ink} style={{ left: 0, top: 198, width: W }}
-        tokens={["Estoke", { w: "ao", style: gradText }, { w: "Cubo", style: gradText }]} />
+      <Kinetic t={t} start={11.42} tokens={["CONHEÇA", "A"]} size={13} weight={700} color={C.slate} style={{ left: 0, top: 148, width: W, letterSpacing: ".32em" }} />
+      <Kinetic t={t} start={11.6} stagger={0.09} size={wm} color={C.ink} display lineHeight={0.98} style={{ left: 0, top: 172, width: W }}
+        tokens={["Estoke"]} />
+      <Kinetic t={t} start={11.78} stagger={0.09} size={wm} color={C.ink} display lineHeight={0.98} style={{ left: 0, top: 172 + wm * 1.02, width: W }}
+        tokens={[{ w: "ao", style: gradText }, { w: "Cubo", style: gradText }]} />
 
       <div style={{
         position: "absolute", left: 30, top: 300, opacity: clamp(mk * 2),
@@ -886,11 +901,11 @@ function Scene3({ t }) {
       </div>
 
       <div style={{
-        position: "absolute", left: 268, top: 270, ...popStyle(speed, 18), display: "flex", alignItems: "center", gap: 8, padding: "8px 14px 8px 8px",
+        position: "absolute", left: 272, top: 284, ...popStyle(speed, 18), display: "flex", alignItems: "center", gap: 8, padding: "8px 14px 8px 8px",
         background: "rgba(255,255,255,.92)", borderRadius: 16, boxShadow: "0 16px 40px -12px rgba(20,28,80,.35)", marginTop: Math.sin(t * 2.1) * 3,
       }}>
-        <span style={{ width: 30, height: 30, borderRadius: 10, background: hexA(C.mint, 0.18), display: "grid", placeItems: "center" }}>
-          <Icon name="bolt" size={16} color="#0EA57A" fill={hexA(C.mint, 0.5)} />
+        <span style={{ width: 30, height: 30, borderRadius: 10, background: hexA(C.cyan, 0.18), display: "grid", placeItems: "center" }}>
+          <Icon name="bolt" size={16} color="#0079B8" fill={hexA(C.cyan, 0.5)} />
         </span>
         <div>
           <div style={{ fontSize: 9.5, fontWeight: 600, color: C.slate }}>Carrega em</div>
@@ -904,7 +919,7 @@ function Scene3({ t }) {
       }}>
         <svg width="34" height="34" viewBox="0 0 36 36">
           <circle cx="18" cy="18" r="15" fill="none" stroke={C.mist} strokeWidth="4" />
-          <circle cx="18" cy="18" r="15" fill="none" stroke="#0EA57A" strokeWidth="4" strokeLinecap="round" pathLength="100"
+          <circle cx="18" cy="18" r="15" fill="none" stroke="#0079B8" strokeWidth="4" strokeLinecap="round" pathLength="100"
             strokeDasharray="100" strokeDashoffset={100 - 98 * easeOut(prog(t, 13.5, 14.3))} transform="rotate(-90 18 18)" />
         </svg>
         <div>
@@ -914,7 +929,7 @@ function Scene3({ t }) {
       </div>
 
       {tag.map((it, i) => (
-        <AbsWord key={i} x={it.x} y={700} size={31} s={spring(t - 13.75 - i * 0.08)} style={i === 3 ? gradText : { color: C.ink }}>{it.text}</AbsWord>
+        <AbsWord key={i} x={it.x} y={700} size={31} display={false} s={spring(t - 13.75 - i * 0.08)} style={i === 3 ? gradText : { color: C.ink }}>{it.text}</AbsWord>
       ))}
       {t >= 14.45 && <SelBox x={box.x} y={box.y} w={box.w * cur.dp} h={box.h * cur.dp} />}
       {cur.visible && <Cursor x={cur.x} y={cur.y} p={cur.hold} />}
@@ -946,7 +961,7 @@ function CardDesign({ lt }) {
     <div style={{ ...cardBase, background: "#fff", color: C.ink }}>
       <div style={{ position: "absolute", left: 18, right: 18, top: 20, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <span style={{ fontSize: 17, fontWeight: 800, letterSpacing: "-0.02em" }}>Coleção Outono</span>
-        <span style={{ fontSize: 11, fontWeight: 700, color: C.orange }}>Ver tudo →</span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: C.blue }}>Ver tudo →</span>
       </div>
       <div style={{ position: "absolute", left: 18, top: 52, display: "flex", gap: 6 }}>
         {["Todos", "Bolsas", "Calçados", "Acessórios"].map((c, i) => (
@@ -989,7 +1004,7 @@ function CardDesign({ lt }) {
         );
       })}
       <div style={{ position: "absolute", left: 18, right: 18, top: 418, height: 34, borderRadius: 12, background: C.paper, display: "flex", alignItems: "center", gap: 8, padding: "0 12px", fontSize: 11, fontWeight: 600, color: C.slate }}>
-        <Icon name="check" size={14} color="#0EA57A" stroke={2.6} />Frete grátis acima de R$ 299
+        <Icon name="check" size={14} color="#0079B8" stroke={2.6} />Frete grátis acima de R$ 299
       </div>
       {lt > 0.2 && lt < 2.6 && <Cursor x={cx} y={cy} p={press(lt, 1.4)} r={ripple(lt, 1.4)} ringColor={C.red} />}
     </div>
@@ -1006,26 +1021,26 @@ function CardCheckout({ lt }) {
   const btnP = press(lt, 1.25);
   const segW = (294 - 8) / 3;
   const [cx, cy] = path(lt, [[0.0, 330, 470], [0.45, 68, 203], [0.62, 68, 203], [1.1, 190, 352], [1.95, 190, 352], [2.4, 330, 470]]);
-  const muted = "#8C93AD";
+  const muted = "#7F93B0";
   return (
     <div style={{
-      ...cardBase, background: "#0C0F1C", color: "#fff", border: `1px solid ${hexA(C.cobalt, 0.45)}`,
-      boxShadow: `0 0 0 1px ${hexA(C.cobalt, 0.2)}, 0 30px 90px -20px ${hexA(C.cobalt, 0.65)}`,
+      ...cardBase, background: "#031230", color: "#fff", border: `1px solid ${hexA(C.blue, 0.45)}`,
+      boxShadow: `0 0 0 1px ${hexA(C.blue, 0.2)}, 0 30px 90px -20px ${hexA(C.blue, 0.65)}`,
     }}>
-      <div style={{ position: "absolute", inset: 0, background: `radial-gradient(300px 200px at 80% 0%, ${hexA(C.cobalt, 0.28)}, transparent 70%), radial-gradient(260px 200px at 0% 100%, ${hexA(C.mint, 0.14)}, transparent 70%)` }} />
+      <div style={{ position: "absolute", inset: 0, background: `radial-gradient(300px 200px at 80% 0%, ${hexA(C.blue, 0.28)}, transparent 70%), radial-gradient(260px 200px at 0% 100%, ${hexA(C.cyan, 0.14)}, transparent 70%)` }} />
       <div style={{ position: "absolute", left: 30, top: 29, width: 270, height: 3, borderRadius: 2, background: "rgba(255,255,255,.12)" }}>
-        <div style={{ width: `${sp * 100}%`, height: "100%", borderRadius: 2, background: C.mint, boxShadow: `0 0 10px ${C.mint}` }} />
+        <div style={{ width: `${sp * 100}%`, height: "100%", borderRadius: 2, background: C.cyan, boxShadow: `0 0 10px ${C.cyan}` }} />
       </div>
       {["Carrinho", "Pagamento", "Pronto"].map((s, i) => {
         const on = sp >= i * 0.5 - 0.001;
         return (
           <div key={s} style={{ position: "absolute", left: 30 + i * 135 - 40, top: 24, width: 80, textAlign: "center" }}>
-            <div style={{ width: 13, height: 13, borderRadius: 7, margin: "0 auto", background: on ? C.mint : "#262B3D", boxShadow: on ? `0 0 12px ${C.mint}` : "none" }} />
-            <div style={{ fontSize: 10, fontWeight: 600, color: on ? "#DDF8EE" : muted, marginTop: 6 }}>{s}</div>
+            <div style={{ width: 13, height: 13, borderRadius: 7, margin: "0 auto", background: on ? C.cyan : "#0E2A4F", boxShadow: on ? `0 0 12px ${C.cyan}` : "none" }} />
+            <div style={{ fontSize: 10, fontWeight: 600, color: on ? "#D8F3FF" : muted, marginTop: 6 }}>{s}</div>
           </div>
         );
       })}
-      <div style={{ position: "absolute", left: 18, top: 78, width: 56, height: 56, borderRadius: 12, background: "#1A2040", display: "grid", placeItems: "center" }}>
+      <div style={{ position: "absolute", left: 18, top: 78, width: 56, height: 56, borderRadius: 12, background: "#0B2A52", display: "grid", placeItems: "center" }}>
         <ProductArt kind="shoe" size={46} />
       </div>
       <div style={{ position: "absolute", left: 86, top: 84 }}>
@@ -1035,16 +1050,16 @@ function CardCheckout({ lt }) {
       <div style={{ position: "absolute", right: 18, top: 85, fontSize: 13, fontWeight: 700 }}>R$ 349,00</div>
       <div style={{ position: "absolute", left: 18, right: 18, top: 150, height: 1, background: "rgba(255,255,255,.08)" }} />
       <div style={{ position: "absolute", left: 18, top: 164, fontSize: 11, fontWeight: 600, color: muted, letterSpacing: ".04em" }}>PAGAMENTO</div>
-      <div style={{ position: "absolute", right: 18, top: 161, ...popStyle(pix, 8), fontSize: 10, fontWeight: 800, color: C.mint, background: hexA(C.mint, 0.14), padding: "3px 8px", borderRadius: 10 }}>5% off no Pix</div>
+      <div style={{ position: "absolute", right: 18, top: 161, ...popStyle(pix, 8), fontSize: 10, fontWeight: 800, color: C.cyan, background: hexA(C.cyan, 0.14), padding: "3px 8px", borderRadius: 10 }}>5% off no Pix</div>
       <div style={{ position: "absolute", left: 18, top: 184, width: 294, height: 42, borderRadius: 12, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.08)" }}>
-        <div style={{ position: "absolute", left: 3 + sel * segW, top: 3, width: segW, height: 34, borderRadius: 9, background: C.cobalt, boxShadow: `0 0 18px ${hexA(C.cobalt, 0.8)}` }} />
+        <div style={{ position: "absolute", left: 3 + sel * segW, top: 3, width: segW, height: 34, borderRadius: 9, background: C.blue, boxShadow: `0 0 18px ${hexA(C.blue, 0.8)}` }} />
         {["Pix", "Cartão", "Boleto"].map((s, i) => (
           <div key={s} style={{ position: "absolute", left: 3 + i * segW, top: 3, width: segW, height: 34, display: "grid", placeItems: "center", fontSize: 13, fontWeight: 700 }}>{s}</div>
         ))}
       </div>
       {[
-        ["Subtotal", "R$ 349,00", "#C9CEDF"],
-        ["Desconto Pix", `− R$ ${fmtBRL(349 - total)}`, C.mint],
+        ["Subtotal", "R$ 349,00", "#B8C8DC"],
+        ["Desconto Pix", `− R$ ${fmtBRL(349 - total)}`, C.cyan],
       ].map(([a, b, col], i) => (
         <div key={a} style={{ position: "absolute", left: 18, right: 18, top: 244 + i * 22, display: "flex", justifyContent: "space-between", fontSize: 12, color: col, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
           <span>{a}</span><span>{b}</span>
@@ -1056,22 +1071,22 @@ function CardCheckout({ lt }) {
       </div>
       <div style={{
         position: "absolute", left: 18, top: 326, width: 294, height: 54, borderRadius: 16, overflow: "hidden", transform: `scale(${1 - btnP * 0.05})`,
-        background: `linear-gradient(90deg, ${C.cobalt}, #6C7BFF)`, boxShadow: `0 0 30px ${hexA(done > 0.5 ? C.mint : C.cobalt, 0.7)}`,
+        background: `linear-gradient(90deg, ${C.blue}, #2FD4FF)`, boxShadow: `0 0 30px ${hexA(done > 0.5 ? C.cyan : C.blue, 0.7)}`,
       }}>
         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${load * 100}%`, background: "rgba(255,255,255,.2)" }} />
-        <div style={{ position: "absolute", inset: 0, background: C.mint, opacity: done }} />
+        <div style={{ position: "absolute", inset: 0, background: C.cyan, opacity: done }} />
         <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", fontSize: 15, fontWeight: 800, opacity: 1 - done, transform: `translateY(${-done * 14}px)` }}>Finalizar compra</div>
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 15, fontWeight: 800, color: "#05261B", opacity: done, transform: `translateY(${(1 - done) * 14}px)` }}>
-          <Icon name="check" size={18} color="#05261B" stroke={3} />Pedido confirmado!
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 15, fontWeight: 800, color: "#00203F", opacity: done, transform: `translateY(${(1 - done) * 14}px)` }}>
+          <Icon name="check" size={18} color="#00203F" stroke={3} />Pedido confirmado!
         </div>
       </div>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 398, display: "flex", justifyContent: "center", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 700, color: "#DDE2F2" }}>
-        <Icon name="bolt" size={15} color={C.mint} fill={hexA(C.mint, 0.4)} />Compra em 3 cliques
+      <div style={{ position: "absolute", left: 0, right: 0, top: 398, display: "flex", justifyContent: "center", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 700, color: "#D6E6F5" }}>
+        <Icon name="bolt" size={15} color={C.cyan} fill={hexA(C.cyan, 0.4)} />Compra em 3 cliques
       </div>
       <div style={{ position: "absolute", left: 0, right: 0, top: 424, display: "flex", justifyContent: "center", alignItems: "center", gap: 5, fontSize: 10.5, color: muted }}>
         <Icon name="lock" size={11} color={muted} />Pix · Cartão · Boleto
       </div>
-      {lt > 0 && lt < 2.45 && <Cursor x={cx} y={cy} p={Math.max(press(lt, 0.5), btnP)} r={ripple(lt, 0.5) ?? ripple(lt, 1.25)} ringColor={C.mint} />}
+      {lt > 0 && lt < 2.45 && <Cursor x={cx} y={cy} p={Math.max(press(lt, 0.5), btnP)} r={ripple(lt, 0.5) ?? ripple(lt, 1.25)} ringColor={C.cyan} />}
     </div>
   );
 }
@@ -1091,7 +1106,7 @@ function CardResponsive({ lt }) {
   const screen = mix("#FFFFFF", "#121626", d);
   const tileBg = mix("#F2F4FA", "#1C2134", d);
   const barC = mix("#D9DDEA", "#2C3348", d);
-  const tints = [["#FFD8C2", "#5A2E1C"], ["#D2DBFF", "#22306A"], ["#FFD3E1", "#5A2036"]];
+  const tints = [["#CFEAF8", "#0B2A52"], ["#B9DDF5", "#00396F"], ["#E3F2FC", "#06152E"]];
   const deskW = (iw - 16 - 12) / 3;
   const deskH = ih - (top0 + 80) - 8;
   const device = m < 0.25 ? 0 : m < 0.75 ? 1 : 2;
@@ -1111,11 +1126,11 @@ function CardResponsive({ lt }) {
           <div style={{ position: "absolute", right: 8, top: top0 + 4, width: lerp(60, 14, m), height: 7, borderRadius: 3, background: barC }} />
           <div style={{
             position: "absolute", left: 8, top: top0 + 18, width: iw - 16, height: lerp(54, 74, m), borderRadius: 8,
-            background: `linear-gradient(120deg, ${mix("#FFE6D6", "#2A1A22", d)}, ${mix("#DCE3FF", "#16204A", d)})`,
+            background: `linear-gradient(120deg, ${mix("#E3F2FC", "#0A1E3D", d)}, ${mix("#B9DDF5", "#06152E", d)})`,
           }}>
             <div style={{ position: "absolute", left: 8, top: 12, width: lerp(80, 50, m), height: 7, borderRadius: 3, background: ink, opacity: 0.8 }} />
             <div style={{ position: "absolute", left: 8, top: 24, width: lerp(56, 36, m), height: 6, borderRadius: 3, background: ink, opacity: 0.35 }} />
-            <div style={{ position: "absolute", left: 8, bottom: 9, width: 34, height: 11, borderRadius: 6, background: C.cobalt }} />
+            <div style={{ position: "absolute", left: 8, bottom: 9, width: 34, height: 11, borderRadius: 6, background: C.blue }} />
           </div>
           {[0, 1, 2].map((k) => {
             const ix = lerp(8 + k * (deskW + 6), 8, m);
@@ -1130,16 +1145,16 @@ function CardResponsive({ lt }) {
               <div key={k} style={{ position: "absolute", left: ix, top: iy, width: iW, height: iH, borderRadius: 7, background: tileBg }}>
                 <div style={{ position: "absolute", left: 4, top: 4, width: imW, height: imH, borderRadius: 5, background: mix(tints[k][0], tints[k][1], d) }} />
                 <div style={{ position: "absolute", left: bx, top: by, width: Math.max(8, (iW - bx - 6) * 0.8), height: 5, borderRadius: 3, background: barC }} />
-                <div style={{ position: "absolute", left: bx, top: by + 10, width: Math.max(6, (iW - bx - 6) * 0.42), height: 5, borderRadius: 3, background: C.orange, opacity: 0.85 }} />
+                <div style={{ position: "absolute", left: bx, top: by + 10, width: Math.max(6, (iW - bx - 6) * 0.42), height: 5, borderRadius: 3, background: C.blue, opacity: 0.85 }} />
               </div>
             );
           })}
         </div>
       </div>
       <div style={{ position: "absolute", left: 99, top: 356, width: 132, height: 40, borderRadius: 20, background: mix("#EEF1F7", "#1C2134", d), border: `1px solid ${mix("#E1E5EF", "#2A3149", d)}` }}>
-        <div style={{ position: "absolute", left: 4 + d * 64, top: 3, width: 60, height: 32, borderRadius: 16, background: mix("#FFFFFF", C.cobalt, d), boxShadow: "0 4px 12px rgba(10,14,40,.18)" }} />
-        <div style={{ position: "absolute", left: 4, top: 3, width: 60, height: 32, display: "grid", placeItems: "center" }}><Icon name="sun" size={16} color={mix("#F59E0B", "#7D849B", d)} /></div>
-        <div style={{ position: "absolute", left: 68, top: 3, width: 60, height: 32, display: "grid", placeItems: "center" }}><Icon name="moon" size={15} color={mix("#7D849B", "#FFFFFF", d)} /></div>
+        <div style={{ position: "absolute", left: 4 + d * 64, top: 3, width: 60, height: 32, borderRadius: 16, background: mix("#FFFFFF", C.blue, d), boxShadow: "0 4px 12px rgba(10,14,40,.18)" }} />
+        <div style={{ position: "absolute", left: 4, top: 3, width: 60, height: 32, display: "grid", placeItems: "center" }}><Icon name="sun" size={16} color={mix("#F59E0B", "#6E83A3", d)} /></div>
+        <div style={{ position: "absolute", left: 68, top: 3, width: 60, height: 32, display: "grid", placeItems: "center" }}><Icon name="moon" size={15} color={mix("#6E83A3", "#FFFFFF", d)} /></div>
       </div>
       <div style={{ position: "absolute", left: 0, right: 0, top: 414, display: "flex", justifyContent: "center", gap: 6 }}>
         {["Desktop", "Tablet", "Celular"].map((s, i) => (
@@ -1182,19 +1197,19 @@ function CardConversion({ lt }) {
       <div style={{ position: "absolute", left: 18, top: 42, fontSize: 34, fontWeight: 800, letterSpacing: "-0.03em", fontVariantNumeric: "tabular-nums" }}>
         R$ {val.toLocaleString("pt-BR")}
       </div>
-      <div style={{ position: "absolute", right: 18, top: 50, ...popStyle(badge, 10), display: "flex", alignItems: "center", gap: 4, background: hexA(C.mint, 0.16), color: "#0B8F68", fontSize: 13, fontWeight: 800, padding: "5px 10px", borderRadius: 20 }}>
-        <Icon name="up" size={14} color="#0B8F68" stroke={2.6} />+327%
+      <div style={{ position: "absolute", right: 18, top: 50, ...popStyle(badge, 10), display: "flex", alignItems: "center", gap: 4, background: hexA(C.cyan, 0.16), color: "#006FA8", fontSize: 13, fontWeight: 800, padding: "5px 10px", borderRadius: 20 }}>
+        <Icon name="up" size={14} color="#006FA8" stroke={2.6} />+327%
       </div>
       <svg width="294" height="172" viewBox="0 0 294 172" style={{ position: "absolute", left: 18, top: 106, overflow: "visible" }}>
         <defs>
           <linearGradient id="eacArea" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor={C.cobalt} stopOpacity=".28" />
-            <stop offset="1" stopColor={C.cobalt} stopOpacity="0" />
+            <stop offset="0" stopColor={C.blue} stopOpacity=".28" />
+            <stop offset="1" stopColor={C.blue} stopOpacity="0" />
           </linearGradient>
           <linearGradient id="eacLine" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stopColor={C.orange} />
-            <stop offset=".5" stopColor={C.pink} />
-            <stop offset="1" stopColor={C.cobalt} />
+            <stop offset="0" stopColor={C.blue} />
+            <stop offset=".5" stopColor={C.cyan} />
+            <stop offset="1" stopColor={C.blue} />
           </linearGradient>
           <clipPath id="eacClip"><rect x="-4" y="-20" width={ex + 4} height="200" /></clipPath>
         </defs>
@@ -1205,8 +1220,8 @@ function CardConversion({ lt }) {
         </g>
         {p > 0 && (
           <>
-            <circle cx={ex} cy={ey} r={6 + pulse * 12} fill={C.cobalt} opacity={(1 - pulse) * 0.25} />
-            <circle cx={ex} cy={ey} r="6" fill="#fff" stroke={C.cobalt} strokeWidth="3" />
+            <circle cx={ex} cy={ey} r={6 + pulse * 12} fill={C.blue} opacity={(1 - pulse) * 0.25} />
+            <circle cx={ex} cy={ey} r="6" fill="#fff" stroke={C.blue} strokeWidth="3" />
           </>
         )}
       </svg>
@@ -1219,7 +1234,7 @@ function CardConversion({ lt }) {
             position: "absolute", left: 26, top: y, ...popStyle(s, 14), display: "flex", alignItems: "center", gap: 8, padding: "7px 12px 7px 7px",
             background: "#fff", borderRadius: 12, boxShadow: "0 12px 30px -10px rgba(20,28,80,.35), 0 0 0 1px rgba(15,20,40,.05)",
           }}>
-            <span style={{ width: 26, height: 26, borderRadius: 8, background: hexA(C.mint, 0.18), display: "grid", placeItems: "center" }}><Icon name="cart" size={14} color="#0B8F68" /></span>
+            <span style={{ width: 26, height: 26, borderRadius: 8, background: hexA(C.cyan, 0.18), display: "grid", placeItems: "center" }}><Icon name="cart" size={14} color="#006FA8" /></span>
             <div>
               <div style={{ fontSize: 11, fontWeight: 800 }}>Nova venda</div>
               <div style={{ fontSize: 10.5, color: C.slate, fontWeight: 600 }}>R$ {k ? "349,00" : "189,90"}</div>
@@ -1257,7 +1272,7 @@ function Scene4({ t }) {
   return (
     <div style={{ position: "absolute", inset: 0, opacity: 1 - ex, transform: `scale(${1 - ex * 0.12})` }}>
       <div style={{ position: "absolute", left: 0, right: 0, top: 58, display: "flex", justifyContent: "center", ...rise(eyebrow, 10) }}>
-        <Wordmark size={14} />
+        <Wordmark size={12} inline />
       </div>
       {BENEFITS.map((b, i) => {
         const Ti = 15.95 + i * 2.5;
@@ -1265,9 +1280,9 @@ function Scene4({ t }) {
         const out = i < 3 ? easeIn(prog(t, Ti + 2.3, Ti + 2.55)) : 0;
         return (
           <div key={b.title} style={{ position: "absolute", inset: 0, ...exitStyle(out, { y: -20, blur: 6 }) }}>
-            <Kinetic t={t} start={Ti + 0.15} stagger={0.07} size={38} color={C.ink} style={{ left: 0, top: 96, width: W }}
+            <Kinetic t={t} start={Ti + 0.15} stagger={0.07} size={fitSize(b.title.toUpperCase(), 400, 30)} color={C.ink} display style={{ left: 0, top: 102, width: W }}
               tokens={b.title.split(" ").map((w, k) => (k === b.title.split(" ").length - 1 ? { w, style: gradText } : w))} />
-            <div style={{ position: "absolute", left: 0, right: 0, top: 146, textAlign: "center", fontSize: 15.5, fontWeight: 600, color: C.slate, ...rise(spring(t - Ti - 0.4), 10) }}>{b.sub}</div>
+            <div style={{ position: "absolute", left: 0, right: 0, top: 148, textAlign: "center", fontSize: 15.5, fontWeight: 600, color: C.slate, ...rise(spring(t - Ti - 0.4), 10) }}>{b.sub}</div>
           </div>
         );
       })}
@@ -1305,24 +1320,26 @@ const BURST = ["rocket", "bolt", "shield", "globe", "cart", "chart", "card", "ph
 function Scene5({ t }) {
   if (t < 25.95 || t > 33.05) return null;
   const ex = easeIn(prog(t, 32.55, 33.0));
-  const F = 52;
-  const lay = layoutLine(["A", "melhor", "parte?"], F, 225);
+  const F = fitSize("A MELHOR PARTE?", 360, 40);
+  const lay = layoutLine(["A", "MELHOR", "PARTE?"], F, 225);
   const aOut = easeIn(prog(t, 27.85, 28.1));
   const mel = lay[1];
-  const box = { x: mel.x - 10, y: 348, w: mel.w + 20, h: F + 24 };
+  const ty = 386 - F / 2;
+  const box = { x: mel.x - 10, y: ty - 12, w: mel.w + 20, h: F + 24 };
   const cur = dragSel(t, { t0: 26.75, from: [460, 760], t1: 27.1, box, dur: 0.35, t2: 27.5, to: [225, 392] });
   const cube = spring(t - 28.9, { stiffness: 140, damping: 12 });
   const marks = ["sem", "dor", "de", "cabeça", "técnica."];
 
   const tokens = [
     "Seu", "site", "pronto", "para", "escalar", "seu", "estoque",
-    { w: "ao", style: gradText }, { w: "cubo,", style: gradText },
+    { w: "ao", style: gradLight }, { w: "cubo,", style: gradLight },
+    "sem", "ferramentas", "caras", "e",
     ...marks.map((w, k) => {
       const mp = easeOut(prog(t, 30.3 + k * 0.12, 30.55 + k * 0.12));
       return {
         w,
         style: {
-          backgroundImage: `linear-gradient(${hexA(C.mint, 0.4)}, ${hexA(C.mint, 0.4)})`,
+          backgroundImage: `linear-gradient(${hexA(C.cyan, 0.4)}, ${hexA(C.cyan, 0.4)})`,
           backgroundSize: `${mp * 100}% 0.42em`, backgroundPosition: "0 86%", backgroundRepeat: "no-repeat",
         },
       };
@@ -1334,13 +1351,13 @@ function Scene5({ t }) {
       {aOut < 1 && (
         <div style={{ position: "absolute", inset: 0, opacity: 1 - aOut, transform: `scale(${1 - aOut * 0.3})`, transformOrigin: "225px 386px" }}>
           {lay.map((it, i) => (
-            <AbsWord key={i} x={it.x} y={360} size={F} s={spring(t - 26.35 - i * 0.1)} style={i === 1 ? { color: "#fff" } : { color: "#C9CEDF" }}>{it.text}</AbsWord>
+            <AbsWord key={i} x={it.x} y={ty} size={F} s={spring(t - 26.35 - i * 0.1)} style={i === 1 ? { color: "#fff" } : { color: "#B8C8DC" }}>{it.text}</AbsWord>
           ))}
-          {t >= 27.1 && <SelBox x={box.x} y={box.y} w={box.w * cur.dp} h={box.h * cur.dp} color={C.mint} glow />}
+          {t >= 27.1 && <SelBox x={box.x} y={box.y} w={box.w * cur.dp} h={box.h * cur.dp} color={C.cyan} glow />}
         </div>
       )}
       {cur.visible && t < 28.3 && (
-        <Cursor x={cur.x} y={cur.y} p={Math.max(cur.hold, press(t, 27.92))} r={ripple(t, 27.92)} ringColor={C.mint} opacity={1 - prog(t, 28.0, 28.25)} />
+        <Cursor x={cur.x} y={cur.y} p={Math.max(cur.hold, press(t, 27.92))} r={ripple(t, 27.92)} ringColor={C.cyan} opacity={1 - prog(t, 28.0, 28.25)} />
       )}
 
       {BURST.map((name, i) => {
@@ -1351,7 +1368,7 @@ function Scene5({ t }) {
         const R = dist * s + Math.max(0, t - 28.4) * 12;
         const x = 225 + Math.cos(ang) * R * 0.95;
         const y = 386 + Math.sin(ang) * R * 1.3;
-        const col = [C.mint, C.cobalt, C.orange][i % 3];
+        const col = [C.cyan, C.sky, "#FFFFFF"][i % 3];
         const op = clamp((t - 28) * 8) * lerp(1, 0.3, prog(t, 28.7, 29.4));
         return (
           <div key={name} style={{
@@ -1366,16 +1383,16 @@ function Scene5({ t }) {
       {t >= 28.0 && t < 28.6 && (
         <div style={{
           position: "absolute", left: 225 - 150, top: 386 - 150, width: 300, height: 300, borderRadius: "50%",
-          border: `2px solid ${hexA(C.mint, 0.8)}`, opacity: 1 - prog(t, 28.0, 28.6), transform: `scale(${0.1 + easeOut(prog(t, 28.0, 28.6)) * 1.3})`,
+          border: `2px solid ${hexA(C.cyan, 0.8)}`, opacity: 1 - prog(t, 28.0, 28.6), transform: `scale(${0.1 + easeOut(prog(t, 28.0, 28.6)) * 1.3})`,
         }} />
       )}
 
       {t > 28.85 && (
-        <div style={{ position: "absolute", left: 225 - 28, top: 196, transform: `scale(${cube})`, opacity: clamp(cube * 2) }}>
-          <Cube3D size={56} rx={-22 + Math.sin(t) * 6} ry={t * 70} />
+        <div style={{ position: "absolute", left: 225 - 30, top: 186, transform: `scale(${cube})`, opacity: clamp(cube * 2) }}>
+          <CubeLogo size={66} glow={1.4} style={{ transform: `translateY(${Math.sin(t * 1.6) * 5}px) rotate(${Math.sin(t * 0.9) * 6}deg)` }} />
         </div>
       )}
-      <Kinetic t={t} start={28.75} stagger={0.06} size={34} color="#fff" lineHeight={1.16} style={{ left: 30, top: 300, width: 390 }} tokens={tokens} />
+      <Kinetic t={t} start={28.75} stagger={0.05} size={31} color="#fff" lineHeight={1.16} style={{ left: 28, top: 286, width: 394 }} tokens={tokens} />
     </div>
   );
 }
@@ -1394,26 +1411,27 @@ function Scene6({ t }) {
   const bp = press(t, 37.0);
   const done = easeOut(prog(t, 37.12, 37.35));
   const rip = prog(t, 37.0, 37.6);
+  const hs = fitSize("COLOQUE SUA MARCA", 400, 32);
   const breathe = 1 + Math.sin(t * 4) * 0.012 * (1 - done);
 
   return (
     <div style={{ position: "absolute", inset: 0 }}>
       <div style={{ position: "absolute", left: 0, right: 0, top: 54, display: "flex", justifyContent: "center", ...popStyle(logo, 16) }}>
-        <Wordmark size={22} />
+        <Wordmark size={19} />
       </div>
       <div style={{
-        position: "absolute", left: 45, top: 128, transformOrigin: "0 0", opacity: clamp(mk * 2),
+        position: "absolute", left: 45, top: 136, transformOrigin: "0 0", opacity: clamp(mk * 2),
         transform: `translateY(${(1 - mk) * 260 + Math.sin(t * 1.3) * 3}px) scale(${0.92 * (0.9 + 0.1 * mk)})`,
       }}>
         <StoreMockup lt={t - 33.6} />
       </div>
-      <div style={{ position: "absolute", left: 318, top: 292, opacity: clamp(ph * 2), transform: `translateX(${(1 - ph) * 140}px) rotate(${(1 - ph) * 12 + 4}deg) translateY(${Math.cos(t * 1.5) * 4}px)` }}>
+      <div style={{ position: "absolute", left: 318, top: 296, opacity: clamp(ph * 2), transform: `translateX(${(1 - ph) * 140}px) rotate(${(1 - ph) * 12 + 4}deg) translateY(${Math.cos(t * 1.5) * 4}px)` }}>
         <PhoneMockup />
       </div>
 
-      <Kinetic t={t} start={34.5} stagger={0.08} size={40} color={C.ink} style={{ left: 0, top: 528, width: W }}
+      <Kinetic t={t} start={34.5} stagger={0.08} size={hs} color={C.ink} display style={{ left: 0, top: 538, width: W }}
         tokens={["Coloque", "sua", "marca"]} />
-      <Kinetic t={t} start={34.75} stagger={0.08} size={40} color={C.ink} style={{ left: 0, top: 574, width: W }}
+      <Kinetic t={t} start={34.75} stagger={0.08} size={hs} color={C.ink} display style={{ left: 0, top: 538 + hs * 1.08, width: W }}
         tokens={[{ w: "no", style: gradText }, { w: "ar", style: gradText }, { w: "hoje", style: gradText }]} />
 
       <div style={{ position: "absolute", left: 80, top: 640, width: 290, height: 62, opacity: clamp(btn * 2), transform: `scale(${(0.6 + 0.4 * btn) * breathe})` }}>
@@ -1422,23 +1440,23 @@ function Scene6({ t }) {
           return (
             <div key={k} style={{
               position: "absolute", left: -ph2 * 22, right: -ph2 * 22, top: -ph2 * 14, bottom: -ph2 * 14, borderRadius: 31 + ph2 * 14,
-              border: `2px solid ${hexA(C.orange, 0.7)}`, opacity: (1 - ph2) * 0.6 * (1 - done),
+              border: `2px solid ${hexA(C.cyan, 0.8)}`, opacity: (1 - ph2) * 0.6 * (1 - done),
             }} />
           );
         })}
         <div style={{
           position: "absolute", inset: 0, borderRadius: 31, overflow: "hidden", transform: `scale(${1 - bp * 0.06})`,
-          background: `linear-gradient(95deg, ${C.orange}, ${C.pink} 60%, #FF5FA0)`,
-          boxShadow: `0 18px 40px -10px ${hexA(C.orange, 0.65)}, inset 0 1px 0 rgba(255,255,255,.35)`,
+          background: `linear-gradient(95deg, ${C.ink} 0%, ${C.blue} 62%, ${C.cyan} 100%)`,
+          boxShadow: `0 18px 40px -10px ${hexA(C.blue, 0.65)}, inset 0 1px 0 rgba(255,255,255,.35)`,
         }}>
-          <div style={{ position: "absolute", inset: 0, background: `linear-gradient(95deg, ${C.cobalt}, #6C7BFF)`, opacity: done }} />
+          <div style={{ position: "absolute", inset: 0, background: `linear-gradient(95deg, ${C.deep}, ${C.blue})`, opacity: done }} />
           {rip > 0 && rip < 1 && (
             <div style={{ position: "absolute", left: 238 - 160, top: 36 - 160, width: 320, height: 320, borderRadius: "50%", background: "rgba(255,255,255,.35)", transform: `scale(${rip})`, opacity: 1 - rip }} />
           )}
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, color: "#fff", fontSize: 19, fontWeight: 800, letterSpacing: "-0.01em", opacity: 1 - done, transform: `translateY(${-done * 16}px)` }}>
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, color: "#fff", ...DISP, fontSize: 15, opacity: 1 - done, transform: `translateY(${-done * 16}px)` }}>
             Solicitar Orçamento <Icon name="arrow" size={20} color="#fff" stroke={2.6} />
           </div>
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, color: "#fff", fontSize: 18, fontWeight: 800, opacity: done, transform: `translateY(${(1 - done) * 16}px)` }}>
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, color: "#fff", ...DISP, fontSize: 14, opacity: done, transform: `translateY(${(1 - done) * 16}px)` }}>
             <Icon name="check" size={20} color="#fff" stroke={3} />Orçamento solicitado
           </div>
         </div>
@@ -1453,7 +1471,7 @@ function Scene6({ t }) {
         return (
           <div key={i} style={{
             position: "absolute", left: x - 4, top: y - 4, width: 8, height: 8, borderRadius: 2,
-            background: [C.orange, C.cobalt, C.mint, C.pink][i % 4], opacity: 1 - prog(dt, 0.8, 1.4),
+            background: [C.blue, C.cyan, C.sky, "#FFFFFF"][i % 4], opacity: 1 - prog(dt, 0.8, 1.4),
             transform: `rotate(${dt * 420 * (i % 2 ? 1 : -1)}deg)`,
           }} />
         );
@@ -1463,7 +1481,7 @@ function Scene6({ t }) {
         Sites · Lojas virtuais · Landing pages
       </div>
 
-      {t > 35.9 && <Cursor x={cx} y={cy} p={bp} r={ripple(t, 37.0)} ringColor={C.orange} />}
+      {t > 35.9 && <Cursor x={cx} y={cy} p={bp} r={ripple(t, 37.0)} ringColor={C.cyan} />}
     </div>
   );
 }
@@ -1483,6 +1501,7 @@ function Frame({ t }) {
       <Scene5 t={t} />
       <Scene6 t={t} />
       <Flash t={t} />
+      <Grain t={t} />
       <EndFade t={t} />
     </div>
   );
@@ -1492,15 +1511,14 @@ function Frame({ t }) {
    Player (controles discretos fora do frame)
 ============================================================================= */
 const GLOBAL_CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 .eac-btn{width:34px;height:34px;border-radius:999px;display:grid;place-items:center;color:rgba(233,235,242,.75);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);transition:background .2s,color .2s;cursor:pointer}
 .eac-btn:hover{background:rgba(255,255,255,.12);color:#fff}
-.eac-btn:focus-visible,.eac-range:focus-visible{outline:2px solid #FF6B2C;outline-offset:2px}
-.eac-btn[aria-pressed="true"]{color:#FF6B2C}
+.eac-btn:focus-visible,.eac-range:focus-visible{outline:2px solid #2FD4FF;outline-offset:2px}
+.eac-btn[aria-pressed="true"]{color:#2FD4FF}
 .eac-range{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:4px;cursor:pointer;background:transparent}
 .eac-range::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:transparent}
-.eac-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;margin-top:-4px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,107,44,.45)}
-.eac-range::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,107,44,.45)}
+.eac-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;margin-top:-4px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(47,212,255,.5)}
+.eac-range::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(47,212,255,.5)}
 `;
 const fmtTime = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
@@ -1560,7 +1578,7 @@ export default function EstokeAoCuboPromo() {
     let alive = true;
     const fl = typeof document !== "undefined" ? document.fonts : null;
     if (fl && fl.load) {
-      Promise.all([fl.load(`800 54px "Plus Jakarta Sans"`), fl.load(`600 16px "Plus Jakarta Sans"`)])
+      Promise.all([fl.load(`800 50px "EAC Display"`), fl.load(`700 16px "Open Sauce Sans"`), fl.load(`600 16px "Open Sauce Sans"`)])
         .catch(() => {})
         .then(() => fl.ready)
         .then(() => {
@@ -1613,12 +1631,12 @@ export default function EstokeAoCuboPromo() {
   const ctrlW = Math.max(300, W * scale);
 
   return (
-    <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", height: "100dvh", minHeight: 520, background: "#0A0B10", fontFamily: FONT, color: "#E9EBF2" }}>
-      <style>{GLOBAL_CSS}</style>
+    <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", height: "100dvh", minHeight: 520, background: "#00050F", fontFamily: FONT, color: "#E9EBF2" }}>
+      <style>{BRAND_FONT_CSS + GLOBAL_CSS}</style>
       <div ref={areaRef} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", flex: "1 1 0", minHeight: 0, padding: "16px 16px 8px" }}>
         <div style={{
           width: W * scale, height: H * scale, flex: "none", position: "relative", overflow: "hidden", borderRadius: 22,
-          boxShadow: "0 40px 120px -30px rgba(61,90,254,.35), 0 0 0 1px rgba(255,255,255,.07)",
+          boxShadow: "0 40px 120px -30px rgba(0,138,204,.4), 0 0 0 1px rgba(255,255,255,.07)",
         }}>
           <div style={{ width: W, height: H, transform: `scale(${scale})`, transformOrigin: "0 0", position: "relative" }}>
             <Frame t={t} />
