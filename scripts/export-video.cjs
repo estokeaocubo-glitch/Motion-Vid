@@ -21,7 +21,8 @@ const format = process.argv[5] || "9x16";
 
 const RENDER_RE = /ReactDOM\.createRoot\(document\.getElementById\("root"\)\)\.render\(<\w+ \/>\);/;
 // Cada motion define MOTION = { Frame, duration, formats, renderWav }
-const CAPTURE = `function CaptureRoot() {
+const CAPTURE = `window.__CAPTURE = true; // motions com <video> buscam o quadro exato de cada instante
+function CaptureRoot() {
   const [t, setT] = React.useState(0);
   const F = MOTION.formats[${JSON.stringify(format)}];
   React.useEffect(() => { window.__cap = { set: (v) => ReactDOM.flushSync(() => setT(v)), wav: MOTION.renderWav, duration: MOTION.duration, w: F.w, h: F.h }; }, []);
@@ -37,7 +38,8 @@ document.fonts.ready.then(() => {
   const src = fs.readFileSync(input, "utf8");
   if (!RENDER_RE.test(src)) throw new Error("HTML inesperado. Rode antes: node scripts/build-html.mjs");
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "eac-"));
-  const html = path.join(tmp, "capture.html");
+  // A página de captura fica ao lado do HTML, para caminhos relativos (ex.: media/*.webm) funcionarem
+  const html = path.join(path.dirname(input), `.capture-${process.pid}.html`);
   fs.writeFileSync(html, src.replace(RENDER_RE, CAPTURE));
 
   const browser = await chromium.launch();
@@ -74,6 +76,10 @@ document.fonts.ready.then(() => {
   const N = Math.round(duration * fps);
   for (let i = 0; i < N; i++) {
     await page.evaluate((v) => window.__cap.set(v), i / fps);
+    // espera os vídeos terminarem de buscar o quadro (no-op em motions sem vídeo)
+    await page.evaluate(() => Promise.all([...document.querySelectorAll("video")].map((v) => (v.seeking || v.readyState < 2
+      ? new Promise((r) => { v.addEventListener("seeked", r, { once: true }); v.addEventListener("loadeddata", r, { once: true }); setTimeout(r, 3000); })
+      : null))));
     const buf = await page.screenshot({ type: "jpeg", quality: 93, clip: { x: 0, y: 0, width: w, height: h } });
     if (!ff.stdin.write(buf)) await new Promise((r) => ff.stdin.once("drain", r));
     if (i % (fps * 5) === 0) console.log(`  ${Math.round((i / N) * 100)}%`);
@@ -82,6 +88,7 @@ document.fonts.ready.then(() => {
   const code = await new Promise((r) => ff.on("close", r));
   await browser.close();
   fs.rmSync(tmp, { recursive: true, force: true });
+  fs.rmSync(html, { force: true });
   if (code !== 0) throw new Error(`ffmpeg saiu com código ${code}`);
   console.log(out);
 })().catch((e) => {

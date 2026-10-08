@@ -6,8 +6,21 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 |---|---|---|---|---|
 | Promo (venda de sites e lojas) | 40s | 9:16 | `src/EstokeAoCuboPromo.jsx` | `dist/estoke-ao-cubo-reels.mp4` |
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
+| Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/showcase.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## Apresentação de site (DeviceShowcase) — Misú Culinária Oriental
+
+Baseado na referência `c24dcfc9f7c5d0463893f71a972aab76.mp4`: tablet flutuando em 3D sobre fundo escuro com esferas brilhantes desfocadas, o site passando seção a seção e o aparelho girando entre os planos.
+
+- Conteúdo da tela: trechos da gravação de tela do site (`Misú Culinária Oriental … Opera 2026-10-07 22-06-05 (1).mp4`), cortados em 6 planos de 3,333s e concatenados em `dist/media/misu-site.webm` / `.mp4` (960×540). Trechos da gravação: 8,2s (abertura com o logo) · 15,3s (Fartura de verdade) · 24,6s (Gira o prato) · 31,6s (O mais pedido da casa) · 37,6s (Uma noite oriental) · 45,3s (Reserve sua mesa → rodapé). Começa e termina no logo MISÚ, então o loop fecha.
+- Os cortes caem no meio do giro do aparelho, escondidos pelo motion blur e por uma esfera de primeiro plano que cruza a tela.
+- Esferas com contorno de luz no vermelho da Misú (`#B80C1D`); legenda "Projeto / Misú Culinária Oriental / Rodízio japonês em Petrópolis" no primeiro plano.
+- Trilha em escala japonesa (Mi, Fá, Lá, Si, Dó): taiko em 3-3-2, koto em arpejo e whoosh em cada corte. Cada plano dura 8 tempos.
+- O vídeo da tela acompanha a timeline: no player corrige a deriva e pausa junto; na exportação busca o quadro exato de cada instante.
+- O preview `dist/showcase.html` precisa da pasta `dist/media/` ao lado. (O `.artifact.jsx` deste motion também referencia `media/`, então não funciona sozinho num Artifact React.)
+- Para outro site: grave a tela, corte os trechos (um por plano) com ffmpeg e edite `src/sites/showcase.js`. Também há o modo imagem: `node scripts/capture-site.cjs <url> showcase "Nome"` captura um print de página inteira que rola dentro do tablet.
 
 ## Carrossel Padrão Portfólio
 
@@ -59,6 +72,8 @@ node scripts/build-html.mjs
 node scripts/export-video.cjs dist/estoke-ao-cubo.html dist/estoke-ao-cubo-reels.mp4 30
 node scripts/export-video.cjs dist/portfolio-carrossel.html dist/portfolio-carrossel-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/portfolio-carrossel.html dist/portfolio-carrossel-4x5.mp4 60 4x5
+node scripts/export-video.cjs dist/showcase.html dist/misu-apresentacao-9x16.mp4 30 9x16
+node scripts/export-video.cjs dist/showcase.html dist/misu-apresentacao-4x5.mp4 30 4x5
 ```
 
 O script captura cada quadro seguindo a timeline (1080 de largura) e junta com a trilha renderizada offline.

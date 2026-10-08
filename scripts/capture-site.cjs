@@ -22,7 +22,9 @@ const height = Number(hArg || 1000);
 const root = path.resolve(__dirname, "..");
 
 (async () => {
-  const browser = await chromium.launch();
+  // Respeita o proxy do ambiente, se houver (ex.: ambientes de nuvem com rede controlada)
+  const proxy = process.env.HTTPS_PROXY || process.env.https_proxy;
+  const browser = await chromium.launch(proxy ? { proxy: { server: proxy } } : {});
   const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });
   await page.goto(url, { waitUntil: "networkidle", timeout: 90000 });
   // Rola até o fim para disparar lazy-load e animações de entrada, depois volta ao topo

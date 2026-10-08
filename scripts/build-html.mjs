@@ -11,7 +11,7 @@ const ENTRIES = [
   { src: "src/EstokeAoCuboPromo.jsx", name: "EstokeAoCuboPromo", slug: "estoke-ao-cubo", title: "Estoke ao Cubo Promo" },
   { src: "src/PortfolioCarousel.jsx", name: "PortfolioCarousel", slug: "portfolio-carrossel", title: "Carrossel Portfólio" },
   // Só entra no build depois de capturar um site: node scripts/capture-site.cjs <url> showcase "Nome"
-  { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "showcase", title: "Apresentação de Site", needs: "src/sites/showcase.js" },
+  { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "showcase", title: "Misú Apresentação", needs: "src/sites/showcase.js" },
 ];
 const IMPORT_RE = /^import\s+([\s\S]+?)\s+from\s+["'](.+?)["'];?[ \t]*$/gm;
 
