@@ -10,8 +10,9 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const ENTRIES = [
   { src: "src/EstokeAoCuboPromo.jsx", name: "EstokeAoCuboPromo", slug: "estoke-ao-cubo", title: "Estoke ao Cubo Promo" },
   { src: "src/PortfolioCarousel.jsx", name: "PortfolioCarousel", slug: "portfolio-carrossel", title: "Carrossel Portfólio" },
-  // Só entra no build depois de capturar um site: node scripts/capture-site.cjs <url> showcase "Nome"
-  { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "showcase", title: "Misú Apresentação", needs: "src/sites/showcase.js" },
+  // Apresentações de site: o mesmo DeviceShowcase com "./sites/current" apontando para cada site
+  { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "misu-apresentacao", title: "Misú Apresentação", alias: { "./sites/current": "src/sites/misu.js" } },
+  { src: "src/DeviceShowcase.jsx", name: "DeviceShowcase", slug: "lcs-apresentacao", title: "LCS Apresentação", alias: { "./sites/current": "src/sites/lcs.js" } },
 ];
 const IMPORT_RE = /^import\s+([\s\S]+?)\s+from\s+["'](.+?)["'];?[ \t]*$/gm;
 
@@ -29,6 +30,10 @@ function bundle(entry) {
       if (from === "react") {
         const m = what.match(/\{([^}]*)\}/);
         if (m) m[1].split(",").map((s) => s.trim()).filter(Boolean).forEach((h) => hooks.add(h));
+        return "";
+      }
+      if (entry.alias && entry.alias[from]) {
+        deps.push(resolve(root, entry.alias[from]));
         return "";
       }
       if (from.startsWith(".")) {
@@ -56,7 +61,8 @@ for (const e of ENTRIES) {
   }
   const { hooks, body } = bundle(e);
   const reactLine = `import React${hooks.length ? `, { ${hooks.join(", ")} }` : ""} from "react";`;
-  writeFileSync(resolve(root, `dist/${e.name}.artifact.jsx`), `${reactLine}\n\n${body}`);
+  const jsxName = e.alias ? `${e.name}.${e.slug}` : e.name;
+  writeFileSync(resolve(root, `dist/${jsxName}.artifact.jsx`), `${reactLine}\n\n${body}`);
 
   const browserSrc = body
     .replace(`export default function ${e.name}`, `function ${e.name}`)
@@ -78,5 +84,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(<${e.name} />);
 </script>
 `;
   writeFileSync(resolve(root, `dist/${e.slug}.html`), html);
-  console.log(`dist/${e.name}.artifact.jsx  dist/${e.slug}.html`);
+  console.log(`dist/${jsxName}.artifact.jsx  dist/${e.slug}.html`);
 }

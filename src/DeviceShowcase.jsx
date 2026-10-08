@@ -3,13 +3,14 @@ import {
   C, DISP, FONT, clamp, lerp, prog, easeOut, easeInOut, rnd, spring, hexA, vel, midi, tone, hiss,
   fitSize, Wordmark, Grain, SND, renderEventsWav, MotionPlayer,
 } from "./motionKit";
-import { SITE } from "./sites/showcase";
+// "./sites/current" é resolvido no build para o site de cada apresentação (scripts/build-html.mjs)
+import { SITE } from "./sites/current";
 
 /* =============================================================================
    Estoke ao Cubo — Apresentação de site (DeviceShowcase, loop)
    Referência: tablet flutuando em 3D sobre fundo escuro com esferas brilhantes
    desfocadas; o site passa seção a seção e o aparelho gira entre os planos.
-   Conteúdo da tela (src/sites/showcase.js):
+   Conteúdo da tela (src/sites/<site>.js):
    - modo vídeo: trechos de uma gravação de tela, um por plano (cortes escondidos no giro)
    - modo imagem: print de página inteira rolando (scripts/capture-site.cjs)
 ============================================================================= */
@@ -18,6 +19,13 @@ const DURATION = SITE.video ? SITE.video.duration : 15;
 const T = DURATION / N_SHOTS; // duração de cada plano; os cortes caem em k·T, no meio do giro
 const TR = 0.7; // duração do "chicote" entre planos
 const ACCENT = SITE.accent || C.cyan;
+const THEME = {
+  label: ACCENT,
+  bg: ["#0A1422", "#05090F", "#020407"],
+  sphere: ["#0E2438", "#081422", "#040A12"],
+  highlight: "140,190,230",
+  ...(SITE.theme || {}),
+};
 const FORMATS = {
   "9x16": { w: 450, h: 800, label: "9:16" },
   "4x5": { w: 450, h: 562.5, label: "4:5" },
@@ -194,7 +202,7 @@ function Sphere({ x, y, r, z, H }) {
   return (
     <div style={{
       position: "absolute", left: x - r, top: (y / 800) * H - r, width: r * 2, height: r * 2, borderRadius: "50%", zIndex: z > 0 ? 40 : 5,
-      background: `radial-gradient(circle at 34% 30%, rgba(255,235,225,${0.16 * k}) 0%, rgba(40,20,20,0) 32%), radial-gradient(circle at 50% 50%, #26191A 0%, #140D0E 62%, #080506 100%)`,
+      background: `radial-gradient(circle at 34% 30%, rgba(${THEME.highlight},${0.16 * k}) 0%, rgba(0,0,0,0) 32%), radial-gradient(circle at 50% 50%, ${THEME.sphere[0]} 0%, ${THEME.sphere[1]} 62%, ${THEME.sphere[2]} 100%)`,
       boxShadow: `inset ${-r * 0.14}px ${-r * 0.12}px ${r * 0.22}px ${-r * 0.07}px ${hexA(ACCENT, 0.95 * k)}, 0 0 ${r * 0.35}px ${hexA(ACCENT, 0.14 * k)}`,
       filter: blur > 0.5 ? `blur(${blur.toFixed(1)}px)` : "none", opacity: lerp(0.55, 1, k),
     }} />
@@ -228,7 +236,7 @@ function ProjectLabel({ t, L }) {
   if (t > T) return null;
   return (
     <div style={{ position: "absolute", left: 0, right: 0, top: L.labelY, zIndex: 60, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, opacity: clamp(s * 1.5) * (1 - out), transform: `translateY(${(1 - s) * 14 - out * 10}px)` }}>
-      <div style={{ fontFamily: FONT, fontSize: 10.5, fontWeight: 700, letterSpacing: ".3em", color: ACCENT === "#B80C1D" ? "#E0333F" : ACCENT }}>PROJETO</div>
+      <div style={{ fontFamily: FONT, fontSize: 10.5, fontWeight: 700, letterSpacing: ".3em", color: THEME.label }}>PROJETO</div>
       <div style={{ ...DISP, fontSize: fitSize(SITE.projectName.toUpperCase(), 390, 21), color: "#FFFFFF", textAlign: "center", whiteSpace: "nowrap" }}>{SITE.projectName}</div>
       <div style={{ fontFamily: FONT, fontSize: 13, fontWeight: 600, color: "rgba(245,240,235,.72)" }}>{SITE.subtitle || SITE.url}</div>
     </div>
@@ -239,7 +247,7 @@ function Frame({ t, format = "9x16" }) {
   const F = FORMATS[format];
   const L = LAYOUT[format];
   return (
-    <div style={{ position: "absolute", inset: 0, overflow: "hidden", fontFamily: FONT, background: "radial-gradient(ellipse at 50% 40%, #1A1213 0%, #0B0809 60%, #040303 100%)" }}>
+    <div style={{ position: "absolute", inset: 0, overflow: "hidden", fontFamily: FONT, background: `radial-gradient(ellipse at 50% 40%, ${THEME.bg[0]} 0%, ${THEME.bg[1]} 60%, ${THEME.bg[2]} 100%)` }}>
       <Spheres t={t} H={F.h} front={false} />
       <Device t={t} L={L} />
       <Spheres t={t} H={F.h} front />
@@ -254,13 +262,12 @@ function Frame({ t, format = "9x16" }) {
 }
 
 /* =============================================================================
-   Som — loop em escala japonesa (in: Mi Fá Lá Si Dó), 144 BPM em meia-batida:
-   cada plano dura 8 tempos, taiko em 3-3-2, koto em arpejo, whoosh em cada corte
+   Som — loop do tamanho do vídeo; cada plano dura 8 tempos e o corte cai no
+   tempo 1, com whoosh. Estilo por site (SITE.music):
+   - "japanese": escala in (Mi Fá Lá Si Dó), taiko em 3-3-2, koto em arpejo
+   - "premium": acordes maj7/add9, pulso de bumbo suave, arpejo de sino limpo
 ============================================================================= */
 const BEAT = T / 8;
-const IN_SCALE = [64, 65, 69, 71, 72, 76, 77, 81, 83, 84]; // Mi Fá Lá Si Dó em duas oitavas
-const SHOT_CHORDS = [[45, 52, 57, 60], [41, 48, 53, 57], [38, 45, 50, 53], [45, 52, 57, 60], [41, 48, 53, 57], [40, 47, 52, 56]];
-const MOTIFS = [[0, 2, 4, 5, 4, 2, 3, 1], [2, 4, 5, 7, 5, 4, 2, 4], [5, 4, 2, 1, 2, 4, 5, 7], [7, 5, 4, 5, 7, 8, 7, 5], [4, 5, 7, 9, 7, 5, 4, 2], [2, 1, 0, 1, 2, 4, 2, 0]];
 const taiko = (A, w, v = 1) => {
   tone(A, w, { f: 120, f2: 52, glide: 0.18, dur: 0.6, v: 0.8 * v, a: 0.004, send: 0.25 });
   hiss(A, w, { type: "lowpass", f: 900, dur: 0.12, v: 0.25 * v });
@@ -269,19 +276,38 @@ const koto = (A, w, n, v = 1, pan = 0) => {
   tone(A, w, { type: "triangle", f: midi(n) * 1.012, f2: midi(n), glide: 0.04, dur: 0.55, v: 0.1 * v, send: 0.4, pan });
   tone(A, w, { f: midi(n + 12), dur: 0.2, v: 0.025 * v, pan });
 };
+const STYLES = {
+  japanese: {
+    scale: [64, 65, 69, 71, 72, 76, 77, 81, 83, 84],
+    chords: [[45, 52, 57, 60], [41, 48, 53, 57], [38, 45, 50, 53], [45, 52, 57, 60], [41, 48, 53, 57], [40, 47, 52, 56]],
+    motifs: [[0, 2, 4, 5, 4, 2, 3, 1], [2, 4, 5, 7, 5, 4, 2, 4], [5, 4, 2, 1, 2, 4, 5, 7], [7, 5, 4, 5, 7, 8, 7, 5], [4, 5, 7, 9, 7, 5, 4, 2], [2, 1, 0, 1, 2, 4, 2, 0]],
+    hits: [0, 3, 6],
+    hit: taiko,
+    lead: koto,
+  },
+  premium: {
+    scale: [67, 69, 71, 74, 76, 79, 81, 83, 86, 88], // Sol maior pentatônica estendida
+    chords: [[43, 50, 54, 59], [40, 47, 50, 55], [36, 43, 47, 52], [38, 45, 50, 54], [43, 50, 54, 59], [40, 47, 50, 55]], // Gmaj7 · Em7 · Cmaj7 · D · …
+    motifs: [[0, 2, 4, 5, 4, 2, 4, 6], [1, 3, 5, 6, 5, 3, 5, 7], [2, 4, 6, 7, 6, 4, 6, 8], [3, 5, 7, 8, 7, 5, 4, 2], [0, 2, 4, 5, 4, 2, 4, 6], [1, 3, 5, 6, 5, 3, 2, 1]],
+    hits: [0, 2, 4, 6],
+    hit: (A, w, v = 1) => SND.kick(A, w, 0.55 * v),
+    lead: (A, w, n, v = 1, pan = 0) => SND.bell(A, w, n, 0.55 * v, pan),
+  },
+};
+const STYLE = STYLES[SITE.music] || STYLES.premium;
 function buildEvents() {
   const ev = [];
   const add = (t, fn) => ev.push({ t, fn });
   for (let k = 0; k < N_SHOTS; k++) {
     const t0 = k * T;
-    const ch = SHOT_CHORDS[k % SHOT_CHORDS.length];
+    const ch = STYLE.chords[k % STYLE.chords.length];
     add(t0, (A, w) => SND.pad(A, w, ch, T, 1200, 1.1));
-    [0, 3, 6].forEach((b, j) => add(t0 + b * BEAT, (A, w) => taiko(A, w, j === 0 ? 1 : 0.6)));
+    STYLE.hits.forEach((b, j) => add(t0 + b * BEAT, (A, w) => STYLE.hit(A, w, j === 0 ? 1 : 0.6)));
     for (let b = 0; b < 8; b++) {
       add(t0 + b * BEAT + BEAT / 2, (A, w) => SND.hat(A, w, 0.45, b % 2 ? 0.4 : -0.4));
       add(t0 + b * BEAT, (A, w) => SND.sub(A, w, ch[0] - 12, BEAT * 0.9, b === 0 ? 0.8 : 0.35));
-      const n = IN_SCALE[MOTIFS[k % MOTIFS.length][b]];
-      add(t0 + b * BEAT, (A, w) => koto(A, w, n, b === 0 ? 1 : 0.7, b % 2 ? 0.35 : -0.35));
+      const n = STYLE.scale[STYLE.motifs[k % STYLE.motifs.length][b]];
+      add(t0 + b * BEAT, (A, w) => STYLE.lead(A, w, n, b === 0 ? 1 : 0.7, b % 2 ? 0.35 : -0.35));
     }
     add(t0 - 0.4 < 0 ? DURATION - 0.4 : t0 - 0.4, (A, w) => SND.whoosh(A, w, { dur: 0.8, from: 300, to: 3200, v: 0.24, pan: k % 2 ? 0.8 : -0.8, panTo: k % 2 ? -0.8 : 0.8 }));
   }

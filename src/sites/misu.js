@@ -1,4 +1,4 @@
-// Site apresentado pelo motion DeviceShowcase.
+// Misú Culinária Oriental — apresentação no motion DeviceShowcase.
 // Modo vídeo: trechos de uma gravação de tela do site, já cortados e concatenados
 // (dist/media/misu-site.*, 6 trechos × 3,333s = 20s, um por plano de câmera).
 // Fonte: "Misú Culinária Oriental _ Rodízio japonês em Petrópolis · Centro e Corrêas - Opera 2026-10-07 22-06-05 (1).mp4"
@@ -9,4 +9,11 @@ export const SITE = {
   accent: "#B80C1D", // vermelho da marca Misú (amostrado da gravação)
   video: { webm: "media/misu-site.webm", mp4: "media/misu-site.mp4", w: 960, h: 540, duration: 20 },
   shots: 6,
+  theme: {
+    label: "#E0333F", // "PROJETO" (vermelho mais claro, legível sobre o escuro)
+    bg: ["#1A1213", "#0B0809", "#040303"],
+    sphere: ["#26191A", "#140D0E", "#080506"],
+    highlight: "255,235,225",
+  },
+  music: "japanese",
 };

@@ -6,11 +6,24 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 |---|---|---|---|---|
 | Promo (venda de sites e lojas) | 40s | 9:16 | `src/EstokeAoCuboPromo.jsx` | `dist/estoke-ao-cubo-reels.mp4` |
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
-| Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/showcase.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
+| Apresentação de site: Misú | 20s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/misu.js` | `dist/misu-apresentacao-9x16.mp4`, `dist/misu-apresentacao-4x5.mp4` |
+| Apresentação de site: LCS | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/lcs.js` | `dist/lcs-apresentacao-9x16.mp4`, `dist/lcs-apresentacao-4x5.mp4` |
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
 
-## Apresentação de site (DeviceShowcase) — Misú Culinária Oriental
+## Apresentações de site (DeviceShowcase)
+
+Um único motion (`src/DeviceShowcase.jsx`) e um arquivo por site em `src/sites/`, com os trechos da gravação, as cores e o estilo da trilha. No build, `./sites/current` é trocado pelo arquivo de cada site, gerando `dist/<site>-apresentacao.html` (preview, precisa de `dist/media/` ao lado).
+
+Para um novo site: grave a tela, escolha um trecho por plano (3,333s cada), gere `dist/media/<site>-site.webm/.mp4` com ffmpeg (ver comentário nos arquivos de `src/sites/`), crie `src/sites/<site>.js` copiando um existente e adicione uma linha em `ENTRIES` de `scripts/build-html.mjs`.
+
+### LCS Transporte e Turismo
+
+- Gravação: `LCS Transporte Turismo _ Transporte Executivo e Fretamento Premium - Opera 2026-10-07 22-26-41.mp4`. 5 planos: 8,6s (logo) · 11,7s (hero) · 15,03s (frota de vans) · 18,36s (carros → "Por que escolher a LCS?") · 21,69s ("Como reservar" → chamada final → rodapé). Começa no logo, então o loop fecha.
+- Tema verde: contorno das esferas no verde-sálvia do site (`#84A892`), esferas e fundo em verde-escuro.
+- Trilha "premium" (Gmaj7 · Em7 · Cmaj7 · D): bumbo suave a cada dois tempos, arpejo de sino e whoosh em cada corte.
+
+### Misú Culinária Oriental
 
 Baseado na referência `c24dcfc9f7c5d0463893f71a972aab76.mp4`: tablet flutuando em 3D sobre fundo escuro com esferas brilhantes desfocadas, o site passando seção a seção e o aparelho girando entre os planos.
 
@@ -19,8 +32,8 @@ Baseado na referência `c24dcfc9f7c5d0463893f71a972aab76.mp4`: tablet flutuando 
 - Esferas com contorno de luz no vermelho da Misú (`#B80C1D`); legenda "Projeto / Misú Culinária Oriental / Rodízio japonês em Petrópolis" no primeiro plano.
 - Trilha em escala japonesa (Mi, Fá, Lá, Si, Dó): taiko em 3-3-2, koto em arpejo e whoosh em cada corte. Cada plano dura 8 tempos.
 - O vídeo da tela acompanha a timeline: no player corrige a deriva e pausa junto; na exportação busca o quadro exato de cada instante.
-- O preview `dist/showcase.html` precisa da pasta `dist/media/` ao lado. (O `.artifact.jsx` deste motion também referencia `media/`, então não funciona sozinho num Artifact React.)
-- Para outro site: grave a tela, corte os trechos (um por plano) com ffmpeg e edite `src/sites/showcase.js`. Também há o modo imagem: `node scripts/capture-site.cjs <url> showcase "Nome"` captura um print de página inteira que rola dentro do tablet.
+- Os `.artifact.jsx` das apresentações referenciam `media/`, então não funcionam sozinhos num Artifact React; use o HTML com a pasta `media/`.
+- Também há o modo imagem: `node scripts/capture-site.cjs <url> <site> "Nome"` captura um print de página inteira que rola dentro do tablet. Sites com animação de entrada ao rolar podem sair com seções em branco; nesse caso use a gravação de tela.
 
 ## Carrossel Padrão Portfólio
 
@@ -72,8 +85,10 @@ node scripts/build-html.mjs
 node scripts/export-video.cjs dist/estoke-ao-cubo.html dist/estoke-ao-cubo-reels.mp4 30
 node scripts/export-video.cjs dist/portfolio-carrossel.html dist/portfolio-carrossel-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/portfolio-carrossel.html dist/portfolio-carrossel-4x5.mp4 60 4x5
-node scripts/export-video.cjs dist/showcase.html dist/misu-apresentacao-9x16.mp4 30 9x16
-node scripts/export-video.cjs dist/showcase.html dist/misu-apresentacao-4x5.mp4 30 4x5
+node scripts/export-video.cjs dist/misu-apresentacao.html dist/misu-apresentacao-9x16.mp4 30 9x16
+node scripts/export-video.cjs dist/misu-apresentacao.html dist/misu-apresentacao-4x5.mp4 30 4x5
+node scripts/export-video.cjs dist/lcs-apresentacao.html dist/lcs-apresentacao-9x16.mp4 30 9x16
+node scripts/export-video.cjs dist/lcs-apresentacao.html dist/lcs-apresentacao-4x5.mp4 30 4x5
 ```
 
 O script captura cada quadro seguindo a timeline (1080 de largura) e junta com a trilha renderizada offline.
