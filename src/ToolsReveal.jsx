@@ -1,38 +1,39 @@
 import React from "react";
 import {
-  C, FONT, clamp, lerp, prog, easeOut, easeInOut, spring, hexA,
+  C, FONT, clamp, lerp, prog, easeOut, easeInOut, spring, hexA, rnd,
   Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer,
 } from "./motionKit";
 import { AD_CLIP_MP4, AD_CLIP_WEBM, AD_CLIP_DUR } from "./adAssets";
-import { TOOLS_DEV, TOOLS_ICONS, TOOLS_DUR, TOOLS_SITES } from "./toolsAssets";
-import { MUSIC_TOOLS } from "./audio/distanceTools";
+import { TOOLS_DEV, TOOLS_DEV_DUR, TOOLS_SITES } from "./toolsAssets";
+import { MUSIC_TOOLS } from "./audio/toolsRef";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 
 /* =============================================================================
-   Estoke ao Cubo — "dev / tools / site" (12s, vertical)
+   Estoke ao Cubo — "dev / tools / site" (11,4s, story 9:16 e 3:4)
    Referência: vídeo "artist / tools / art" (3:4, 11,4s): tela branca dividida em três
    faixas, os nomes "artist", "tools" e "art" aparecem um a um e, quando o beat volta,
    as três faixas viram vídeo ao mesmo tempo (a artista, os materiais na mesa, o desenho).
    Nossa versão, para programação:
-     - dev:   programador de costas com os monitores cheios de código (Mixkit 41637)
-     - tools: o vídeo enviado (pilha de ícones neon com o Pinterest na frente) e, no mesmo
-              estilo, Python, Java, GitHub e Antigravity passando pela câmera; fecha com as
-              cinco ferramentas lado a lado, pulsando no beat
+     - dev:   o vídeo do programador (assets/dev-programador.mp4), com o recorte da faixa
+              acompanhando o rosto e um leve avanço de câmera nos planos abertos
+     - tools: animação própria em neon — Pinterest, Python, Java, GitHub e Antigravity
+              atravessando a câmera, um a cada duas batidas, com rastros de velocidade e o
+              fundo tingido pela cor do ícone; fecha com as cinco lado a lado, uma acendendo
+              por batida
      - site:  o que sai disso — a Dizzy (moeda 3D) e os prints de Kaiirós, YMB Cocktails,
               KDust, Trama e Bastos trocando no beat
-   Música: "DISTANCE" — o trecho começa no respiro da faixa e o beat volta (67,29s da
-   faixa) exatamente no corte para os vídeos (3,79s).
+   Música: a do vídeo de referência, inteira e no mesmo tempo: o beat volta em 3,78s e a
+   grade é de 137,6 BPM (uma batida a cada 0,436s); todos os cortes caem nela.
 ============================================================================= */
-const DURATION = 12;
+const DURATION = 11.4;
 const FORMATS = {
+  "9x16": { w: 450, h: 800, label: "Story 9:16" },
   "3x4": { w: 450, h: 600, label: "3:4" },
-  "9x16": { w: 450, h: 800, label: "9:16" },
 };
-// Batidas da faixa depois do corte (segundos do vídeo)
-const BEATS = [3.79, 5.0, 5.9, 6.5, 7.1, 8.39, 9.19, 9.89, 10.49, 11.69];
-const T = { dev: 0.75, tools: 1.5, site: 2.25, cut: 3.79, fly: 5.0, dock: 8.39 };
+const BEAT = 0.436;
+const beat = (n) => 3.78 + n * BEAT; // n-ésima batida depois do corte
+const T = { dev: 0.75, tools: 1.5, site: 2.25, cut: 3.78, dock: beat(10.5) };
 const LABELS = ["dev", "tools", "site"];
-
 /* ---------- Ícones das ferramentas (traço branco sobre o bloco colorido) ---------- */
 const ICONS = {
   python: { name: "Python", vb: 24, d: "M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95l.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25l-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z", bg: ["#5A9AD0", "#2B5F8E"], glow: "#4B8BBE", accent: "#FFD43B" },
@@ -41,16 +42,17 @@ const ICONS = {
   antigravity: { name: "Antigravity", vb: 24, d: "M21.751 22.607c1.34 1.005 3.35.335 1.508-1.508C17.73 15.74 18.904 1 12.037 1 5.17 1 6.342 15.74.815 21.1c-2.01 2.009.167 2.511 1.507 1.506 5.192-3.517 4.857-9.714 9.715-9.714 4.857 0 4.522 6.197 9.714 9.715z", bg: ["#4285F4", "#34A853", "#FBBC05", "#EA4335"], glow: "#4285F4" },
   pinterest: { name: "Pinterest", vb: 24, d: "M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z", bg: ["#FF2A4B", "#C8001C"], glow: "#E60023" },
 };
-const FLY = ["python", "java", "github", "antigravity"];
-const DOCK = ["python", "java", "github", "antigravity", "pinterest"];
 
-function Tile({ id, size, glow = 1, style }) {
+function Tile({ id, size, glow = 1, depth = false, style }) {
   const k = ICONS[id];
   const bg = k.bg.length > 2 ? `linear-gradient(135deg, ${k.bg.join(", ")})` : `linear-gradient(160deg, ${k.bg[0]}, ${k.bg[1]})`;
+  const edge = k.bg[k.bg.length - 1];
+  // espessura: camadas escuras empilhadas atrás do bloco, como um ícone 3D
+  const thick = depth ? [1, 2, 3, 4].map((i) => `${size * 0.012 * i}px ${size * 0.016 * i}px 0 ${hexA(edge, 1)}`).join(", ") + ", " : "";
   return (
     <div style={{
       position: "absolute", width: size, height: size, borderRadius: size * 0.24, background: bg,
-      boxShadow: `0 0 ${size * 0.32 * glow}px ${hexA(k.glow, 0.75)}, 0 0 ${size * 0.08}px ${hexA(k.glow, 0.9)}, inset 0 ${size * 0.04}px ${size * 0.05}px rgba(255,255,255,.35)`,
+      boxShadow: `${thick}0 0 ${size * 0.32 * glow}px ${hexA(k.glow, 0.75)}, 0 0 ${size * 0.08}px ${hexA(k.glow, 0.9)}, inset 0 ${size * 0.04}px ${size * 0.05}px rgba(255,255,255,.35)`,
       display: "grid", placeItems: "center", overflow: "hidden", ...style,
     }}>
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0) 45%)" }} />
@@ -62,43 +64,82 @@ function Tile({ id, size, glow = 1, style }) {
 }
 
 /* ---------- tools: ícones atravessando a câmera ---------- */
-// Cada ícone passa pela câmera numa batida (5,9 · 6,5 · 7,1 · 8,0s)
-const PASS = [5.9, 6.5, 7.1, 8.0];
+const FLY = ["pinterest", "python", "java", "github", "antigravity"];
+const DOCK = ["python", "java", "github", "antigravity", "pinterest"];
+const GAP = 2.2; // distância entre ícones na pilha
+const NEAR = 0.3; // distância em que o ícone "atravessa" a câmera
+const FX = [0, 0.55, -0.5, 0.5, -0.45]; // pilha em zigue-zague
+const FY = [0, -0.14, 0.1, -0.12, 0.08];
+const PASS = [2, 4, 6, 8, 10].map(beat); // um ícone a cada duas batidas
+// avanço: devagar entre as batidas e um "soco" até atravessar o ícone na batida
+const lunge = (p) => 0.3 * p + 0.7 * p * p * p;
 function camZ(t) {
-  // posição da câmera: avança aos trancos, acelerando em cada batida
-  const keys = [[T.fly, -2.6], ...PASS.map((p, k) => [p, k * 2.2 - 0.35]), [T.dock, 3 * 2.2 + 0.4]];
+  const keys = [[T.cut, -2.0], ...PASS.map((p, k) => [p, k * GAP - NEAR])];
+  if (t <= keys[0][0]) return keys[0][1];
   for (let i = 0; i < keys.length - 1; i++) {
     const [a, za] = keys[i];
     const [b, zb] = keys[i + 1];
-    if (t <= b) return lerp(za, zb, easeInOut(prog(t, a, b)));
+    if (t <= b) return lerp(za, zb, lunge(prog(t, a, b)));
   }
-  return keys[keys.length - 1][1];
+  return keys[keys.length - 1][1] + (t - keys[keys.length - 1][0]) * 3;
 }
+function camXY(cz) {
+  const f = clamp((cz + NEAR) / GAP, 0, FLY.length - 1);
+  const i = Math.min(Math.floor(f), FLY.length - 2);
+  const p = easeInOut(clamp(f - i));
+  return [lerp(FX[i], FX[i + 1], p), lerp(FY[i], FY[i + 1], p)];
+}
+const STARS = Array.from({ length: 70 }, (_, i) => [(rnd(i, 1) - 0.5) * 5, (rnd(i, 2) - 0.5) * 2.4, rnd(i, 3) * 12]);
 function FlyThrough({ t, PW, PH }) {
   const cz = camZ(t);
-  const base = PH * 0.42;
-  const items = FLY.map((id, k) => {
-    const d = k * 2.2 - cz;
-    if (d < 0.18 || d > 9) return null;
-    const s = 1 / d;
-    const size = base * s;
-    // pilha em diagonal (cada ícone um pouco à direita e acima do anterior); a câmera
-    // acompanha a pilha e deixa o ícone da vez levemente à esquerda, saindo pela borda
-    const f = (cz + 0.35) / 2.2;
-    const x = PW / 2 + (k * 0.55 - (f * 0.55 + 0.14)) * PH * s;
-    const y = PH / 2 + (-k * 0.12 + f * 0.12) * PH * s;
-    const op = clamp((d - 0.18) / 0.3) * clamp((9 - d) / 3);
-    return (
-      <Tile key={id} id={id} size={size} glow={1.1} style={{
-        left: x - size / 2, top: y - size / 2, opacity: op, zIndex: Math.round(1000 - d * 100),
-        transform: `perspective(${PH * 2}px) rotateY(${-22 + 10 / (1 + d)}deg) rotateZ(${-7}deg)`,
-      }} />
-    );
-  });
-  return <div style={{ position: "absolute", inset: 0, background: "#000" }}>{items}</div>;
+  const v = (camZ(t + 0.01) - camZ(t - 0.01)) / 0.02; // velocidade da câmera
+  const [cx, cy] = camXY(cz);
+  const base = PH * 0.38;
+  const proj = (x, y, d) => [PW / 2 + (x - cx) * PH * 0.9 / d, PH / 2 + (y - cy) * PH * 0.9 / d];
+  // cor do próximo ícone tinge o fundo, mais forte quanto mais perto
+  const next = FLY.findIndex((_, k) => k * GAP - cz > NEAR);
+  const nd = next >= 0 ? next * GAP - cz : 9;
+  const tint = next >= 0 ? ICONS[FLY[next]].glow : "#000000";
+  // clarão na cor do ícone logo depois de atravessá-lo
+  const lastPass = PASS.filter((p) => p <= t).pop();
+  const flashK = PASS.indexOf(lastPass);
+  const flash = lastPass != null ? Math.exp(-(t - lastPass) * 9) : 0;
+  return (
+    <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: `radial-gradient(70% 90% at 50% 50%, ${hexA(tint, clamp(0.5 / nd, 0, 0.45))}, #000 75%)` }}>
+      {STARS.map(([x, y, z0], i) => {
+        const d = ((z0 - cz) % 12 + 12) % 12 + 0.2;
+        const [px, py] = proj(x, y, d);
+        const ang = Math.atan2(py - PH / 2, px - PW / 2);
+        const len = 2 + Math.min(70, v * 9 / d);
+        return <div key={i} style={{
+          position: "absolute", left: px, top: py, width: len, height: Math.max(1, 2.2 / d), borderRadius: 2,
+          background: "#fff", opacity: clamp((12 - d) / 6) * 0.55, transformOrigin: "0 50%", transform: `rotate(${ang}rad)`,
+        }} />;
+      })}
+      {FLY.map((id, k) => {
+        const d = k * GAP - cz;
+        if (d < NEAR || d > 10) return null;
+        const size = base / d;
+        const [x, y] = proj(FX[k], FY[k], d);
+        const op = clamp((d - NEAR) / 0.25) * clamp((10 - d) / 3);
+        const blur = Math.min(7, (v * size) / (d * 260));
+        const turn = (FX[k] - cx) * 40;
+        return (
+          <Tile key={id} id={id} size={size} glow={1.2} depth style={{
+            left: x - size / 2, top: y - size / 2, opacity: op, zIndex: Math.round(1000 - d * 100),
+            transform: `perspective(${PH * 2.2}px) rotateY(${-turn - 14}deg) rotateX(${(FY[k] - cy) * -40 + 6}deg) rotateZ(${-6 + k * 3}deg)`,
+            filter: blur > 0.4 ? `blur(${blur.toFixed(2)}px)` : undefined,
+          }} />
+        );
+      })}
+      {flash > 0.02 && <div style={{ position: "absolute", inset: 0, background: ICONS[FLY[flashK]].glow, opacity: flash * 0.55, zIndex: 2000 }} />}
+    </div>
+  );
 }
 
-/* ---------- tools: as cinco ferramentas lado a lado ---------- */
+/* ---------- tools: as cinco ferramentas lado a lado, uma acendendo por batida ---------- */
+const PULSE = [12, 13, 14, 15, 16].map(beat); // 9,02 · 9,46 · 9,89 · 10,33 · 10,76
+const ALL = beat(17); // 11,2: todas juntas
 function Dock({ t, PW, PH }) {
   const u = t - T.dock;
   const n = DOCK.length;
@@ -106,26 +147,24 @@ function Dock({ t, PW, PH }) {
   const gap = size * 0.28;
   const total = n * size + (n - 1) * gap;
   const x0 = (PW - total) / 2;
-  const after = BEATS.filter((b) => b > T.dock + 0.3);
+  const hit = (b) => (t >= b ? Math.exp(-(t - b) * 6) : 0);
   return (
     <div style={{ position: "absolute", inset: 0, background: "radial-gradient(60% 80% at 50% 55%, #0B1830, #000 70%)" }}>
       {DOCK.map((id, k) => {
-        const p = spring(u - k * 0.08, { stiffness: 260, damping: 15 });
-        // pulso no beat: cada batida acende um ícone, da esquerda para a direita
-        let pulse = 0;
-        after.forEach((b, j) => { if (j % n === k) pulse = Math.max(pulse, Math.exp(-Math.max(0, t - b) * 6) * (t >= b ? 1 : 0)); });
+        const p = spring(u - k * 0.06, { stiffness: 260, damping: 15 });
+        const pulse = Math.max(hit(PULSE[k]), hit(ALL));
         const float = Math.sin((t + k * 0.4) * 2.4) * size * 0.03;
-        const sc = clamp(p, 0, 1.2) * (1 + pulse * 0.12);
+        const sc = clamp(p, 0, 1.2) * (1 + pulse * 0.14);
         return (
           <React.Fragment key={id}>
-            <Tile id={id} size={size} glow={0.8 + pulse * 0.9} style={{
-              left: x0 + k * (size + gap), top: PH * 0.47 - size / 2 + float,
-              transform: `scale(${sc})`, opacity: clamp(p * 2),
+            <Tile id={id} size={size} glow={0.7 + pulse * 1.1} depth style={{
+              left: x0 + k * (size + gap), top: PH * 0.45 - size / 2 + float - pulse * size * 0.08,
+              transform: `perspective(600px) rotateX(10deg) scale(${sc})`, opacity: clamp(p * 2),
             }} />
             <div style={{
-              position: "absolute", left: x0 + k * (size + gap) - gap, width: size + gap * 2, top: PH * 0.47 + size * 0.62,
+              position: "absolute", left: x0 + k * (size + gap) - gap, width: size + gap * 2, top: PH * 0.45 + size * 0.64,
               textAlign: "center", fontFamily: FONT, fontWeight: 600, fontSize: Math.max(8, size * 0.17), color: "#fff",
-              opacity: clamp((u - 0.35 - k * 0.08) * 4) * 0.72, whiteSpace: "nowrap",
+              opacity: clamp((u - 0.3 - k * 0.06) * 4) * (0.6 + pulse * 0.4), whiteSpace: "nowrap",
             }}>{ICONS[id].name}</div>
           </React.Fragment>
         );
@@ -135,16 +174,37 @@ function Dock({ t, PW, PH }) {
 }
 
 function ToolsPanel({ t, PW, PH }) {
-  if (t < T.fly) {
-    // vídeo enviado: a pilha de ícones neon com o Pinterest na frente
-    return <SyncedVideo t={clamp(t - T.cut, 0, TOOLS_DUR.ICONS - 0.04)} duration={TOOLS_DUR.ICONS} webm={TOOLS_ICONS.webm} mp4={TOOLS_ICONS.mp4} style={{ background: "#000" }} />;
+  return t < T.dock ? <FlyThrough t={t} PW={PW} PH={PH} /> : <Dock t={t} PW={PW} PH={PH} />;
+}
+
+/* ---------- dev: vídeo do programador, recorte seguindo o rosto ---------- */
+// [segundo do vídeo depois do corte, altura do rosto (fração da altura do vídeo), zoom]
+const FACE = [[0, 0.17, 1.0], [0.67, 0.3, 1.0], [1.22, 0.33, 1.08], [1.78, 0.4, 1.25], [6.22, 0.4, 1.3], [6.78, 0.36, 1.15], [7.33, 0.33, 1.1], [7.7, 0.31, 1.1]];
+function faceAt(u) {
+  for (let i = 0; i < FACE.length - 1; i++) {
+    const [a, fa, za] = FACE[i];
+    const [b, fb, zb] = FACE[i + 1];
+    if (u <= b) { const p = easeInOut(prog(u, a, b)); return [lerp(fa, fb, p), lerp(za, zb, p)]; }
   }
-  if (t < T.dock) return <FlyThrough t={t} PW={PW} PH={PH} />;
-  return <Dock t={t} PW={PW} PH={PH} />;
+  return FACE[FACE.length - 1].slice(1);
+}
+function DevPanel({ t, PW, PH, tall }) {
+  const u = clamp(t - T.cut, 0, TOOLS_DEV_DUR - 0.04);
+  const [face, zoom] = faceAt(u);
+  const vw = PW * zoom;
+  const vh = vw * (1024 / 576);
+  // rosto a ~42% da faixa no story (abaixo da barra do Instagram) e ~36% no 3:4
+  const top = clamp(PH * (tall ? 0.46 : 0.38) - face * vh, PH - vh, 0);
+  return (
+    <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#000" }}>
+      <SyncedVideo t={u} duration={TOOLS_DEV_DUR} webm={TOOLS_DEV.webm} mp4={TOOLS_DEV.mp4}
+        style={{ inset: "auto", left: (PW - vw) / 2, top, width: vw, height: vh, filter: "contrast(1.06) saturate(1.05)" }} />
+    </div>
+  );
 }
 
 /* ---------- site: Dizzy e os prints trocando no beat ---------- */
-const SITE_CUTS = [6.5, 7.1, 8.39, 9.19, 9.89]; // Kaiirós, YMB, KDust, Trama, Bastos
+const SITE_CUTS = [4, 6, 8, 10, 12].map(beat); // Kaiirós, YMB, KDust, Trama, Bastos
 function SitePanel({ t }) {
   if (t < SITE_CUTS[0]) {
     return <SyncedVideo t={clamp(t - T.cut, 0, AD_CLIP_DUR - 0.04)} duration={AD_CLIP_DUR} webm={AD_CLIP_WEBM} mp4={AD_CLIP_MP4} style={{ transform: "scale(1.04)" }} />;
@@ -165,7 +225,7 @@ function SitePanel({ t }) {
 }
 
 /* ---------- molduras ---------- */
-function Label({ text, t, at, cut }) {
+function Label({ text, t, at, cut, top = 9 }) {
   if (t < at) return null;
   const p = spring(t - at, { stiffness: 300, damping: 18 });
   if (!cut) {
@@ -176,37 +236,46 @@ function Label({ text, t, at, cut }) {
     );
   }
   return (
-    <div style={{ position: "absolute", left: 12, top: 9, fontFamily: FONT, fontWeight: 700, fontSize: 13, color: "#fff", letterSpacing: "-0.01em", textShadow: "0 1px 6px rgba(0,0,0,.55)", zIndex: 5 }}>{text}</div>
+    <div style={{ position: "absolute", left: 12, top, fontFamily: FONT, fontWeight: 700, fontSize: 13, color: "#fff", letterSpacing: "-0.01em", textShadow: "0 1px 6px rgba(0,0,0,.55)", zIndex: 5 }}>{text}</div>
   );
 }
 
-function Frame({ t, format = "3x4" }) {
+function Frame({ t, format = "9x16" }) {
   const F = FORMATS[format];
   const W = F.w;
   const H = F.h;
   const PH = H / 3;
+  const tall = format === "9x16";
   const cut = t >= T.cut;
-  // no corte, cada faixa entra com um leve "soco" de escala
-  const punch = cut ? 1 + 0.05 * Math.exp(-(t - T.cut) * 7) : 1;
+  // no corte, cada faixa entra com um leve "soco" de escala; os prints também a cada troca
+  const punch = (k) => {
+    if (!cut) return 1;
+    let at = T.cut;
+    if (k === 2) SITE_CUTS.forEach((c) => { if (t >= c) at = c; });
+    return 1 + 0.05 * Math.exp(-(t - at) * 7);
+  };
   const panels = [
-    () => <SyncedVideo t={clamp(t - T.cut, 0, TOOLS_DUR.DEV - 0.04)} duration={TOOLS_DUR.DEV} webm={TOOLS_DEV.webm} mp4={TOOLS_DEV.mp4} style={{ objectPosition: "50% 40%" }} />,
+    () => <DevPanel t={t} PW={W} PH={PH} tall={tall} />,
     () => <ToolsPanel t={t} PW={W} PH={PH} />,
     () => <SitePanel t={t} />,
   ];
   const ats = [T.dev, T.tools, T.site];
+  // no story, o nome da faixa de cima desce para fugir da barra de progresso e do perfil
+  const labelTop = (k) => (tall && k === 0 ? 64 : 9);
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: cut ? "#000" : "#FFFFFF", fontFamily: FONT }}>
       {LABELS.map((lb, k) => (
         <div key={lb} style={{ position: "absolute", left: 0, top: k * PH, width: W, height: PH, overflow: "hidden" }}>
-          {cut && <div style={{ position: "absolute", inset: 0, transform: `scale(${punch})` }}>{panels[k]()}</div>}
-          {cut && <div style={{ position: "absolute", left: 0, top: 0, width: "45%", height: "40%", background: "radial-gradient(90% 100% at 0% 0%, rgba(0,0,0,.5), rgba(0,0,0,0) 70%)", zIndex: 4 }} />}
-          <Label text={lb} t={t} at={ats[k]} cut={cut} />
+          {cut && <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(k)})` }}>{panels[k]()}</div>}
+          {cut && <div style={{ position: "absolute", left: 0, top: labelTop(k) - 9, width: "45%", height: "40%", background: "radial-gradient(90% 100% at 0% 0%, rgba(0,0,0,.5), rgba(0,0,0,0) 70%)", zIndex: 4 }} />}
+          <Label text={lb} t={t} at={ats[k]} cut={cut} top={labelTop(k)} />
           {!cut && k < 2 && <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 1, background: hexA(C.ink, 0.14) }} />}
         </div>
       ))}
       {cut && (
-        // assinatura no canto, como a marca d'água da referência
-        <div style={{ position: "absolute", right: 10, bottom: 9, display: "flex", alignItems: "center", gap: 5, opacity: 0.85, zIndex: 6 }}>
+        // assinatura (como a marca d'água da referência); no story fica no alto da faixa de baixo,
+        // longe do campo de resposta
+        <div style={{ position: "absolute", right: 10, ...(tall ? { top: PH * 2 + 9 } : { bottom: 9 }), display: "flex", alignItems: "center", gap: 5, opacity: 0.85, zIndex: 6 }}>
           <CubeLogo size={15} />
           <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 10, color: "#fff", textShadow: "0 1px 4px rgba(0,0,0,.6)" }}>estoke ao cubo</div>
         </div>
@@ -219,27 +288,19 @@ function Frame({ t, format = "3x4" }) {
 }
 
 /* =============================================================================
-   Som — "DISTANCE": respiro da faixa (reforçado) com os nomes aparecendo e o beat
-   voltando no corte. Efeitos gravados bem baixos, só para marcar os movimentos.
+   Som — a música do vídeo de referência, inteira e sem cortes (o ritmo do motion segue
+   a grade dela). Efeitos gravados bem baixos, só nos ícones atravessando a câmera.
 ============================================================================= */
-const MUSIC = { drop: 3.79, gain: 0.5 }; // beat de 67,29s da faixa dentro do trecho (começa em 63,5s)
-const SAMPLES = { music: MUSIC_TOOLS.distanceTools, ...SFX };
+const MUSIC = { gain: 0.9 };
+const SAMPLES = { music: MUSIC_TOOLS.toolsRef, ...SFX };
 function buildEvents() {
   const ev = [];
   const fx = (at, name, gain, opts = {}) => ev.push({ t: Math.max(0, at - SFX_PEAK[name] / (opts.rate || 1)), fn: (A, w) => A.sample(name, w, { gain, ...opts }) });
   ev.push({
     t: 0, dur: DURATION,
-    fn: (A, w, off = 0) => A.sample("music", w, {
-      off, dur: DURATION - off, gain: MUSIC.gain, fadeIn: 0.05,
-      env: [[0, 1.9], [MUSIC.drop - 0.03, 1.9], [MUSIC.drop, 1], [DURATION - 0.7, 1], [DURATION, 0]],
-    }),
+    fn: (A, w, off = 0) => A.sample("music", w, { off, dur: DURATION - off, gain: MUSIC.gain, fadeIn: 0.02, env: [[0, 1], [DURATION - 0.25, 1], [DURATION, 0]] }),
   });
-  [T.dev, T.tools, T.site].forEach((at, i) => fx(at, "lightPop", 0.07, { rate: [1, 1.07, 1.14][i] }));
-  fx(T.cut, "deepHit", 0.1);
-  fx(T.fly, "airSweep", 0.07);
-  PASS.forEach((p, k) => fx(p, "airWhoosh", 0.06, { rate: [1, 1.06, 0.96, 1.1][k] }));
-  DOCK.forEach((_, k) => fx(T.dock + k * 0.08 + 0.05, "bubblePop", 0.04, { rate: 1 + k * 0.05 }));
-  SITE_CUTS.forEach((c, k) => fx(c, "smallSweep", 0.035, { rate: [1, 1.05, 0.97, 1.08, 1.02][k] }));
+  PASS.forEach((p, k) => fx(p, "airWhoosh", 0.05, { rate: [1, 1.06, 0.96, 1.1, 1.02][k] }));
   return ev.sort((a, b) => a.t - b.t);
 }
 const EVENTS = buildEvents();
@@ -250,12 +311,11 @@ const MOTION = { Frame, duration: DURATION, formats: FORMATS, renderWav };
 
 export default function ToolsReveal() {
   return (
-    <MotionPlayer Frame={Frame} duration={DURATION} events={EVENTS} formats={FORMATS} defaultFormat="3x4" renderWav={renderWav} samples={SAMPLES}
+    <MotionPlayer Frame={Frame} duration={DURATION} events={EVENTS} formats={FORMATS} defaultFormat="9x16" renderWav={renderWav} samples={SAMPLES}
       fontsToLoad={[`700 16px "Open Sauce Sans"`]}
       scenes={[
         { name: "Nomes", from: 0 },
         { name: "Corte", from: T.cut },
-        { name: "Ícones", from: T.fly },
         { name: "Ferramentas", from: T.dock },
       ]} />
   );
