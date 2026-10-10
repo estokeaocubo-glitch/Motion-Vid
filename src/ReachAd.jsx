@@ -16,9 +16,9 @@ import { SFX, SFX_PEAK } from "./audio/sfx";
    seleção se deformando, imagens em tela cheia com texto gigante ("REWRITE THE RULES",
    "DREAM BIGGER", "MUCH BIGGER"), feixes de luz em V e a logo no fundo claro.
    Nossa versão: as imagens são telas dos 9 sites que fizemos; na parte em tela cheia,
-   vídeos cinematográficos (Mixkit, licença livre): "VENDER MAIS" com alguém comemorando no
-   notebook e notificações de pedido pipocando, "IR ALÉM" com braços abertos no alto de um
-   penhasco e "MUITO ALÉM" sobre as nuvens; fecha com "vendas." e a logo.
+   vídeos com visual tech e limpo (Mixkit, licença livre): "VENDER MAIS" com notebook e café
+   numa mesa escura e notificações de pedido pipocando, "IR ALÉM" com o celular na mão à noite
+   (luzes desfocadas) e "MUITO ALÉM" sobre as nuvens; fecha com "vendas." e a logo.
    Música: "Alexa 2" (EMANVEL) — forte no começo, pausa enquanto a lista e a moldura
    aparecem e o drop (17,47s da faixa) cai exatamente nas imagens em tela cheia.
 ============================================================================= */
@@ -281,7 +281,7 @@ function BigWords({ t, t0, top, bottom, L, H }) {
     </>
   );
 }
-// Notificações de venda pipocando sobre a comemoração ("VENDER MAIS")
+// Notificações de venda pipocando sobre o notebook ("VENDER MAIS")
 const ORDERS = [["Novo pedido", "R$ 249,90"], ["Pagamento aprovado", "Pix"], ["Novo pedido", "R$ 89,90"], ["Novo pedido", "R$ 1.240,00"]];
 function SaleToasts({ t, W, H, L }) {
   const w = L.tall ? 250 : 220;

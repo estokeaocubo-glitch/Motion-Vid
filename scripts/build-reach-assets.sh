@@ -3,8 +3,8 @@
 #  Vídeos cinematográficos da Mixkit (Mixkit Video Free License: uso comercial, inclusive anúncios,
 #  sem atribuição), recortados (a partir da versão 720p, a maior liberada no plano gratuito) no trecho usado, em 16:9 (1280×720) e vertical (576×1024),
 #  WebM (VP9) + MP4 (H.264), com medidas múltiplas de 16 (evita linha verde em decodificadores):
-#   - REACH_SALE   (14830 "Man celebrating in front of the computer")  → "VENDER MAIS"
-#   - REACH_BEYOND (33546 "Man looking at the horizon raises his hands") → "IR ALÉM"
+#   - REACH_SALE   (1730  "Software developer working while drinks coffee": notebook + café, mesa escura) → "VENDER MAIS"
+#   - REACH_BEYOND (14669 "Hands texting on a mobile phone at night": celular com luzes desfocadas) → "IR ALÉM"
 #   - REACH_SKY    (4204  "Pink sunset seen from a plane window")       → "MUITO ALÉM"
 # Os originais são baixados a cada build e não ficam no repositório. Uso: bash scripts/build-reach-assets.sh
 set -euo pipefail
@@ -22,8 +22,8 @@ clip() { # nome id início duração posição-do-recorte-vertical (0 = esquerda
     ffmpeg -v error -ss "$ss" -t "$dur" -i "$tmp/$id.mp4" -an -vf "$vf" -c:v libvpx-vp9 -b:v 0 -crf 38 -row-mt 1 -pix_fmt yuv420p "$tmp/${name}_$o.webm"
   done
 }
-clip SALE 14830 4.8 2.2 0.3
-clip BEYOND 33546 0.8 1.8 0.55
+clip SALE 1730 5.0 2.2 0.6
+clip BEYOND 14669 2.0 1.8 0.55
 clip SKY 4204 10.0 3.6 0.5
 {
   echo "// Gerado por scripts/build-reach-assets.sh — trechos de vídeos da Mixkit (licença livre) em base64"
