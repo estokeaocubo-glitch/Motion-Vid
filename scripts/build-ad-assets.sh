@@ -16,9 +16,11 @@ for spec in "lcs 3" "noka 7" "misu 6" "lcs 9" "noka 11" "misu 10" "lcs 12" "noka
   set -- $spec
   tile "dist/media/$1-site.mp4" "$2"
 done
-ffmpeg -v error -ss 6.5 -t 2.6 -i "$DIZZY" -an -vf "scale=960:-2,fps=30" -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p -movflags +faststart "$tmp/clip.mp4"
+ffmpeg -v error -ss 6.5 -t 2.6 -i "$DIZZY" -an -vf "scale=1024:576,fps=30" -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p -movflags +faststart "$tmp/clip.mp4"
+# 1024×576: largura e altura múltiplas de 16 — evita a linha verde que alguns decodificadores
+# (Safari, aceleração de hardware) desenham na borda quando a altura não é múltipla de 16
 # WebM (VP9) para navegadores sem H.264, como o Chromium da exportação
-ffmpeg -v error -ss 6.5 -t 2.6 -i "$DIZZY" -an -vf "scale=960:-2,fps=30" -c:v libvpx-vp9 -b:v 0 -crf 34 -row-mt 1 -pix_fmt yuv420p "$tmp/clip.webm"
+ffmpeg -v error -ss 6.5 -t 2.6 -i "$DIZZY" -an -vf "scale=1024:576,fps=30" -c:v libvpx-vp9 -b:v 0 -crf 34 -row-mt 1 -pix_fmt yuv420p "$tmp/clip.webm"
 {
   echo "// Gerado por scripts/build-ad-assets.sh — telas e vídeo dos sites que fizemos (base64)"
   echo "export const AD_TILES = ["

@@ -24,7 +24,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 Baseado no anúncio "Creator Studio" (Apple) enviado como referência: fundo preto, tipografia cinética e um efeito diferente em cada palavra, refeito para vender sites da Estoke ao Cubo:
 
 - **0–1,5s** logo com as letras trocando de fonte e cor até assentar em "ESTOKE AO CUBO" com o cubo.
-- **1,5s (drop)** mosaico 3D com telas dos sites que fizemos — a Dizzy em destaque (todas as telas do centro e a maioria do mural).
+- **1,5s (drop)** mosaico 3D com telas dos sites que fizemos — mistura equilibrada (~40% Dizzy, inclusive a tela do centro; LCS, Noka e Misú intercalados, vizinhas sempre de sites diferentes).
 - **3,5s** "Um site." / "Vendas 24 horas." em corte seco, palavra a palavra.
 - **5,5s** dock de serviços (site, loja, SEO, WhatsApp, pagamento, métricas, domínio, mobile, segurança) com onda de ampliação.
 - **7,5s** "Monte sua loja." explode em blocos que montam uma loja virtual (carrinho recebe "1").

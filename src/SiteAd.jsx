@@ -90,6 +90,15 @@ function GlitchLogo({ t, t0, settle, size, tagline, column = false }) {
 }
 
 /* ---------- Mosaico de telas dos sites ---------- */
+// Mistura equilibrada: ~40% Dizzy (inclusive a tela do centro), o resto dividido entre LCS, Noka e
+// Misú, alternando para telas vizinhas serem sempre de sites diferentes.
+// AD_TILES: [0, AD_DIZZY_TILES) = Dizzy; depois LCS, Noka, Misú intercalados (3 de cada).
+function mosaicTile(r, c) {
+  const site = (c + r * 2) % 5; // 0–1: Dizzy · 2: LCS · 3: Noka · 4: Misú
+  const k = r * 7 + c * 3;
+  if (site <= 1) return (k + site) % AD_DIZZY_TILES;
+  return AD_DIZZY_TILES + ((k % 3) * 3 + (site - 2));
+}
 function Mosaic({ t, W, H, L }) {
   const lt = t - T.mosaic;
   const cols = L.tall ? 4 : 6;
@@ -118,7 +127,7 @@ function Mosaic({ t, W, H, L }) {
               position: "absolute", left: c * (tw + gap), top: r * (th + gap), width: tw, height: th, borderRadius: 7, overflow: "hidden",
               opacity: clamp(s * 2), transform: `scale(${clamp(s, 0, 1.1)})`, boxShadow: "0 10px 24px rgba(0,0,0,.6)", background: "#111",
             }}>
-              <img src={AD_TILES[d < 2.3 ? (i * 3) % AD_DIZZY_TILES : (i * 7) % AD_TILES.length]} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              <img src={AD_TILES[mosaicTile(r, c)]} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             </div>
           );
         })}
@@ -269,7 +278,8 @@ function Store({ t, W, H, L }) {
 // Vídeo da Dizzy (30fps, sincronizado com a timeline): começa quando o quadro abre entre as palavras
 const CLIP_START = T.clip + 0.35;
 function ClipVideo({ t }) {
-  return <SyncedVideo t={clamp(t - CLIP_START, 0, AD_CLIP_DUR - 0.04)} duration={AD_CLIP_DUR} webm={AD_CLIP_WEBM} mp4={AD_CLIP_MP4} />;
+  // leve ampliação (2%) esconde qualquer resíduo de borda do decodificador dentro da moldura
+  return <SyncedVideo t={clamp(t - CLIP_START, 0, AD_CLIP_DUR - 0.04)} duration={AD_CLIP_DUR} webm={AD_CLIP_WEBM} mp4={AD_CLIP_MP4} style={{ transform: "scale(1.02)" }} />;
 }
 function SelectBox({ children, pad = 10, color = C.cyan }) {
   const h = (pos) => <div style={{ position: "absolute", width: 7, height: 7, background: "#FFFFFF", border: `1.5px solid ${color}`, boxSizing: "border-box", ...pos }} />;
