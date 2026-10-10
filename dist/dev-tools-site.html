@@ -1027,6 +1027,7 @@ function Frame({ t, format = "3x4" }) {
       {LABELS.map((lb, k) => (
         <div key={lb} style={{ position: "absolute", left: 0, top: k * PH, width: W, height: PH, overflow: "hidden" }}>
           {cut && <div style={{ position: "absolute", inset: 0, transform: `scale(${punch})` }}>{panels[k]()}</div>}
+          {cut && <div style={{ position: "absolute", left: 0, top: 0, width: "45%", height: "40%", background: "radial-gradient(90% 100% at 0% 0%, rgba(0,0,0,.5), rgba(0,0,0,0) 70%)", zIndex: 4 }} />}
           <Label text={lb} t={t} at={ats[k]} cut={cut} />
           {!cut && k < 2 && <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 1, background: hexA(C.ink, 0.14) }} />}
         </div>
