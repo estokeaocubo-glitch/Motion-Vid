@@ -1,12 +1,13 @@
 import React from "react";
 import {
-  C, FONT, DISP, clamp, lerp, prog, easeOut, easeIn, easeInOut, rnd, spring, hexA, midi, tone, hiss,
-  Grain, CubeLogo, SND, renderEventsWav, MotionPlayer,
+  C, FONT, DISP, clamp, lerp, prog, easeOut, easeIn, easeInOut, rnd, spring, hexA,
+  Grain, CubeLogo, renderEventsWav, MotionPlayer,
 } from "./motionKit";
 import { FLOW_SHOTS } from "./flowAssets";
 import { FLOW_VARIANT } from "./flow/variant";
 import { MUSIC_FLOW } from "./audio/miamiFlow";
-import { TAPE } from "./audio/tape";
+import { TAPE, TAPE_PEAK } from "./audio/tape";
+import { SFX, SFX_PEAK } from "./audio/sfx";
 
 /* =============================================================================
    Estoke ao Cubo — "Venda no automático" (fluxo → projetos → cubo)
@@ -397,58 +398,56 @@ function Frame({ t, format = FLOW_VARIANT.defaultFormat }) {
 }
 
 /* =============================================================================
-   Som — 100 BPM, leve e "tech": pad, batida suave e baixo; cada card que surge toca
-   uma nota subindo; zoom out com whoosh, projetos com pops e brilho, colapso com
-   queda e ondas graves, cubo desenhado com sinos subindo e o "plim" de vidro da marca.
+   Som
 ============================================================================= */
-function cubeChime(A, w, v = 1) {
-  [84, 91, 96].forEach((n, i) => tone(A, w + i * 0.025, { f: midi(n), dur: 1.6 - i * 0.3, v: (0.08 - i * 0.02) * v, send: 0.7, pan: i - 1 }));
-  tone(A, w, { type: "triangle", f: midi(108), dur: 0.25, v: 0.02 * v, send: 0.5 });
-  SND.shimmer(A, w + 0.04, 0.6 * v);
-}
-// Música ("Miami") e efeitos analógicos gravados (scripts/build-audio-assets.sh).
-// drop: segundo do golpe do drop dentro do trecho embutido (24,97s na faixa; o trecho começa em 9,5s)
-const MUSIC = { drop: 15.47, gain: 0.55 };
-const TAPE_PEAK = { fastScrub: 0.85, sweep1: 1.05, sweep2: 1.25, rewindTape: 1.2, rewindKick: 0.85, dialTurn: 0.55, fwdDown: 0.45, dialDown: 0.7, shutDown: 1.1, tuning: 0.9 };
-const SAMPLES = { music: MUSIC_FLOW.miamiFlow, ...TAPE };
+// Som: música "Miami" + efeitos gravados (Mixkit e analógicos do repositório), sem síntese.
+// Arquivos gerados por scripts/build-audio-assets.py (efeitos normalizados, com a posição do golpe).
+// A música já entra com a batida no primeiro quadro, e o golpe forte que a faixa dá depois de
+// quase 1s de pausa (39,38s na faixa) cai exatamente na revelação do cubo: a pausa acontece
+// enquanto o cubo é desenhado. hit: segundo desse golpe dentro do trecho embutido (começa em 23s).
+const MUSIC = { hit: 16.38, gain: 0.5 };
+const SAMPLES = { music: MUSIC_FLOW.miamiFlow, ...TAPE, ...SFX };
+const PEAK = { ...TAPE_PEAK, ...SFX_PEAK };
+const VARY = [1, 1.06, 0.95, 1.1, 0.98, 1.04, 1.08, 0.97];
 function buildEvents() {
   const ev = [];
-  const add = (t, fn) => ev.push({ t, fn });
-  // música: a intro calma da faixa acompanha o fluxo e o drop entra na revelação do cubo
-  const off0 = MUSIC.drop - T.cube;
+  const fx = (at, name, gain, opts = {}) => ev.push({
+    t: Math.max(0, at - PEAK[name] / (opts.rate || 1)),
+    fn: (A, w) => A.sample(name, w, { gain, ...opts }),
+  });
+  const off0 = MUSIC.hit - T.cube;
   const endF = off0 + DURATION;
   ev.push({
     t: 0, dur: DURATION,
     fn: (A, w, off = 0) => A.sample("music", w, {
-      off: off0 + off, dur: DURATION - off, gain: MUSIC.gain, fadeIn: off > 0 ? 0.03 : 0.004,
-      env: [[0, 1.8], [MUSIC.drop - 0.4, 1.8], [MUSIC.drop - 0.02, 1], [endF - 1.2, 1], [endF, 0]],
+      off: off0 + off, dur: DURATION - off, gain: MUSIC.gain, fadeIn: off > 0 ? 0.03 : 0.05,
+      env: [[0, 1], [endF - 1.2, 1], [endF, 0]],
     }),
   });
-  const tapeAt = (t, name, gain, opts) => add(Math.max(0, t - TAPE_PEAK[name]), (A, w) => A.sample(name, w, { gain, ...opts }));
-  // cards do fluxo: a linha "corre" e cada card entra com um pop
+  // cards do fluxo: a linha corre e cada card entra com um pop leve (alturas variadas)
   NODES.forEach((n, i) => {
-    if (i > 0) add(n.t - 0.3, (A, w) => hiss(A, w, { type: "highpass", f: 3000, f2: 6000, dur: 0.25, v: 0.035, shape: "swell", pan: i % 2 ? 0.4 : -0.4 }));
-    add(n.t, (A, w) => { SND.pop(A, w, 700 + i * 40, 0.1); SND.tick(A, w, 2400 + i * 150, 0.8); });
+    if (i > 0) fx(n.t - 0.12, "techSlide", 0.22, { rate: VARY[i] });
+    fx(n.t + 0.03, "lightPop", 0.1, { rate: VARY[i] });
   });
   // zoom out → bolinhas
-  tapeAt(T.morphEnd - 0.3, "sweep2", 0.5);
-  NODES.forEach((_, i) => add(T.morphEnd - 0.15 + i * 0.04, (A, w) => SND.tick(A, w, 2600 + i * 120, 0.7)));
+  fx(T.morph + 0.75, "airWhoosh", 0.18);
+  fx(T.morphEnd + 0.1, "smallSweep", 0.14);
   // projetos saindo
-  tapeAt(T.burst + 0.05, "rewindKick", 0.65);
-  SHOTS.forEach((s, i) => add(T.burst + s.d, (A, w) => SND.pop(A, w, 520 + i * 70, 0.12)));
+  fx(T.burst + 0.05, "windSwoosh", 0.28);
+  SHOTS.forEach((s, i) => fx(T.burst + s.d + 0.08, "lightPop", 0.08, { rate: VARY[i] }));
   // viram pontos e colapsam
-  tapeAt(T.round + 0.2, "dialTurn", 1.6);
-  tapeAt(T.collapse - 0.05, "shutDown", 0.55);
-  [0, 0.35, 0.7].forEach((d, j) => add(T.collapse + 0.3 + d, (A, w) => tone(A, w, { f: 110 - j * 8, f2: 70, glide: 0.8, dur: 1.0, v: 0.16, send: 0.6 })));
-  // cubo sendo desenhado: sintonia de rádio + subida até o drop
-  add(T.draw, (A, w) => A.sample("tuning", w, { gain: 0.3, dur: T.cube - T.draw - 0.1, fadeOut: 0.3 }));
-  add(T.draw, (A, w) => hiss(A, w, { f: 400, f2: 8000, q: 1.2, dur: T.cube - T.draw, v: 0.1, shape: "rise", send: 0.3 }));
-  // cubo + palavras (o drop da música marca o tempo)
-  add(T.cube, (A, w) => { tone(A, w, { f: 70, f2: 36, glide: 0.5, dur: 1.2, v: 0.3, send: 0.2 }); cubeChime(A, w, 0.7); });
-  add(T.words, (A, w) => SND.swipe(A, w, 0.7));
-  add(T.words + 0.4, (A, w) => SND.swipe(A, w, 0.7));
-  if (FLOW_VARIANT.defaultFormat === "story") add(T.mark + 0.35, (A, w) => SND.pop(A, w, 640, 0.14));
-  add(DURATION - 2.29, (A, w) => A.sample("dialDown", w, { gain: 0.35 }));
+  fx(T.round + 0.25, "smallSweep", 0.14, { rate: 0.95 });
+  fx(T.collapse - 0.05, "shutDown", 0.22);
+  fx(T.collapse + 0.35, "deepHit", 0.24);
+  // cubo sendo desenhado (pausa da música): sintonia de rádio baixinha e brilho subindo
+  ev.push({ t: T.draw, fn: (A, w) => A.sample("tuning", w, { gain: 0.06, dur: T.cube - T.draw - 0.2, fadeOut: 0.3 }) });
+  fx(T.cube - 0.1, "sparkleSweep", 0.07);
+  // cubo + palavras (o golpe da música marca o tempo)
+  fx(T.cube, "logoImpact", 0.2);
+  fx(T.words + 0.2, "airSweep", 0.13);
+  fx(T.words + 0.6, "airSweep", 0.13, { rate: 1.06 });
+  if (FLOW_VARIANT.defaultFormat === "story") fx(T.mark + 0.4, "dryPop", 0.13);
+  ev.push({ t: DURATION - 2.29, fn: (A, w) => A.sample("dialDown", w, { gain: 0.16 }) });
   return ev.sort((a, b) => a.t - b.t);
 }
 const EVENTS = buildEvents();

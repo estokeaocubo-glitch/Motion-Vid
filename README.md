@@ -29,7 +29,7 @@ Baseado na referência `587c2d7b4c2af98f4c64e2a105233105_720w.mp4` (commit "gere
 - Fundo: gradiente navy → azul → sky com manchas de luz gelo/ciano que derivam, e grão.
 - Câmera própria para o 9:16 (segue cada card de perto, já que o fluxo é largo).
 - **Versão Story** (`dist/fluxo-automatico-story.html`, variante em `src/flow/story.js`): o fluxo desce em escadinha vertical e preenche a altura, o panorama mostra o fluxo inteiro legível, todo o conteúdo importante fica fora das faixas de interface do Instagram (~14% no topo, ~20% no rodapé) e o final ganha o botão "Solicite seu orçamento".
-- Som: música "Miami" — a intro calma acompanha o fluxo e o drop entra na revelação do cubo com "VENDA no automático". Efeitos analógicos: sweep no zoom out, "rewind kick" nos projetos, dial quando viram pontos, "shut down" no colapso, sintonia de rádio enquanto o cubo é desenhado e "dial down" fechando; pops e tiques sintetizados nos cards.
+- Som: música "Miami" com a batida desde o primeiro quadro; o golpe forte que a faixa dá depois de quase 1s de pausa (39,38s) cai na revelação do cubo, então a pausa acontece enquanto o cubo é desenhado. Efeitos gravados: slide e pop leve em cada card, whoosh de ar no zoom out, swoosh de vento nos projetos, "shut down" no colapso, sintonia de rádio baixinha e brilho no desenho do cubo, impacto na revelação.
 - Imagens dos sites: `src/flowAssets.js`, gerado por `bash scripts/build-flow-assets.sh` a partir das gravações em `dist/media/`.
 
 ## SaaS Gestão de Estoque (InventorySaaS)
@@ -50,7 +50,7 @@ Roteiro (tempos da história; no vídeo final cada trecho fica ~1,3× mais longo
 - **22–30s Automação**: linha liga os processos, mão 3D liga "Reposição Automática" e arrasta o pedido; estoque baixo → NF-e emitida → equipe atualizada. Texto: "Zere as rupturas. Automatize pedidos e acompanhe cada item em tempo real." Sai em persianas no ritmo.
 - **30–34s Segurança**: cadeado fecha com ondas e se divide em barras de crescimento.
 - **34–39,5s Logo + CTA**: digitação de "Estoke ao Cubo" e "Transforme complexidade em controle.", botão "Agende uma demonstração" tocado pela mão 3D.
-- Som: música "Miami" (Nemzzz, hoodtrap) com o drop (24,97s da faixa) caindo no instante em que o caos entra no cubo; a pausa longa da faixa coincide com a digitação da logo e o CTA. Efeitos analógicos de fita/rádio nas transições (scrub no gancho, sweep no portal, rebobinar na ida para o monitor, sweep no card que atravessa a câmera, "rewind kick" nas persianas, dial no cadeado, "forward down" no corte para a logo, "dial down" fechando). Por cima, os efeitos sintetizados de cada ação e o "plim" de vidro do cubo.
+- Som: música "Miami" (Nemzzz, hoodtrap) com o drop (24,97s da faixa) caindo no instante em que o caos entra no cubo; a pausa longa da faixa coincide com a digitação da logo e o CTA. Efeitos 100% gravados (Mixkit + analógicos do repositório), sem síntese: pops leves nos elementos que surgem, whooshes de ar e de vento nos movimentos de câmera, impacto de zoom ao atravessar o card, clique de mouse real e interruptor na automação, cadeado mecânico, brilho e impacto na logo, teclado real na digitação. Golpe de cada efeito alinhado ao corte; efeitos ~12 dB abaixo da música.
 - Exportado em 60fps, trilha normalizada em -14 LUFS.
 
 ## Pasta "Nossos clientes" (FolderReveal)
@@ -164,7 +164,8 @@ Revelação por máscara nos títulos, motion blur direcional (câmera dos cards
 ## Músicas e efeitos gravados
 
 - Músicas de fundo na raiz do repositório (commit "Musicas pra usar de fundo") e efeitos em `Efeitos Analógicos (15)/` (commit "Sons Pra usar"), com licença de uso.
-- `bash scripts/build-audio-assets.sh` recorta o trecho usado de cada música e o trecho útil de cada efeito e gera `src/audio/*.js` (mp3 em base64), embutidos no artifact.
+- `python3 scripts/build-audio-assets.py` recorta o trecho usado de cada música, baixa os efeitos escolhidos da [Mixkit](https://mixkit.co/free-sound-effects/) (licença Sound Effects Free: uso comercial sem atribuição; os arquivos não ficam versionados), recorta, normaliza (pico -1 dBFS), mede o golpe principal de cada efeito e gera `src/audio/*.js` (mp3 em base64), embutidos no artifact.
+- Mixagem seguindo práticas de sound design para motion: menos efeitos e só onde mudam a percepção, golpe alinhado ao corte, variações de altura em sons repetidos e efeitos 6–12 dB abaixo da música.
 - O `motionKit` toca essas amostras junto com a síntese (`samples` no `MotionPlayer` e no `renderEventsWav`; `A.sample(nome, w, { off, dur, gain, env })` nos eventos). Eventos com `dur` (a música) entram no ponto certo quando o player começa no meio.
 
 ## Exportar o MP4

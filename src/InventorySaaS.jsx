@@ -1,11 +1,12 @@
 import React from "react";
 import {
-  C, FONT, DISP, clamp, lerp, prog, easeOut, easeIn, easeInOut, rnd, spring, vel, hexA, midi, tone, hiss,
-  GRAD, GRAD_LIGHT, Beam, Grain, CubeLogo, SND, renderEventsWav, MotionPlayer,
+  C, FONT, DISP, clamp, lerp, prog, easeOut, easeIn, easeInOut, rnd, spring, vel, hexA,
+  GRAD, GRAD_LIGHT, Beam, Grain, CubeLogo, renderEventsWav, MotionPlayer,
 } from "./motionKit";
 import { VARIANT } from "./saas/variant";
 import { MUSIC_SAAS } from "./audio/miamiSaas";
-import { TAPE } from "./audio/tape";
+import { TAPE, TAPE_PEAK } from "./audio/tape";
+import { SFX, SFX_PEAK } from "./audio/sfx";
 
 /* =============================================================================
    Estoke ao Cubo — Sistema de Gestão de Estoque (motion SaaS, 35s)
@@ -1155,137 +1156,84 @@ function FullFrame({ t: tg, format = "9x16" }) {
 }
 
 /* =============================================================================
-   Som — 120 BPM, I–V–vi–IV em Dó. Pad ambiente no caos, batida entra no portal,
-   arpejo nas cenas de produto, pausa no cadeado e acorde final com a logo.
-   Cada movimento importante tem o seu efeito (pop, swipe, tique, clique, clack).
+   Som
 ============================================================================= */
-// Assinatura sonora do cubo: "plim" de vidro (sino + harmônico agudo + brilho), sempre que o cubo aparece
-// Música e efeitos gravados (scripts/build-audio-assets.sh). drop: segundo do golpe do drop
-// dentro do trecho embutido (24,97s na faixa original; o trecho começa em 16s).
-const MUSIC = { drop: 8.97, gain: 0.55 };
-// segundo do pico (golpe principal) dentro de cada efeito recortado
-const TAPE_PEAK = { fastScrub: 0.85, sweep1: 1.05, sweep2: 1.25, rewindTape: 1.2, rewindKick: 0.85, dialTurn: 0.55, fwdDown: 0.45, dialDown: 0.7, shutDown: 1.1, tuning: 0.9 };
-const SAMPLES = { music: MUSIC_SAAS.miamiSaas, ...TAPE };
-function cubeChime(A, w, v = 1) {
-  [84, 91, 96].forEach((n, i) => tone(A, w + i * 0.025, { f: midi(n), dur: 1.6 - i * 0.3, v: (0.08 - i * 0.02) * v, send: 0.7, pan: i - 1 }));
-  tone(A, w, { type: "triangle", f: midi(108), dur: 0.25, v: 0.02 * v, send: 0.5 });
-  SND.shimmer(A, w + 0.04, 0.6 * v);
-}
-// duração no vídeo de um trecho da história (tempo local das cenas)
-const outDur = (t0, dur) => W(HOOK + t0 + dur) - W(HOOK + t0);
+// Som: música "Miami" + efeitos gravados (Mixkit e analógicos do repositório), sem síntese.
+// Arquivos gerados por scripts/build-audio-assets.py. Cada efeito vem normalizado (pico -1 dBFS)
+// e com a posição do seu golpe (PEAK): o golpe cai exatamente no corte e os ganhos deixam os
+// efeitos 6–12 dB abaixo da música. Repetições variam levemente de altura para não soarem iguais.
+// drop: segundo do drop dentro do trecho embutido da música (24,97s na faixa; trecho começa em 16s)
+const MUSIC = { drop: 8.97, gain: 0.5 };
+const SAMPLES = { music: MUSIC_SAAS.miamiSaas, ...TAPE, ...SFX };
+const PEAK = { ...TAPE_PEAK, ...SFX_PEAK };
+const VARY = [1, 1.06, 0.95, 1.1, 0.98, 1.04];
 function buildEvents() {
-  const ev = [];
-  const add = (t, fn) => ev.push({ t, fn });
-  const click = (A, w, v = 1) => {
-    hiss(A, w, { type: "highpass", f: 3500, dur: 0.018, v: 0.28 * v });
-    tone(A, w, { type: "square", f: 2200, dur: 0.015, v: 0.04 * v });
-  };
-  const riser = (t0, d, v = 0.13) => add(t0, (A, w) => {
-    const dur = outDur(t0, d);
-    hiss(A, w, { f: 400, f2: 7000, q: 1.2, dur, v, shape: "rise", send: 0.3 });
-    tone(A, w, { f: 180, f2: 900, glide: dur, dur, a: dur * 0.85, v: 0.04, send: 0.4 });
-  });
-  const hit = (t0, v = 1) => add(t0, (A, w) => {
-    tone(A, w, { f: 70, f2: 34, glide: 0.5, dur: 1.2, v: 0.45 * v, send: 0.2 });
-    hiss(A, w, { type: "highpass", f: 6000, dur: 0.9, v: 0.06 * v, send: 0.4 });
-    SND.shimmer(A, w, 0.8 * v);
+  const out = [];
+  const L = (u) => W(HOOK + u); // tempo local da cena → tempo do vídeo
+  const fx = (at, name, gain, opts = {}) => out.push({
+    t: Math.max(0, at - PEAK[name] / (opts.rate || 1)),
+    fn: (A, w) => A.sample(name, w, { gain, ...opts }),
   });
 
-  // Cena 1: ar, ícones surgindo, sucção e nascimento do anel
-  add(0, (A, w) => hiss(A, w, { type: "lowpass", f: 900, dur: 3.2, v: 0.05, shape: "swell", send: 0.4 }));
-  CHAOS.forEach((c, i) => add(0.2 + c.d, (A, w) => SND.pop(A, w, 420 + i * 45, 0.05)));
-  riser(2.6, 1.12, 0.14);
-  hit(3.74, 1);
-  add(3.76, (A, w) => cubeChime(A, w));
-  add(4.45, (A, w) => SND.whoosh(A, w, { dur: 0.75, from: 200, to: 6000, v: 0.26, pan: 0, panTo: 0 }));
-  // Cena 2: cartões saindo do anel e giros do carrossel
-  add(5.05, (A, w) => cubeChime(A, w, 0.5));
-  MODULES.forEach((_, i) => add(5.12 + i * 0.1, (A, w) => SND.pluck(A, w, [72, 76, 79, 84][i], 1.1, i / 1.5 - 1)));
-  STEPS.forEach((s, i) => {
-    add(s, (A, w) => { SND.swipe(A, w, 1.2); SND.tick(A, w, 2600, 1); });
-    add(s + 0.22, (A, w) => SND.pop(A, w, [660, 740, 880][i], 0.12));
-  });
-  riser(11.2, 0.8, 0.15);
-  // Cena 3: monitor, card flutuante, contador, palavras-chave
-  hit(12.0, 0.85);
-  add(12.02, (A, w) => SND.whoosh(A, w, { dur: 0.9, from: 6000, to: 300, v: 0.18, pan: 0.4, panTo: -0.4 }));
-  add(13.0, (A, w) => SND.pop(A, w, 520, 0.08));
-  add(14.3, (A, w) => { SND.pop(A, w, 700, 0.16); SND.shimmer(A, w, 0.55); SND.whoosh(A, w, { dur: 0.45, from: 600, to: 4000, v: 0.12 }); });
-  for (let tt = 15.0, i = 0; tt < 18.4; tt += 0.075 + i * 0.0012, i++) add(tt, (A, w) => SND.tick(A, w, 2400 + i * 30, 0.8));
-  add(15.0, (A, w) => { const d = outDur(15.0, 3.4); tone(A, w, { f: 300, f2: 900, glide: d, dur: d, a: d * 0.47, v: 0.025, send: 0.4 }); });
-  PILLS.forEach((p, i) => add(p.t, (A, w) => { SND.bell(A, w, [84, 88, 91][i], 1, [-0.5, 0.5, -0.2][i]); SND.pop(A, w, 900 + i * 120, 0.08); }));
-  riser(19.3, 0.7, 0.15);
-  // Cena 4: linha, mão, pedido, sequência
-  add(20.0, (A, w) => { hiss(A, w, { type: "highpass", f: 5000, dur: 0.7, v: 0.08, send: 0.5 }); SND.bell(A, w, 84, 0.9); });
-  add(20.35, (A, w) => hiss(A, w, { f: 800, f2: 5000, q: 1.5, dur: 1.0, v: 0.06, shape: "swell", pan: -0.6, panTo: 0.6 }));
-  NODES.forEach((_, i) => add(20.35 + (i / 3) * 1.0, (A, w) => SND.pop(A, w, [520, 620, 740, 880][i], 0.13)));
-  add(20.55, (A, w) => SND.swipe(A, w, 0.8));
-  add(21.0, (A, w) => SND.swipe(A, w, 0.5));
-  add(21.55, (A, w) => SND.pop(A, w, 600, 0.1));
-  add(22.04, (A, w) => click(A, w));
-  add(22.12, (A, w) => { tone(A, w, { type: "triangle", f: 880, f2: 1320, glide: 0.08, dur: 0.14, v: 0.08 }); SND.pop(A, w, 980, 0.1); });
-  add(22.99, (A, w) => click(A, w, 0.7));
-  add(23.1, (A, w) => SND.whoosh(A, w, { dur: 0.7, from: 400, to: 2400, v: 0.1, pan: 0.5, panTo: -0.2 }));
-  add(24.0, (A, w) => { tone(A, w, { f: 170, f2: 70, glide: 0.15, dur: 0.22, v: 0.35 }); click(A, w, 0.6); });
-  add(24.06, (A, w) => SND.bell(A, w, 79, 1));
-  add(24.16, (A, w) => SND.bell(A, w, 84, 1));
-  add(24.42, (A, w) => SND.swipe(A, w, 0.9));
-  [24.75, 24.9].forEach((tt) => add(tt, (A, w) => tone(A, w, { type: "square", f: 988, dur: 0.09, v: 0.045, lp: 2600 })));
-  add(24.75, (A, w) => SND.pop(A, w, 560, 0.12));
-  add(25.15, (A, w) => SND.tick(A, w, 3200, 1));
-  add(25.35, (A, w) => { hiss(A, w, { f: 3000, q: 1.5, dur: 0.18, v: 0.08, shape: "swell" }); SND.pop(A, w, 700, 0.12); });
-  add(25.75, (A, w) => SND.tick(A, w, 3400, 1));
-  add(25.95, (A, w) => [76, 79, 83].forEach((n, i) => SND.bell(A, w + i * 0.03, n, 0.9, i - 1)));
-  add(TEAM_CHECK, (A, w) => { SND.pluck(A, w, 84, 1.2); SND.pluck(A, w + 0.07, 88, 1.2); });
-  riser(27.2, 0.6, 0.12);
-  // persianas: um "swipe" curto por faixa, alternando os lados
-  for (let j = 0; j < 6; j++) add(BLINDS + 0.2 + j * 0.05, (A, w) => hiss(A, w, { type: "highpass", f: 2500, f2: 6000, dur: 0.12, v: 0.06, shape: "swell", pan: j / 2.5 - 1 }));
-  // Cena 5: cadeado, ondas, barras
-  add(28.05, (A, w) => tone(A, w, { f: 60, f2: 40, glide: 0.8, dur: 1.2, v: 0.4, send: 0.3 }));
-  add(28.15, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 2000, to: 400, v: 0.12, pan: -0.4, panTo: 0 }));
-  add(29.0, (A, w) => {
-    hiss(A, w, { type: "highpass", f: 4000, dur: 0.03, v: 0.38 });
-    tone(A, w, { type: "square", f: 1600, dur: 0.02, v: 0.07 });
-    tone(A, w, { f: 240, f2: 110, glide: 0.1, dur: 0.18, v: 0.42 });
-    tone(A, w + 0.005, { type: "triangle", f: 1250, dur: 0.3, v: 0.04, send: 0.4 });
-  });
-  [0, 1, 2].forEach((j) => add(29.05 + j * 0.22, (A, w) => tone(A, w, { f: 150 - j * 15, f2: 90, glide: 0.6, dur: 0.75, v: 0.22 - j * 0.04, send: 0.55 })));
-  add(29.85, (A, w) => { SND.swipe(A, w, 1); tone(A, w, { f: 300, f2: 700, glide: 0.4, dur: 0.45, a: 0.3, v: 0.04, send: 0.3 }); });
-  [67, 72, 76, 79].forEach((n, j) => add(30.3 + j * 0.12, (A, w) => { SND.pluck(A, w, n + 12, 1.3, j / 1.5 - 1); SND.pop(A, w, 500 + j * 120, 0.08); }));
-  add(30.75, (A, w) => SND.bell(A, w, 91, 1));
-  riser(31.1, 0.55, 0.15);
-  // Final: corte claro, logo, digitação
-  add(T.fin, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 300, to: 6000, v: 0.18, pan: 0, panTo: 0 }));
-  hit(32.05, 1.1);
-  add(32.05, (A, w) => { SND.sub(A, w, 36, 1.6, 0.8); cubeChime(A, w, 0.8); });
-  [...WORDMARK].forEach((ch, i) => {
-    if (ch !== " ") add(TYPE.w0 + i * TYPE.wd, (A, w) => { hiss(A, w, { type: "highpass", f: 5000, dur: 0.02, v: 0.09 }); tone(A, w, { type: "square", f: 1700 + (i % 4) * 140, dur: 0.008, v: 0.02 }); });
-  });
-  [...TAGLINE].forEach((ch, i) => {
-    if (ch !== " ") add(TYPE.g0 + i * TYPE.gd, (A, w) => hiss(A, w, { type: "highpass", f: 5500, dur: 0.016, v: 0.06, pan: (i % 5) / 5 - 0.4 }));
-  });
-  add(34.5, (A, w) => { SND.bell(A, w, 79, 0.8, -0.3); SND.bell(A, w + 0.08, 84, 0.8, 0.3); });
-  // CTA: botão sobe, mão entra, toque e confirmação
-  add(CTA.rise, (A, w) => SND.swipe(A, w, 0.7));
-  add(CTA.btn, (A, w) => SND.pop(A, w, 640, 0.16));
-  add(CTA.tap - 0.75, (A, w) => SND.whoosh(A, w, { dur: 0.6, from: 600, to: 2500, v: 0.08, pan: 0.6, panTo: 0.1 }));
-  add(CTA.tap, (A, w) => click(A, w));
-  add(CTA.tap + 0.04, (A, w) => [79, 84, 88, 91].forEach((n, i) => SND.bell(A, w + i * 0.05, n, 0.8, i / 1.5 - 1)));
-  add(CTA.tap + 0.05, (A, w) => SND.shimmer(A, w, 0.7));
-  // tudo acima é tempo local; o gancho vem antes
-  const out = ev.map((e) => ({ t: W(e.t + HOOK), fn: e.fn }));
-  const addG = (t, fn) => out.push({ t: W(t), fn });
-  const hookOut = W(HOOK);
-  addG(0, (A, w) => { tone(A, w, { f: 58, f2: 46, glide: hookOut, dur: hookOut + 0.1, a: 0.25, v: 0.22, send: 0.3 }); hiss(A, w, { type: "lowpass", f: 600, dur: hookOut, v: 0.05, shape: "swell" }); });
-  [0.15, 0.32, 0.5, 0.67].forEach((tt, i) => addG(tt, (A, w) => tone(A, w, { type: "square", f: i % 2 ? 784 : 988, dur: 0.09, v: 0.04, lp: 2600, pan: i % 2 ? 0.3 : -0.3 })));
-  for (let tt = 0.3, i = 0; tt < 1.45; tt += 0.05 + i * 0.002, i++) addG(tt, (A, w) => SND.tick(A, w, 3200 - i * 40, 0.8));
-  addG(0.2, (A, w) => SND.clap(A, w, 0.5));
-  // tensão contínua: pulso grave tipo batimento + riser até a virada para o caos
-  addG(0.6, (A, w) => { const d = W(1.62) - W(0.6); hiss(A, w, { f: 300, f2: 5000, q: 1.2, dur: d, v: 0.14, shape: "rise", send: 0.3 }); tone(A, w, { type: "sawtooth", f: 110, f2: 330, glide: d, dur: d, a: d * 0.9, v: 0.035, lp: 1400 }); });
-  addG(1.45, (A, w) => tone(A, w, { f: 300, f2: 110, glide: 0.4, dur: 0.5, v: 0.12 }));
-  addG(1.6, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 4000, to: 300, v: 0.16, pan: 0, panTo: 0 }));
-  // Música ("Miami"): o drop da faixa cai no instante em que o caos entra no cubo
-  const drop = W(HOOK + 3.74);
+  // Gancho
+  fx(W(0.05), "deepHit", 0.16);
+  fx(W(0.15), "alertBeep", 0.1);
+  fx(W(1.9), "airWhoosh", 0.16);
+  // Cena 1: ícones surgem, são sugados, o cubo nasce e abre o portal
+  CHAOS.forEach((c, i) => fx(L(0.2 + c.d), "lightPop", 0.07, { rate: VARY[i % 6] }));
+  fx(L(3.74), "trailerRiser", 0.28);
+  fx(L(3.74), "deepHit", 0.3);
+  fx(L(3.85), "sparkleSweep", 0.1);
+  fx(L(4.85), "tunnelWhoosh", 0.1);
+  // Cena 2: prisma
+  fx(L(5.1), "airSweep", 0.12);
+  STEPS.forEach((st, i) => fx(L(st + 0.12), "smallSweep", 0.2, { rate: VARY[i] }));
+  fx(L(11.85), "windSwoosh", 0.3);
+  // Cena 3: monitor, card flutuante, palavras-chave, notificações
+  fx(L(12.1), "shortWind", 0.2);
+  fx(L(14.35), "lightPop", 0.11);
+  fx(L(14.45), "airSweep", 0.14);
+  PILLS.forEach((pl, i) => fx(L(pl.t + 0.05), "sparkleTouch", 0.11, { rate: VARY[i] }));
+  TOASTS.forEach((n, i) => fx(L(n.t + 0.05), "dryPop", 0.1, { rate: VARY[i + 1] }));
+  fx(L(20.0), "zoomImpact", 0.28);
+  // Cena 4: automação
+  fx(L(20.45), "techSlide", 0.32);
+  NODES.forEach((_, i) => fx(L(20.35 + i / 3), "bubblePop", 0.06, { rate: 0.95 + i * 0.07 }));
+  fx(L(20.6), "smallSweep", 0.14);
+  fx(L(21.6), "lightPop", 0.09);
+  fx(L(22.04), "mouseClick", 0.42);
+  fx(L(22.12), "switchTap", 0.28);
+  fx(L(22.99), "mouseClose", 0.28);
+  fx(L(23.45), "airSweep", 0.12);
+  fx(L(24.0), "hardPop", 0.14);
+  fx(L(24.1), "confirm", 0.16);
+  fx(L(24.5), "smallSweep", 0.13);
+  fx(L(24.78), "alertBeep", 0.08);
+  fx(L(25.38), "lightPop", 0.1);
+  fx(L(25.98), "lightPop", 0.1, { rate: 1.08 });
+  fx(L(TEAM_CHECK + 0.02), "positive", 0.14);
+  fx(L(28.1), "rewindKick", 0.18);
+  // Cena 5: cadeado → barras → logo
+  fx(L(28.35), "airWhoosh", 0.12);
+  fx(L(29.02), "lockShut", 0.42);
+  fx(L(29.05), "deepHit", 0.22);
+  [0, 1, 2, 3].forEach((j) => fx(L(30.32 + j * 0.12), "bubblePop", 0.07, { rate: 0.9 + j * 0.12 }));
+  fx(L(30.9), "sparkleTouch", 0.11);
+  fx(L(32.05), "logoImpact", 0.15);
+  fx(L(32.15), "sparkleSweep", 0.14);
+  // digitação da logo e da frase: teclado real, do primeiro ao último caractere
+  const t0 = L(TYPE.w0 - 0.03);
+  const t1 = L(TYPE.g0 + TAGLINE.length * TYPE.gd);
+  out.push({ t: t0, fn: (A, w) => A.sample("typing", w, { gain: 0.38, dur: t1 - t0, fadeOut: 0.12 }) });
+  // CTA
+  fx(L(CTA.rise + 0.02), "smallSweep", 0.12);
+  fx(L(CTA.btn + 0.02), "dryPop", 0.13);
+  fx(L(CTA.tap), "mouseClick", 0.42);
+  fx(L(CTA.tap + 0.06), "confirm", 0.16);
+  out.push({ t: FULL_DURATION - 2.29, fn: (A, w) => A.sample("dialDown", w, { gain: 0.18 }) });
+
+  // Música: o drop da faixa cai no instante em que o caos entra no cubo
+  const drop = L(3.74);
   const off0 = MUSIC.drop - drop;
   const endF = off0 + FULL_DURATION;
   out.push({
@@ -1293,20 +1241,10 @@ function buildEvents() {
     fn: (A, w, off = 0, cap = Infinity) => A.sample("music", w, {
       off: off0 + off, dur: Math.min(FULL_DURATION - off, cap), gain: MUSIC.gain, fadeIn: off > 0 ? 0.03 : 0.004,
       // intro da faixa (antes do drop) +5 dB; pausa final da faixa +3,5 dB; fade nos últimos 1,8s
-      env: [[0, 1.8], [MUSIC.drop - 0.4, 1.8], [MUSIC.drop - 0.02, 1], [off0 + W(HOOK + 32.3), 1], [off0 + W(HOOK + 32.8), 1.5], [endF - 1.8, 1.5], [endF, 0]],
+      env: [[0, 1.8], [MUSIC.drop - 0.4, 1.8], [MUSIC.drop - 0.02, 1], [off0 + L(32.3), 1], [off0 + L(32.8), 1.5], [endF - 1.8, 1.5], [endF, 0]],
     }),
   });
-  // Efeitos analógicos (fita/rádio) nas transições: o pico de cada efeito cai no corte
-  const tapeAt = (outT, name, gain) => out.push({ t: Math.max(0, outT - TAPE_PEAK[name]), fn: (A, w) => A.sample(name, w, { gain }) });
-  tapeAt(W(1.85), "fastScrub", 0.5); // gancho → caos
-  tapeAt(W(HOOK + 4.95), "sweep1", 0.55); // portal
-  tapeAt(W(HOOK + 12.0), "rewindTape", 0.5); // face do prisma → monitor
-  tapeAt(W(HOOK + 20.0), "sweep2", 0.55); // card atravessa a câmera
-  tapeAt(W(HOOK + 28.1), "rewindKick", 0.7); // persianas → cadeado
-  tapeAt(W(HOOK + 29.9), "dialTurn", 1.6); // cadeado vira barras
-  tapeAt(W(HOOK + 31.85), "fwdDown", 0.45); // corte para a logo
-  out.push({ t: FULL_DURATION - 2.29, fn: (A, w) => A.sample("dialDown", w, { gain: 0.4 }) }); // fecha o vídeo
-  return out.sort((a, b) => a.t - b.t);
+  return out.sort((x, y) => x.t - y.t);
 }
 const FULL_EVENTS = buildEvents();
 const FULL_SCENES = [
