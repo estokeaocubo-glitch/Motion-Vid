@@ -60,6 +60,9 @@ document.fonts.ready.then(() => {
   await page.waitForFunction(() => window.__cap, null, { timeout: 60000 });
   await page.waitForTimeout(500);
   const { duration, w, h } = await page.evaluate(() => ({ duration: window.__cap.duration, w: window.__cap.w, h: window.__cap.h }));
+  // a janela precisa caber o formato inteiro (ex.: 16:9 = 800×450), senão o recorte sai cortado
+  await page.setViewportSize({ width: Math.ceil(w), height: Math.ceil(h) });
+  await page.waitForTimeout(300);
 
   console.log("Renderizando trilha…");
   const wav = path.join(tmp, "trilha.wav");
