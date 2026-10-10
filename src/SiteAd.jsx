@@ -1,9 +1,9 @@
 import React, { useLayoutEffect, useRef } from "react";
 import {
   C, FONT, DISP, DISPLAY_FONT, measure, fitSize, clamp, lerp, prog, easeOut, easeIn, easeInOut, rnd, spring, hexA, GRAD, GRAD_LIGHT,
-  Grain, CubeLogo, renderEventsWav, MotionPlayer,
+  Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer,
 } from "./motionKit";
-import { AD_TILES, AD_CLIP } from "./adAssets";
+import { AD_TILES, AD_DIZZY_TILES, AD_CLIP_MP4, AD_CLIP_WEBM, AD_CLIP_DUR } from "./adAssets";
 import { MUSIC_AD } from "./audio/bailarAd";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 
@@ -118,7 +118,7 @@ function Mosaic({ t, W, H, L }) {
               position: "absolute", left: c * (tw + gap), top: r * (th + gap), width: tw, height: th, borderRadius: 7, overflow: "hidden",
               opacity: clamp(s * 2), transform: `scale(${clamp(s, 0, 1.1)})`, boxShadow: "0 10px 24px rgba(0,0,0,.6)", background: "#111",
             }}>
-              <img src={AD_TILES[(i * 7) % AD_TILES.length]} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              <img src={AD_TILES[d < 2.3 ? (i * 3) % AD_DIZZY_TILES : (i * 7) % AD_TILES.length]} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             </div>
           );
         })}
@@ -266,9 +266,10 @@ function Store({ t, W, H, L }) {
 }
 
 /* ---------- Notebook / celular ---------- */
-function ClipFrame({ t, style }) {
-  const k = Math.floor(Math.max(0, t - T.clip) * 6) % AD_CLIP.length;
-  return <img src={AD_CLIP[k]} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", ...style }} />;
+// Vídeo da Dizzy (30fps, sincronizado com a timeline): começa quando o quadro abre entre as palavras
+const CLIP_START = T.clip + 0.35;
+function ClipVideo({ t }) {
+  return <SyncedVideo t={clamp(t - CLIP_START, 0, AD_CLIP_DUR - 0.04)} duration={AD_CLIP_DUR} webm={AD_CLIP_WEBM} mp4={AD_CLIP_MP4} />;
 }
 function SelectBox({ children, pad = 10, color = C.cyan }) {
   const h = (pos) => <div style={{ position: "absolute", width: 7, height: 7, background: "#FFFFFF", border: `1.5px solid ${color}`, boxSizing: "border-box", ...pos }} />;
@@ -280,60 +281,59 @@ function SelectBox({ children, pad = 10, color = C.cyan }) {
     </div>
   );
 }
-// "Mostre ▢ seu trabalho." → o quadro com o site abre entre as palavras, ocupa a tela e vira a tela do notebook
+// "Mostre ▢ seu trabalho." → o quadro com o site abre entre as palavras, ocupa a tela, vira a tela do
+// notebook e depois o celular. É um único quadro (e um único <video>) do começo ao fim: nada recarrega.
 function ClipAndDevice({ t, W, H, L }) {
   const lt = t - T.clip;
   const fs = L.tall ? 30 : 54;
   const open = easeInOut(prog(lt, 0.35, 0.85));
   const full = easeInOut(prog(lt, 1.15, 1.55));
   const toLap = easeInOut(prog(lt, 1.75, 2.25));
-  // geometria do notebook
-  const lw = (L.tall ? 400 : 470) * (L.tall ? 1 : 1);
-  const lh = lw * 0.62;
-  const ly = H / 2 - (L.tall ? 40 : 18);
-  // geometria do celular
-  const pw = L.tall ? 230 : 170;
-  const ph = pw * 2.05;
   const toPhone = easeInOut(prog(t, T.phone, T.phone + 0.6));
   const out = easeIn(prog(t, T.publique - 0.2, T.publique));
+  if (lt < 0 || out >= 1) return null;
+  const cx = W / 2;
+  // notebook e celular
+  const lw = L.tall ? 400 : 470;
+  const lh = lw * 0.62;
+  const ly = H / 2 - (L.tall ? 40 : 18);
+  const pw = L.tall ? 230 : 170;
+  const ph = pw * 2.05;
   const sw = lerp(lw, pw, toPhone);
   const sh = lerp(lh, ph, toPhone);
   const sy = lerp(ly, H / 2, toPhone);
-  const words = t >= T.device + 0.65 ? [["Venda", 0.65], ["de qualquer", 1.05], ["lugar.", 1.45]].filter(([, d]) => t >= T.device + d).map(([w]) => w) : [];
+  // quadro entre as palavras (posição pela largura real das palavras)
+  const adv = (str) => measure(str, fs, false, 700) - str.length * fs * 0.035;
+  const wl = adv("Mostre");
+  const wr = adv("seu trabalho.");
+  const gap = fs * 0.28;
+  const cw = 150 * L.txt * 1.2 * open;
+  const chh = lerp(fs * 0.9, fs * 1.4, open);
+  const total = wl + gap + cw + gap + wr;
+  const left0 = cx - total / 2;
+  const boxCx0 = left0 + wl + gap + cw / 2;
+  // retângulo do vídeo/tela em cada fase (contínuo entre elas)
+  let rect;
+  if (lt < 1.55) rect = { cx: lerp(boxCx0, cx, full), cy: H / 2, w: lerp(cw, W, full), h: lerp(chh, H, full), r: lerp(10, 0, full), bd: 0 };
+  else rect = { cx, cy: lerp(H / 2, sy, toLap), w: lerp(W, sw, toLap), h: lerp(H, sh, toLap), r: lerp(0, lerp(10, 28, toPhone), toLap), bd: lerp(0, lerp(8, 7, toPhone), toLap) };
+  const words = [["Venda", 0.65], ["de qualquer", 1.05], ["lugar.", 1.45]].filter(([, d]) => t >= T.device + d).map(([w]) => w);
+  const showText = t >= T.device + 0.6;
   const grad = prog(t, T.phone + 0.2, T.phone + 0.7);
   const hue = (t - T.phone) * 0.6;
   const tap = t - (T.phone + 1.55);
-  if (lt < 0 || out >= 1) return null;
-  // fase 1: palavras + quadro
-  if (lt < 1.55) {
-    const cw = lerp(0, 150 * L.txt * 1.2, open);
-    const chh = lerp(fs * 0.9, fs * 1.4, open);
-    const box = { w: lerp(cw, W, full), h: lerp(chh, H, full), r: lerp(10, 0, full) };
-    return (
-      <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: lerp(fs * 0.25, 0, full), opacity: 1 }}>
-          <div style={{ ...TEXT, fontSize: fs, opacity: 1 - full }}>Mostre</div>
-          <div style={{ width: box.w, height: box.h, borderRadius: box.r, overflow: "hidden", flex: "0 0 auto", boxShadow: open > 0 ? `0 0 0 1px rgba(255,255,255,.2), 0 10px 40px ${hexA(C.blue, 0.35)}` : "none" }}>
-            {open > 0 && <ClipFrame t={t} />}
-          </div>
-          <div style={{ ...TEXT, fontSize: fs, opacity: 1 - full }}>seu trabalho.</div>
-        </div>
-      </div>
-    );
-  }
-  // fase 2: tela cheia → notebook → texto selecionado → celular
-  const base = 1 - toPhone;
-  const cx = W / 2;
-  const scrW = lerp(W, sw, toLap);
-  const scrH = lerp(H, sh, toLap);
-  const scrY = lerp(H / 2, sy, toLap);
-  const showText = t >= T.device + 0.6;
   const phoneLines = toPhone > 0.5;
   const textFs = phoneLines
     ? fitSize("de qualquer", sw - 64, 40, false)
     : fitSize(words.join(" ") || "Venda", sw - 70, 44 * (L.tall ? 0.85 : 1), false);
+  const base = 1 - toPhone;
   return (
     <div style={{ position: "absolute", inset: 0, opacity: 1 - out, transform: `scale(${1 - out * 0.08}) rotate(${Math.sin(t * 1.3) * 0.6 * toPhone}deg)`, transformOrigin: `${cx}px ${H / 2}px` }}>
+      {full < 1 && (
+        <>
+          <div style={{ ...TEXT, position: "absolute", left: left0, top: H / 2, transform: "translateY(-50%)", fontSize: fs, opacity: 1 - prog(full, 0, 0.45) }}>Mostre</div>
+          <div style={{ ...TEXT, position: "absolute", left: left0 + wl + gap + cw + gap, top: H / 2, transform: "translateY(-50%)", fontSize: fs, opacity: 1 - prog(full, 0, 0.45) }}>seu trabalho.</div>
+        </>
+      )}
       {/* base do notebook */}
       {toLap > 0 && base > 0 && (
         <div style={{
@@ -342,12 +342,12 @@ function ClipAndDevice({ t, W, H, L }) {
         }} />
       )}
       <div style={{
-        position: "absolute", left: cx - scrW / 2, top: scrY - scrH / 2, width: scrW, height: scrH, boxSizing: "border-box", overflow: "hidden",
-        borderRadius: lerp(0, lerp(10, 28, toPhone), toLap), border: toLap > 0 ? `${lerp(0, lerp(8, 7, toPhone), toLap)}px solid #0D1016` : "none",
-        boxShadow: toLap > 0 ? `0 0 0 1px rgba(255,255,255,.12), 0 30px 60px rgba(0,0,0,.6), 0 0 60px ${hexA(C.blue, 0.25 * grad)}` : "none",
+        position: "absolute", left: rect.cx - rect.w / 2, top: rect.cy - rect.h / 2, width: rect.w, height: rect.h, boxSizing: "border-box", overflow: "hidden",
+        borderRadius: rect.r, border: rect.bd > 0.2 ? `${rect.bd}px solid #0D1016` : "none", opacity: open > 0 ? 1 : 0,
+        boxShadow: lt < 1.55 ? `0 0 0 1px rgba(255,255,255,.2), 0 10px 40px ${hexA(C.blue, 0.35)}` : toLap > 0 ? `0 0 0 1px rgba(255,255,255,.12), 0 30px 60px rgba(0,0,0,.6), 0 0 60px ${hexA(C.blue, 0.25 * grad)}` : "none",
         background: grad > 0 ? `linear-gradient(${150 + hue * 30}deg, ${C.deep} 0%, ${C.blue} 45%, ${C.cyan} 100%)` : "#05070B",
       }}>
-        {!showText && <ClipFrame t={t} />}
+        {!showText && <ClipVideo t={t} />}
         {showText && (
           <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", padding: 14 }}>
             <SelectBox pad={8} color={grad > 0.5 ? "#FFFFFF" : C.cyan}>
@@ -357,7 +357,6 @@ function ClipAndDevice({ t, W, H, L }) {
             </SelectBox>
           </div>
         )}
-        {/* notch do celular */}
         {toPhone > 0.6 && <div style={{ position: "absolute", left: "50%", top: 6, width: 54, height: 14, marginLeft: -27, borderRadius: 10, background: "#0D1016", opacity: prog(toPhone, 0.6, 1) }} />}
       </div>
       {tap > 0 && tap < 0.7 && (() => {

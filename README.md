@@ -24,16 +24,16 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 Baseado no anúncio "Creator Studio" (Apple) enviado como referência: fundo preto, tipografia cinética e um efeito diferente em cada palavra, refeito para vender sites da Estoke ao Cubo:
 
 - **0–1,5s** logo com as letras trocando de fonte e cor até assentar em "ESTOKE AO CUBO" com o cubo.
-- **1,5s (drop)** mosaico 3D com 16 telas dos sites que fizemos.
+- **1,5s (drop)** mosaico 3D com telas dos sites que fizemos — a Dizzy em destaque (todas as telas do centro e a maioria do mural).
 - **3,5s** "Um site." / "Vendas 24 horas." em corte seco, palavra a palavra.
 - **5,5s** dock de serviços (site, loja, SEO, WhatsApp, pagamento, métricas, domínio, mobile, segurança) com onda de ampliação.
 - **7,5s** "Monte sua loja." explode em blocos que montam uma loja virtual (carrinho recebe "1").
-- **9,5s** "Mostre ▢ seu trabalho.": um site abre entre as palavras, ocupa a tela e vira a tela do notebook.
+- **9,5s** "Mostre ▢ seu trabalho.": a abertura da Dizzy (moeda 3D girando, vídeo real a 30fps sincronizado com a timeline, trecho da gravação sem quadros perdidos) abre entre as palavras, ocupa a tela e vira a tela do notebook — um único quadro de vídeo do começo ao fim, sem recarregar.
 - **11,5s** "Venda de qualquer lugar." selecionado no notebook, que vira celular com gradiente da marca.
 - **15,5s** rajada de verbos: Publique (partículas, na pausa da música) · Edite (caixa de seleção) · Destaque (marca-texto) · Ranqueie (letras subindo + seta) · Chega de template (letras caem na lixeira) · Converta (letras embaralhadas se encaixam) · Escale (scanline: pixelado → nítido) · Venda (brilho).
 - **25,3s** pinceladas azuis → "Solicite seu orçamento." → serviços (sites institucionais, lojas virtuais, landing pages, gestão de estoque) → logo + "Sites e lojas virtuais que vendem."
 - Som: "BAILAR" (120 BPM, mesmo andamento da referência) com o drop no mosaico e a pausa da faixa em "Publique."; efeitos gravados (glitch, swooshes, cliques, marca-texto, papel amassado, lixo de papel, brilho) ~15 dB abaixo da música.
-- Imagens: `src/adAssets.js`, gerado por `bash scripts/build-ad-assets.sh` a partir das gravações em `dist/media/`.
+- Imagens e vídeo: `src/adAssets.js`, gerado por `bash scripts/build-ad-assets.sh` a partir da gravação original da Dizzy e das gravações em `dist/media/` (vídeo em MP4 e WebM, para o Chromium da exportação).
 
 ## "Venda no automático" (FlowReveal)
 
