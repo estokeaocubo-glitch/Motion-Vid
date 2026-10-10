@@ -3,8 +3,8 @@ import {
   C, FONT, DISP, clamp, lerp, prog, easeOut, easeIn, easeInOut, rnd, spring, hexA,
   Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer,
 } from "./motionKit";
-import { AD_TILES, AD_CLIP_MP4, AD_CLIP_WEBM, AD_CLIP_DUR } from "./adAssets";
-import { REACH_TRAMA } from "./reachAssets";
+import { AD_TILES } from "./adAssets";
+import { REACH_SALE, REACH_BEYOND, REACH_SKY, REACH_DUR } from "./reachAssets";
 import { MUSIC_REACH } from "./audio/alexaReach";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 
@@ -15,9 +15,10 @@ import { SFX, SFX_PEAK } from "./audio/sfx";
    explodindo do centro, imagens deslizando, lista de ferramentas rolando, moldura de
    seleção se deformando, imagens em tela cheia com texto gigante ("REWRITE THE RULES",
    "DREAM BIGGER", "MUCH BIGGER"), feixes de luz em V e a logo no fundo claro.
-   Nossa versão: as imagens são telas dos 9 sites que fizemos; "VENDER MAIS" sobre o
-   vídeo da Dizzy, "IR ALÉM" sobre a foto da Trama e "MUITO ALÉM" com a câmera recuando
-   de um site até o mural com todos; fecha com "vendas." e a logo.
+   Nossa versão: as imagens são telas dos 9 sites que fizemos; na parte em tela cheia,
+   vídeos cinematográficos (Mixkit, licença livre): "VENDER MAIS" com alguém comemorando no
+   notebook e notificações de pedido pipocando, "IR ALÉM" com braços abertos no alto de um
+   penhasco e "MUITO ALÉM" sobre as nuvens; fecha com "vendas." e a logo.
    Música: "Alexa 2" (EMANVEL) — forte no começo, pausa enquanto a lista e a moldura
    aparecem e o drop (17,47s da faixa) cai exatamente nas imagens em tela cheia.
 ============================================================================= */
@@ -280,52 +281,70 @@ function BigWords({ t, t0, top, bottom, L, H }) {
     </>
   );
 }
+// Notificações de venda pipocando sobre a comemoração ("VENDER MAIS")
+const ORDERS = [["Novo pedido", "R$ 249,90"], ["Pagamento aprovado", "Pix"], ["Novo pedido", "R$ 89,90"], ["Novo pedido", "R$ 1.240,00"]];
+function SaleToasts({ t, W, H, L }) {
+  const w = L.tall ? 250 : 220;
+  const x = L.tall ? W / 2 - w / 2 : W - w - 26;
+  const y0 = L.tall ? H * 0.46 : H * 0.24;
+  return ORDERS.map(([title, val], i) => {
+    const t0 = T.big + 0.25 + i * 0.38;
+    const s = spring(t - t0, { stiffness: 230, damping: 17 });
+    if (s <= 0) return null;
+    // as mais antigas descem e somem: no máximo 3 na tela
+    const age = ORDERS.filter((_, j) => j > i && t >= T.big + 0.25 + j * 0.38).length;
+    const slot = easeOut(clamp(age, 0, 3) / 3) * 3;
+    const out = prog(age, 2.2, 3);
+    return (
+      <div key={i} style={{
+        position: "absolute", left: x, top: y0 + slot * (L.tall ? 52 : 46), width: w, zIndex: 20 - age, boxSizing: "border-box",
+        display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 14,
+        background: "rgba(8,20,40,.62)", border: "1px solid rgba(255,255,255,.22)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)",
+        boxShadow: "0 12px 28px rgba(0,0,0,.4)", opacity: clamp(s * 2) * (1 - out),
+        transform: `translateX(${(1 - clamp(s)) * 40}px) scale(${lerp(0.9, 1, clamp(s)) * (1 - age * 0.04)})`,
+      }}>
+        <div style={{ width: 28, height: 28, borderRadius: 8, background: i === 1 ? "linear-gradient(145deg, #4FE0B0, #0B8F6B)" : `linear-gradient(145deg, ${C.cyan}, ${C.blue})`, display: "grid", placeItems: "center", flex: "0 0 auto" }}>
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d={i === 1 ? "M5 12.5l4.5 4.5L19 7.5" : "M3 4h2l2.4 10.5h10.2L20 7H6.2 M9 19.5h.01 M17 19.5h.01"} fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </div>
+        <div style={{ fontFamily: FONT, lineHeight: 1.15 }}>
+          <div style={{ fontWeight: 700, fontSize: 12.5, color: "#FFFFFF" }}>{title}</div>
+          <div style={{ fontWeight: 600, fontSize: 11.5, color: hexA(C.ice, 0.8) }}>{val} · agora</div>
+        </div>
+      </div>
+    );
+  });
+}
+// Vídeo em tela cheia (versão 16:9 ou vertical), sincronizado com a timeline
+function Footage({ t, t0, clip, dur, L, style }) {
+  const src = L.tall ? clip.tall : clip.wide;
+  return <SyncedVideo t={clamp(t - t0, 0, dur - 0.04)} duration={dur} webm={src.webm} mp4={src.mp4} style={{ transform: "scale(1.02)", ...style }} />;
+}
 function Big({ t, W, H, L }) {
   const s1 = inWin(t, T.big, T.big2);
   const s2 = inWin(t, T.big2, T.big3);
   const s3 = inWin(t, T.big3, T.beams);
   const out = easeIn(prog(t, T.beams - 0.25, T.beams));
-  // "MUITO ALÉM": a câmera recua de um site até o mural com todos
-  const pull = easeInOut(prog(t, T.big3 + 0.15, T.big3 + 2.6));
-  const cols = L.tall ? 5 : 7;
-  const rows = L.tall ? 9 : 7;
-  const tw = 160;
-  const th = 100;
-  const gap = 10;
-  const gw = cols * (tw + gap);
-  const gh = rows * (th + gap);
-  const focusC = Math.floor(cols / 2);
-  const focusR = Math.floor(rows / 2);
-  const zoomFull = Math.max(W / tw, H / th) * 1.02;
-  const zoom = lerp(zoomFull, L.tall ? 0.62 : 0.72, pull);
+  // cada corte entra com um leve "punch" de zoom, e a câmera segue andando
+  const punch = (t0) => lerp(1.12, 1, easeOut(prog(t, t0, t0 + 0.45)));
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#000", opacity: 1 - out }}>
       {s1 && (
-        <div style={{ position: "absolute", inset: 0, transform: `scale(${lerp(1, 1.1, prog(t, T.big, T.big2))})` }}>
-          <SyncedVideo t={clamp(t - T.big, 0, AD_CLIP_DUR - 0.04)} duration={AD_CLIP_DUR} webm={AD_CLIP_WEBM} mp4={AD_CLIP_MP4} style={{ transform: "scale(1.28) translateY(9%)" }} />
+        <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(T.big) * lerp(1, 1.06, prog(t, T.big, T.big2))})` }}>
+          <Footage t={t} t0={T.big} clip={REACH_SALE} dur={REACH_DUR.SALE} L={L} />
         </div>
       )}
       {s2 && (
-        <div style={{ position: "absolute", inset: 0, transform: `scale(${lerp(1.12, 1.0, easeOut(prog(t, T.big2, T.big3)))}) translateX(${lerp(-12, 12, prog(t, T.big2, T.big3))}px)` }}>
-          <img src={REACH_TRAMA} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(T.big2) * lerp(1, 1.05, prog(t, T.big2, T.big3))})` }}>
+          <Footage t={t} t0={T.big2} clip={REACH_BEYOND} dur={REACH_DUR.BEYOND} L={L} />
         </div>
       )}
       {s3 && (
-        <div style={{ position: "absolute", left: W / 2, top: H / 2, width: 0, height: 0 }}>
-          <div style={{ position: "absolute", left: 0, top: 0, transform: `scale(${zoom})` }}>
-            {Array.from({ length: cols * rows }, (_, i) => {
-              const r = Math.floor(i / cols);
-              const c = i % cols;
-              return (
-                <Card key={i} i={(r * 4 + c * 3 + 16 - focusR * 4 - focusC * 3 + AD_TILES.length * 4) % AD_TILES.length} w={tw} h={th} style={{
-                  left: (c - focusC) * (tw + gap) - tw / 2, top: (r - focusR) * (th + gap) - th / 2, borderRadius: 4,
-                }} />
-              );
-            })}
-          </div>
+        <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(T.big3) * lerp(1, 1.16, easeInOut(prog(t, T.big3, T.beams)))})` }}>
+          <Footage t={t} t0={T.big3} clip={REACH_SKY} dur={REACH_DUR.SKY} L={L} />
         </div>
       )}
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,0) 35%, rgba(0,0,0,0) 65%, rgba(0,0,0,.35))" }} />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,.4), rgba(0,0,0,0) 35%, rgba(0,0,0,0) 65%, rgba(0,0,0,.4))" }} />
+      {s1 && <SaleToasts t={t} W={W} H={H} L={L} />}
       {s1 && <BigWords t={t} t0={T.big} top="Vender" bottom="mais" L={L} H={H} />}
       {s2 && <BigWords t={t} t0={T.big2} top="Ir" bottom="além" L={L} H={H} />}
       {s3 && <BigWords t={t} t0={T.big3} top="Muito" bottom="além" L={L} H={H} />}

@@ -30,11 +30,11 @@ Baseado no anúncio Freepik → Magnific enviado como referência, refeito para 
 - **7,3–9,6s** sites deslizando em profundidade: "com" · "design sob medida".
 - **9,6–13,2s** lista de recursos rolando (loja virtual, Pix, SEO, WhatsApp, agendamento, cardápio digital…) em volta de "▸ e tudo o que você precisa", com recortes de sites aparecendo.
 - **13,2–16s** moldura ciano com alças se deformando: "pra você".
-- **16s (drop)** tela cheia com texto gigante: "VENDER MAIS" (vídeo da Dizzy) → "IR ALÉM" (foto da Trama) → "MUITO ALÉM" (a câmera recua da Kaiirós até o mural com todos os sites).
+- **16s (drop)** tela cheia com texto gigante sobre vídeos cinematográficos (Mixkit, licença livre para uso comercial): "VENDER MAIS" (alguém comemorando no notebook, com notificações "Novo pedido · R$…" e "Pagamento aprovado" pipocando), "IR ALÉM" (braços abertos no alto de um penhasco sobre o mar) e "MUITO ALÉM" (janela do avião sobre as nuvens no pôr do sol, com a câmera avançando). Cada vídeo tem recorte próprio para o 9:16, seguindo a pessoa em cena.
 - **23–27s** feixes de luz ciano em V: "hoje," · "seu site" · "vira" → clarão.
 - **27–31s** fundo claro: "vendas." → cubo + "Estoke ao Cubo" + "Sites e lojas virtuais que vendem.".
 - Som: "Alexa 2" (EMANVEL) — forte no começo, a pausa da faixa cobre a lista e a moldura, e o drop (17,47s da faixa) cai exatamente em "VENDER MAIS"; efeitos gravados ~15 dB abaixo da música.
-- Foto da Trama: `src/reachAssets.js` (`bash scripts/build-reach-assets.sh`); telas e vídeo da Dizzy vêm de `src/adAssets.js`.
+- Vídeos: `src/reachAssets.js`, gerado por `bash scripts/build-reach-assets.sh` (baixa da Mixkit, recorta o trecho e gera 16:9 e vertical em WebM + MP4; os originais não ficam no repositório); telas dos sites vêm de `src/adAssets.js`.
 
 ## Anúncio de sites (SiteAd)
 
