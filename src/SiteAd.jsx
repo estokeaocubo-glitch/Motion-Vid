@@ -3,7 +3,7 @@ import {
   C, FONT, DISP, DISPLAY_FONT, measure, fitSize, clamp, lerp, prog, easeOut, easeIn, easeInOut, rnd, spring, hexA, GRAD, GRAD_LIGHT,
   Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer,
 } from "./motionKit";
-import { AD_TILES, AD_DIZZY_TILES, AD_CLIP_MP4, AD_CLIP_WEBM, AD_CLIP_DUR } from "./adAssets";
+import { AD_TILES, AD_DIZZY_TILES, AD_EXTRA_TILES, AD_CLIP_MP4, AD_CLIP_WEBM, AD_CLIP_DUR } from "./adAssets";
 import { MUSIC_AD } from "./audio/bailarAd";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 
@@ -90,14 +90,18 @@ function GlitchLogo({ t, t0, settle, size, tagline, column = false }) {
 }
 
 /* ---------- Mosaico de telas dos sites ---------- */
-// Mistura equilibrada: ~40% Dizzy (inclusive a tela do centro), o resto dividido entre LCS, Noka e
-// Misú, alternando para telas vizinhas serem sempre de sites diferentes.
-// AD_TILES: [0, AD_DIZZY_TILES) = Dizzy; depois LCS, Noka, Misú intercalados (3 de cada).
+// Mistura equilibrada de 9 sites: a Dizzy em ~20% das telas (inclusive a do centro) e os outros em ~10%
+// cada; o padrão (coluna + 4 × linha) garante que telas vizinhas nunca sejam do mesmo site.
+// AD_TILES: [0, 7) Dizzy · [7, 16) LCS, Noka, Misú intercalados (3 de cada) · [16, 21) Kaiirós, YMB,
+// KDust, Trama, Bastos.
+const MOSAIC_SITES = ["dizzy", "lcs", "kaiiros", "noka", "ymb", "dizzy", "misu", "kdust", "trama", "bastos"];
+const EXTRA = { kaiiros: 0, ymb: 1, kdust: 2, trama: 3, bastos: 4 };
 function mosaicTile(r, c) {
-  const site = (c + r * 2) % 5; // 0–1: Dizzy · 2: LCS · 3: Noka · 4: Misú
+  const site = MOSAIC_SITES[(c + r * 4) % MOSAIC_SITES.length];
   const k = r * 7 + c * 3;
-  if (site <= 1) return (k + site) % AD_DIZZY_TILES;
-  return AD_DIZZY_TILES + ((k % 3) * 3 + (site - 2));
+  if (site === "dizzy") return k % AD_DIZZY_TILES;
+  if (site in EXTRA) return AD_EXTRA_TILES + EXTRA[site];
+  return AD_DIZZY_TILES + (k % 3) * 3 + { lcs: 0, noka: 1, misu: 2 }[site];
 }
 function Mosaic({ t, W, H, L }) {
   const lt = t - T.mosaic;
