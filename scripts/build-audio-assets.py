@@ -5,6 +5,7 @@
   src/audio/miamiFlow.js  trecho da "Miami" para o "Venda no automático" (MUSIC_FLOW)
   src/audio/bailarAd.js   trecho da "BAILAR" para o anúncio de sites (MUSIC_AD)
   src/audio/alexaReach.js trecho da "Alexa 2" para o anúncio "Amplie seu alcance" (MUSIC_REACH)
+  src/audio/distanceTools.js trecho da "DISTANCE" para o motion "dev / tools / site" (MUSIC_TOOLS)
   src/audio/tape.js       efeitos analógicos do repositório (TAPE, TAPE_PEAK)
   src/audio/sfx.js        efeitos gravados da Mixkit (SFX, SFX_PEAK)
 
@@ -21,6 +22,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MIAMI = os.path.join(ROOT, "[FREE] Nemzzz x Sample x Hoodtrap Type Beat - _Miami_ [sc9ICHEniso].mp3")
 ALEXA = os.path.join(ROOT, "Lh Chucro x Derek x Neckklace type beat _Alexa 2_ _ Prod. EMANVEL.m4a")
 BAILAR = os.path.join(ROOT, "[FREE] Latin Trap x Mexican Type Beat - ''BAILAR'' 🇲🇽 _ Cuban Trap Type Beat 2025 [mdU25uOFZRg].mp3")
+DISTANCE = os.path.join(ROOT, "TRAP TYPE BEAT - _DISTANCE_ _ FREESTYLE BEAT _ HARD TYPE BEAT _ FREE RAP INSTRUMENTAL 2026 [zuHucgfzkoA].mp3")
 TAPE_DIR = os.path.join(ROOT, "Efeitos Analógicos (15)")
 
 # Música: id → (arquivo, constante exportada, início na faixa, duração)
@@ -29,6 +31,7 @@ MUSIC = {
     "miamiFlow": (MIAMI, "MUSIC_FLOW", 23.0, 20.5),  # golpe de 39,38s da faixa em 16,38s do trecho
     "bailarAd": (BAILAR, "MUSIC_AD", 30.0, 33.0),     # drop da "BAILAR" (32,02s) em 2,02s do trecho
     "alexaReach": (ALEXA, "MUSIC_REACH", 1.3, 32.0),   # drop da "Alexa 2" (17,47s) em 16,17s do trecho
+    "distanceTools": (DISTANCE, "MUSIC_TOOLS", 63.5, 12.5),  # volta do beat da "DISTANCE" (67,29s) em 3,79s do trecho
 }
 # Efeitos analógicos do repositório: id → (arquivo, início, duração)
 TAPE = {

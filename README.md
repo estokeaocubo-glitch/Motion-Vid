@@ -8,6 +8,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
+| "dev / tools / site" (três faixas) | 12s | 3:4 e 9:16 | `src/ToolsReveal.jsx` | `dist/dev-tools-site-3x4.mp4`, `dist/dev-tools-site-9x16.mp4` |
 | "Amplie seu alcance" (anúncio de sites) | 31s | 16:9 e 9:16 | `src/ReachAd.jsx` | `dist/anuncio-alcance-16x9.mp4`, `dist/anuncio-alcance-9x16.mp4` |
 | Anúncio de sites (tipografia cinética) | 32s | 16:9 e 9:16 | `src/SiteAd.jsx` | `dist/anuncio-sites-16x9.mp4`, `dist/anuncio-sites-9x16.mp4` |
 | "Venda no automático" (fluxo → projetos → cubo) | 18s | 16:9, 9:16 e Story | `src/FlowReveal.jsx` + `src/flow/` | `dist/fluxo-automatico-16x9.mp4`, `dist/fluxo-automatico-9x16.mp4`, `dist/fluxo-automatico-story.mp4` |
@@ -19,6 +20,19 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Apresentação de site: Dizzy | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/dizzy.js` | `dist/dizzy-apresentacao-9x16.mp4`, `dist/dizzy-apresentacao-4x5.mp4` |
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## "dev / tools / site" (ToolsReveal)
+
+Refeito a partir do vídeo "artist / tools / art", agora para programação:
+
+- **0–3,8s** tela branca dividida em três faixas; "dev", "tools" e "site" aparecem um a um (0,75 · 1,5 · 2,25s), no respiro da música.
+- **3,8s (beat volta)** as três faixas viram vídeo juntas, com os nomes no canto:
+  - **dev**: programador de costas com os monitores cheios de código (Mixkit 41637, licença livre).
+  - **tools**: o vídeo enviado (pilha de ícones neon com o Pinterest na frente, `assets/tools-icons.mp4`) e, no mesmo estilo neon, Python, Java, GitHub e Antigravity atravessando a câmera um por batida; a partir de 8,4s as cinco ferramentas lado a lado, cada batida acendendo uma.
+  - **site**: a Dizzy (moeda 3D) e os prints de Kaiirós, YMB Cocktails, KDust, Trama e Bastos trocando no beat.
+- Assinatura "estoke ao cubo" no canto, como a marca d'água da referência.
+- Som: "DISTANCE" — o trecho começa no respiro da faixa (reforçado) e o beat (67,29s da faixa) volta exatamente no corte; efeitos gravados bem baixos.
+- Vídeos e prints: `src/toolsAssets.js`, gerado por `bash scripts/build-tools-assets.sh`. Ícones: traços do Simple Icons (Python, GitHub, Pinterest), Devicon (Java) e Lobe Icons (Antigravity), embutidos no componente.
 
 ## "Amplie seu alcance" (ReachAd)
 
@@ -224,6 +238,8 @@ node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-3x4.m
 node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-4x5.mp4 60 4x5
+node scripts/export-video.cjs dist/dev-tools-site.html dist/dev-tools-site-3x4.mp4 60 3x4
+node scripts/export-video.cjs dist/dev-tools-site.html dist/dev-tools-site-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/anuncio-alcance.html dist/anuncio-alcance-16x9.mp4 60 16x9
 node scripts/export-video.cjs dist/anuncio-alcance.html dist/anuncio-alcance-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/anuncio-sites.html dist/anuncio-sites-16x9.mp4 60 16x9
