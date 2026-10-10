@@ -4,6 +4,7 @@
   src/audio/miamiSaas.js  trecho da "Miami" para o motion SaaS (MUSIC_SAAS)
   src/audio/miamiFlow.js  trecho da "Miami" para o "Venda no automático" (MUSIC_FLOW)
   src/audio/bailarAd.js   trecho da "BAILAR" para o anúncio de sites (MUSIC_AD)
+  src/audio/alexaReach.js trecho da "Alexa 2" para o anúncio "Amplie seu alcance" (MUSIC_REACH)
   src/audio/tape.js       efeitos analógicos do repositório (TAPE, TAPE_PEAK)
   src/audio/sfx.js        efeitos gravados da Mixkit (SFX, SFX_PEAK)
 
@@ -18,6 +19,7 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MIAMI = os.path.join(ROOT, "[FREE] Nemzzz x Sample x Hoodtrap Type Beat - _Miami_ [sc9ICHEniso].mp3")
+ALEXA = os.path.join(ROOT, "Lh Chucro x Derek x Neckklace type beat _Alexa 2_ _ Prod. EMANVEL.m4a")
 BAILAR = os.path.join(ROOT, "[FREE] Latin Trap x Mexican Type Beat - ''BAILAR'' 🇲🇽 _ Cuban Trap Type Beat 2025 [mdU25uOFZRg].mp3")
 TAPE_DIR = os.path.join(ROOT, "Efeitos Analógicos (15)")
 
@@ -26,6 +28,7 @@ MUSIC = {
     "miamiSaas": (MIAMI, "MUSIC_SAAS", 16.0, 54.0),  # drop da "Miami" (24,97s) em 8,97s do trecho
     "miamiFlow": (MIAMI, "MUSIC_FLOW", 23.0, 20.5),  # golpe de 39,38s da faixa em 16,38s do trecho
     "bailarAd": (BAILAR, "MUSIC_AD", 30.0, 33.0),     # drop da "BAILAR" (32,02s) em 2,02s do trecho
+    "alexaReach": (ALEXA, "MUSIC_REACH", 1.3, 32.0),   # drop da "Alexa 2" (17,47s) em 16,17s do trecho
 }
 # Efeitos analógicos do repositório: id → (arquivo, início, duração)
 TAPE = {
