@@ -3,6 +3,7 @@
 
   src/audio/miamiSaas.js  trecho da "Miami" para o motion SaaS (MUSIC_SAAS)
   src/audio/miamiFlow.js  trecho da "Miami" para o "Venda no automático" (MUSIC_FLOW)
+  src/audio/bailarAd.js   trecho da "BAILAR" para o anúncio de sites (MUSIC_AD)
   src/audio/tape.js       efeitos analógicos do repositório (TAPE, TAPE_PEAK)
   src/audio/sfx.js        efeitos gravados da Mixkit (SFX, SFX_PEAK)
 
@@ -17,12 +18,14 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MIAMI = os.path.join(ROOT, "[FREE] Nemzzz x Sample x Hoodtrap Type Beat - _Miami_ [sc9ICHEniso].mp3")
+BAILAR = os.path.join(ROOT, "[FREE] Latin Trap x Mexican Type Beat - ''BAILAR'' 🇲🇽 _ Cuban Trap Type Beat 2025 [mdU25uOFZRg].mp3")
 TAPE_DIR = os.path.join(ROOT, "Efeitos Analógicos (15)")
 
-# Música: (início na faixa, duração). O drop da faixa está em 24,97s.
+# Música: id → (arquivo, constante exportada, início na faixa, duração)
 MUSIC = {
-    "miamiSaas": (16.0, 54.0),  # drop em 8,97s do trecho
-    "miamiFlow": (23.0, 20.5),  # drop em 1,97s do trecho
+    "miamiSaas": (MIAMI, "MUSIC_SAAS", 16.0, 54.0),  # drop da "Miami" (24,97s) em 8,97s do trecho
+    "miamiFlow": (MIAMI, "MUSIC_FLOW", 23.0, 20.5),  # golpe de 39,38s da faixa em 16,38s do trecho
+    "bailarAd": (BAILAR, "MUSIC_AD", 30.0, 33.0),     # drop da "BAILAR" (32,02s) em 2,02s do trecho
 }
 # Efeitos analógicos do repositório: id → (arquivo, início, duração)
 TAPE = {
@@ -59,6 +62,11 @@ SFX = {
     "techSlide": (3120, 0, 0.8),         # Technology transition slide — linha do fluxo
     "lockShut": (2849, 0, None),         # Shut and lock — cadeado
     "typing": (1396, 5.0, 4.0),          # Soft typing on a digital keyboard — digitação da logo
+    "glitch": (2946, 0, 1.6),            # Virtual quick glitch — logo trocando de fonte
+    "glitchBreak": (2951, 0, 0.6),       # Digital glitch break — logo assentando
+    "crumple": (2996, 0, None),          # Quick paper crumple sound — "template" amassado
+    "paperTrash": (2381, 0, None),       # Pile of paper trash — cai na lixeira
+    "marker": (2998, 0, None),           # Pen marker line — marca-texto
 }
 
 
@@ -113,10 +121,10 @@ def main():
     out = os.path.join(ROOT, "src", "audio")
     os.makedirs(out, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
-        for k, (s, d) in MUSIC.items():
+        for k, (src, const, s, d) in MUSIC.items():
             p = os.path.join(tmp, k + ".mp3")
-            encode(MIAMI, s, d, p, "160k", normalize=False)
-            module(os.path.join(out, k + ".js"), "MUSIC_" + k[5:].upper(), {k: p})
+            encode(src, s, d, p, "160k", normalize=False)
+            module(os.path.join(out, k + ".js"), const, {k: p})
         files, peaks = {}, {}
         for k, (f, s, d) in TAPE.items():
             p = os.path.join(tmp, k + ".mp3")

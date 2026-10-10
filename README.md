@@ -8,6 +8,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
+| Anúncio de sites (tipografia cinética) | 32s | 16:9 e 9:16 | `src/SiteAd.jsx` | `dist/anuncio-sites-16x9.mp4`, `dist/anuncio-sites-9x16.mp4` |
 | "Venda no automático" (fluxo → projetos → cubo) | 18s | 16:9, 9:16 e Story | `src/FlowReveal.jsx` + `src/flow/` | `dist/fluxo-automatico-16x9.mp4`, `dist/fluxo-automatico-9x16.mp4`, `dist/fluxo-automatico-story.mp4` |
 | SaaS Gestão de Estoque | 52s + corte de 21s | 9:16 e 4:5 | `src/InventorySaaS.jsx` + `src/saas/` | `dist/saas-estoque-9x16.mp4`, `dist/saas-estoque-4x5.mp4`, `dist/saas-estoque-curto-9x16.mp4`, `dist/saas-estoque-curto-4x5.mp4` |
 | Pasta "Nossos clientes" | 5,2s, loop | 9:16 e 4:5 | `src/FolderReveal.jsx` | `dist/pasta-clientes-9x16.mp4`, `dist/pasta-clientes-4x5.mp4` |
@@ -17,6 +18,22 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Apresentação de site: Dizzy | 16,7s, loop perfeito | 9:16 e 4:5 | `src/DeviceShowcase.jsx` + `src/sites/dizzy.js` | `dist/dizzy-apresentacao-9x16.mp4`, `dist/dizzy-apresentacao-4x5.mp4` |
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## Anúncio de sites (SiteAd)
+
+Baseado no anúncio "Creator Studio" (Apple) enviado como referência: fundo preto, tipografia cinética e um efeito diferente em cada palavra, refeito para vender sites da Estoke ao Cubo:
+
+- **0–1,5s** logo com as letras trocando de fonte e cor até assentar em "ESTOKE AO CUBO" com o cubo.
+- **1,5s (drop)** mosaico 3D com 16 telas dos sites que fizemos.
+- **3,5s** "Um site." / "Vendas 24 horas." em corte seco, palavra a palavra.
+- **5,5s** dock de serviços (site, loja, SEO, WhatsApp, pagamento, métricas, domínio, mobile, segurança) com onda de ampliação.
+- **7,5s** "Monte sua loja." explode em blocos que montam uma loja virtual (carrinho recebe "1").
+- **9,5s** "Mostre ▢ seu trabalho.": um site abre entre as palavras, ocupa a tela e vira a tela do notebook.
+- **11,5s** "Venda de qualquer lugar." selecionado no notebook, que vira celular com gradiente da marca.
+- **15,5s** rajada de verbos: Publique (partículas, na pausa da música) · Edite (caixa de seleção) · Destaque (marca-texto) · Ranqueie (letras subindo + seta) · Chega de template (letras caem na lixeira) · Converta (letras embaralhadas se encaixam) · Escale (scanline: pixelado → nítido) · Venda (brilho).
+- **25,3s** pinceladas azuis → "Solicite seu orçamento." → serviços (sites institucionais, lojas virtuais, landing pages, gestão de estoque) → logo + "Sites e lojas virtuais que vendem."
+- Som: "BAILAR" (120 BPM, mesmo andamento da referência) com o drop no mosaico e a pausa da faixa em "Publique."; efeitos gravados (glitch, swooshes, cliques, marca-texto, papel amassado, lixo de papel, brilho) ~15 dB abaixo da música.
+- Imagens: `src/adAssets.js`, gerado por `bash scripts/build-ad-assets.sh` a partir das gravações em `dist/media/`.
 
 ## "Venda no automático" (FlowReveal)
 
@@ -190,6 +207,8 @@ node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-3x4.m
 node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-4x5.mp4 60 4x5
+node scripts/export-video.cjs dist/anuncio-sites.html dist/anuncio-sites-16x9.mp4 60 16x9
+node scripts/export-video.cjs dist/anuncio-sites.html dist/anuncio-sites-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/fluxo-automatico.html dist/fluxo-automatico-16x9.mp4 60 16x9
 node scripts/export-video.cjs dist/fluxo-automatico.html dist/fluxo-automatico-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/fluxo-automatico-story.html dist/fluxo-automatico-story.mp4 60 story
