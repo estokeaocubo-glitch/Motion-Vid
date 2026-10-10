@@ -29,7 +29,7 @@ Baseado na referência `587c2d7b4c2af98f4c64e2a105233105_720w.mp4` (commit "gere
 - Fundo: gradiente navy → azul → sky com manchas de luz gelo/ciano que derivam, e grão.
 - Câmera própria para o 9:16 (segue cada card de perto, já que o fluxo é largo).
 - **Versão Story** (`dist/fluxo-automatico-story.html`, variante em `src/flow/story.js`): o fluxo desce em escadinha vertical e preenche a altura, o panorama mostra o fluxo inteiro legível, todo o conteúdo importante fica fora das faixas de interface do Instagram (~14% no topo, ~20% no rodapé) e o final ganha o botão "Solicite seu orçamento".
-- Som: 100 BPM (Ré maior), pad + batida suave; cada card toca uma nota subindo, whoosh no zoom out, pops nos projetos, queda e ondas graves no colapso, sinos subindo no desenho do cubo e o "plim" de vidro da marca.
+- Som: música "Miami" — a intro calma acompanha o fluxo e o drop entra na revelação do cubo com "VENDA no automático". Efeitos analógicos: sweep no zoom out, "rewind kick" nos projetos, dial quando viram pontos, "shut down" no colapso, sintonia de rádio enquanto o cubo é desenhado e "dial down" fechando; pops e tiques sintetizados nos cards.
 - Imagens dos sites: `src/flowAssets.js`, gerado por `bash scripts/build-flow-assets.sh` a partir das gravações em `dist/media/`.
 
 ## SaaS Gestão de Estoque (InventorySaaS)
@@ -50,7 +50,7 @@ Roteiro (tempos da história; no vídeo final cada trecho fica ~1,3× mais longo
 - **22–30s Automação**: linha liga os processos, mão 3D liga "Reposição Automática" e arrasta o pedido; estoque baixo → NF-e emitida → equipe atualizada. Texto: "Zere as rupturas. Automatize pedidos e acompanhe cada item em tempo real." Sai em persianas no ritmo.
 - **30–34s Segurança**: cadeado fecha com ondas e se divide em barras de crescimento.
 - **34–39,5s Logo + CTA**: digitação de "Estoke ao Cubo" e "Transforme complexidade em controle.", botão "Agende uma demonstração" tocado pela mão 3D.
-- Som: 120 BPM em Dó (I–V–vi–IV); assinatura sonora do cubo ("plim" de vidro) sempre que ele aparece; cada ação tem efeito próprio.
+- Som: música "Miami" (Nemzzz, hoodtrap) com o drop (24,97s da faixa) caindo no instante em que o caos entra no cubo; a pausa longa da faixa coincide com a digitação da logo e o CTA. Efeitos analógicos de fita/rádio nas transições (scrub no gancho, sweep no portal, rebobinar na ida para o monitor, sweep no card que atravessa a câmera, "rewind kick" nas persianas, dial no cadeado, "forward down" no corte para a logo, "dial down" fechando). Por cima, os efeitos sintetizados de cada ação e o "plim" de vidro do cubo.
 - Exportado em 60fps, trilha normalizada em -14 LUFS.
 
 ## Pasta "Nossos clientes" (FolderReveal)
@@ -160,6 +160,12 @@ Trilha e efeitos são sintetizados com Web Audio, sem nenhum arquivo de áudio. 
 ## Transições
 
 Revelação por máscara nos títulos, motion blur direcional (câmera dos cards, mockups subindo, celular entrando), tremor de câmera nos impactos, anel de luz na revelação circular, streak anamórfico no flash, zoom-through para dentro do site, transição de pixels/cubos (eco do cubo pixelado do manual) e wipe diagonal com faixas azuis para o CTA.
+
+## Músicas e efeitos gravados
+
+- Músicas de fundo na raiz do repositório (commit "Musicas pra usar de fundo") e efeitos em `Efeitos Analógicos (15)/` (commit "Sons Pra usar"), com licença de uso.
+- `bash scripts/build-audio-assets.sh` recorta o trecho usado de cada música e o trecho útil de cada efeito e gera `src/audio/*.js` (mp3 em base64), embutidos no artifact.
+- O `motionKit` toca essas amostras junto com a síntese (`samples` no `MotionPlayer` e no `renderEventsWav`; `A.sample(nome, w, { off, dur, gain, env })` nos eventos). Eventos com `dur` (a música) entram no ponto certo quando o player começa no meio.
 
 ## Exportar o MP4
 

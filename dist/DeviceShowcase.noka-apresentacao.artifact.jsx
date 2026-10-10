@@ -347,10 +347,66 @@ const SND = {
   shimmer: (A, w, v = 1) => [84, 88, 91, 96].forEach((n, i) => tone(A, w + i * 0.03, { f: midi(n), dur: 1.4, v: 0.035 * v, send: 0.8, pan: i % 2 ? 0.5 : -0.5 })),
 };
 
+/* ---------- Amostras de áudio (músicas e efeitos gravados) ----------
+   samples: { nome: "data:audio/mpeg;base64,..." }. Cada contexto de áudio decodifica uma vez.
+   Eventos com `dur` são "contínuos" (ex.: a música): se o player começar no meio deles,
+   o player chama fn(A, w, off) com o deslocamento, para a faixa entrar no ponto certo. */
+const sampleCache = new WeakMap();
+function loadSamples(ctx, samples) {
+  if (!samples || !Object.keys(samples).length) return Promise.resolve(new Map());
+  if (!sampleCache.has(ctx)) {
+    sampleCache.set(ctx, Promise.all(Object.entries(samples).map(async ([k, src]) => {
+      const bin = atob(src.slice(src.indexOf(",") + 1));
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      try {
+        return [k, await ctx.decodeAudioData(bytes.buffer)];
+      } catch (e) {
+        return [k, null];
+      }
+    })).then((list) => new Map(list.filter(([, b]) => b))));
+  }
+  return sampleCache.get(ctx);
+}
+// Toca a amostra `name` em w. off: início dentro do arquivo · dur: duração máxima ·
+// env: [[segundos desde o início do arquivo, ganho], ...] para automação de volume (fades, ducking)
+function playSample(A, name, w, { off = 0, dur, gain = 1, rate = 1, pan = 0, send = 0, fadeIn = 0.004, fadeOut = 0.03, env } = {}) {
+  const buf = A.buffers && A.buffers.get(name);
+  if (!buf || off >= buf.duration) return;
+  const { ctx } = A;
+  const len = Math.min(dur ?? Infinity, (buf.duration - off) / rate);
+  if (len <= 0.01) return;
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  src.playbackRate.value = rate;
+  const g = ctx.createGain();
+  const level = (u) => {
+    if (!env) return gain;
+    if (u <= env[0][0]) return gain * env[0][1];
+    for (let i = 1; i < env.length; i++) {
+      if (u <= env[i][0]) return gain * lerp(env[i - 1][1], env[i][1], (u - env[i - 1][0]) / Math.max(1e-6, env[i][0] - env[i - 1][0]));
+    }
+    return gain * env[env.length - 1][1];
+  };
+  g.gain.setValueAtTime(0, w);
+  g.gain.linearRampToValueAtTime(level(off), w + fadeIn);
+  if (env) env.forEach(([u, v]) => { if (u > off + fadeIn && u < off + len * rate - fadeOut) g.gain.linearRampToValueAtTime(gain * v, w + (u - off) / rate); });
+  g.gain.setValueAtTime(level(off + (len - fadeOut) * rate), w + Math.max(fadeIn, len - fadeOut));
+  g.gain.linearRampToValueAtTime(0, w + len);
+  src.connect(g);
+  route(A, g, { send, pan, w, dur: len });
+  src.start(w, off, len * rate + 0.02);
+}
+const makeA = (ctx, out, send, noise, buffers) => {
+  const A = { ctx, out, send, noise, buffers };
+  A.sample = (name, w, opts) => playSample(A, name, w, opts);
+  return A;
+};
+
 /* Renderiza os eventos offline e devolve WAV estéreo 16-bit em base64.
    loop=true: renderiza dois ciclos e devolve o segundo, já com as caudas de reverb
    do ciclo anterior, para o arquivo emendar sem corte quando o vídeo repetir. */
-async function renderEventsWav(events, duration, { loop = false, sampleRate = 48000 } = {}) {
+async function renderEventsWav(events, duration, { loop = false, sampleRate = 48000, samples } = {}) {
   const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
   const cycles = loop ? 2 : 1;
   const ctx = new OAC(2, Math.ceil(sampleRate * duration * cycles), sampleRate);
@@ -359,8 +415,8 @@ async function renderEventsWav(events, duration, { loop = false, sampleRate = 48
   bus.connect(eng.master);
   const send = ctx.createGain();
   send.connect(eng.rev);
-  const A = { ctx, out: bus, send, noise: eng.noise };
-  for (let c = 0; c < cycles; c++) events.forEach((e) => e.fn(A, Math.max(0.001, e.t + c * duration)));
+  const A = makeA(ctx, bus, send, eng.noise, await loadSamples(ctx, samples));
+  for (let c = 0; c < cycles; c++) events.forEach((e) => e.fn(A, Math.max(0.001, e.t + c * duration), 0));
   const buf = await ctx.startRendering();
   const start = loop ? Math.round(sampleRate * duration) : 0;
   const n = Math.round(sampleRate * duration);
@@ -404,7 +460,7 @@ const PLAYER_CSS = `
 `;
 const fmtTime = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
-function MotionPlayer({ Frame, duration, events = [], formats, defaultFormat, scenes = [], renderWav, fontsToLoad = [] }) {
+function MotionPlayer({ Frame, duration, events = [], formats, defaultFormat, scenes = [], renderWav, fontsToLoad = [], samples }) {
   const fmtIds = Object.keys(formats);
   const [format, setFormat] = useState(defaultFormat || fmtIds[0]);
   const [t, setT] = useState(0);
@@ -418,7 +474,7 @@ function MotionPlayer({ Frame, duration, events = [], formats, defaultFormat, sc
   const playingRef = useRef(playing);
   const soundRef = useRef(soundOn);
   const areaRef = useRef(null);
-  const audio = useRef({ eng: null, bus: null, send: null, anchorCtx: 0, anchorT: 0, idx: 0 });
+  const audio = useRef({ eng: null, bus: null, send: null, anchorCtx: 0, anchorT: 0, idx: 0, buffers: null });
   loopRef.current = loop;
   playingRef.current = playing;
   soundRef.current = soundOn;
@@ -455,18 +511,29 @@ function MotionPlayer({ Frame, duration, events = [], formats, defaultFormat, sc
     a.anchorT = fromT;
     const i = events.findIndex((e) => e.t >= fromT - 0.001);
     a.idx = i < 0 ? events.length : i;
+    // eventos contínuos já em andamento (ex.: música) entram no ponto certo
+    const A = makeA(ctx, a.bus, a.send, a.eng.noise, a.buffers);
+    events.forEach((e) => {
+      if (e.dur && e.t < fromT - 0.001 && e.t + e.dur > fromT) {
+        try {
+          e.fn(A, a.anchorCtx, fromT - e.t);
+        } catch (err) {
+          /* ignora */
+        }
+      }
+    });
   }, [audioStop, events]);
   const audioPump = (curT) => {
     const a = audio.current;
     if (!a.bus) return;
     const { ctx } = a.eng;
-    const A = { ctx, out: a.bus, send: a.send, noise: a.eng.noise };
+    const A = makeA(ctx, a.bus, a.send, a.eng.noise, a.buffers);
     while (a.idx < events.length && events[a.idx].t < curT + 0.25) {
       const e = events[a.idx++];
       const w = a.anchorCtx + (e.t - a.anchorT);
       if (w < ctx.currentTime - 0.02) continue;
       try {
-        e.fn(A, Math.max(w, ctx.currentTime + 0.001));
+        e.fn(A, Math.max(w, ctx.currentTime + 0.001), Math.max(0, ctx.currentTime + 0.001 - w));
       } catch (err) {
         /* um efeito com problema não deve parar o vídeo */
       }
@@ -536,6 +603,11 @@ function MotionPlayer({ Frame, duration, events = [], formats, defaultFormat, sc
     if (first) {
       a.eng = makeEngine();
       if (!a.eng) return;
+      // decodifica músicas/efeitos; ao terminar, reinicia o agendamento para a música entrar
+      loadSamples(a.eng.ctx, samples).then((b) => {
+        a.buffers = b;
+        if (b.size && playingRef.current && soundRef.current) audioStart(tRef.current);
+      });
     }
     if (a.eng.ctx.state === "suspended") a.eng.ctx.resume().catch(() => {});
     if (first || !soundRef.current) {
@@ -546,7 +618,8 @@ function MotionPlayer({ Frame, duration, events = [], formats, defaultFormat, sc
       setSoundOn(true);
       setPlaying(true);
     } else setSoundOn(false);
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audioStart, samples]);
 
   // Fontes embutidas: reavalia medidas de texto quando carregarem
   useEffect(() => {

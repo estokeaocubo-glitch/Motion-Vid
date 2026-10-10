@@ -4,6 +4,8 @@ import {
   GRAD, GRAD_LIGHT, Beam, Grain, CubeLogo, SND, renderEventsWav, MotionPlayer,
 } from "./motionKit";
 import { VARIANT } from "./saas/variant";
+import { MUSIC_SAAS } from "./audio/miamiSaas";
+import { TAPE } from "./audio/tape";
 
 /* =============================================================================
    Estoke ao Cubo — Sistema de Gestão de Estoque (motion SaaS, 35s)
@@ -1158,60 +1160,16 @@ function FullFrame({ t: tg, format = "9x16" }) {
    Cada movimento importante tem o seu efeito (pop, swipe, tique, clique, clack).
 ============================================================================= */
 // Assinatura sonora do cubo: "plim" de vidro (sino + harmônico agudo + brilho), sempre que o cubo aparece
+// Música e efeitos gravados (scripts/build-audio-assets.sh). drop: segundo do golpe do drop
+// dentro do trecho embutido (24,97s na faixa original; o trecho começa em 16s).
+const MUSIC = { drop: 8.97, gain: 0.55 };
+// segundo do pico (golpe principal) dentro de cada efeito recortado
+const TAPE_PEAK = { fastScrub: 0.85, sweep1: 1.05, sweep2: 1.25, rewindTape: 1.2, rewindKick: 0.85, dialTurn: 0.55, fwdDown: 0.45, dialDown: 0.7, shutDown: 1.1, tuning: 0.9 };
+const SAMPLES = { music: MUSIC_SAAS.miamiSaas, ...TAPE };
 function cubeChime(A, w, v = 1) {
   [84, 91, 96].forEach((n, i) => tone(A, w + i * 0.025, { f: midi(n), dur: 1.6 - i * 0.3, v: (0.08 - i * 0.02) * v, send: 0.7, pan: i - 1 }));
   tone(A, w, { type: "triangle", f: midi(108), dur: 0.25, v: 0.02 * v, send: 0.5 });
   SND.shimmer(A, w + 0.04, 0.6 * v);
-}
-const CH = [
-  { b: 36, n: [48, 52, 55, 59] },
-  { b: 43, n: [47, 50, 55, 59] },
-  { b: 45, n: [45, 48, 52, 55] },
-  { b: 41, n: [45, 48, 52, 53] },
-];
-// Música (pad, bateria, baixo, arpejo) gerada no tempo do vídeo: o andamento fica constante em 120 BPM
-function buildMusic() {
-  const m = [];
-  const addM = (t, fn) => m.push({ t, fn });
-  const B = 0.5;
-  const L = (u) => W(HOOK + u);
-  const g0 = L(0);
-  const end = L(32.05);
-  const chordAt = (tt) => CH[Math.floor(Math.max(0, tt - g0 + 1e-6) / 2) % 4];
-  for (let tb = g0; tb < end - 0.3; tb += 2) {
-    const ch = chordAt(tb);
-    const u = unW(tb) - HOOK;
-    const v = u < 4 ? 1.9 : u >= 28 ? 2.3 : 1.3;
-    // cada acorde dura 2,7s e se sobrepõe ao próximo: sem "respiro" entre compassos
-    addM(tb, (A, w) => SND.pad(A, w, ch.n, Math.min(2.7, end - tb + 0.1), u < 4 ? 1100 : 1900, v));
-  }
-  const quiet = [[L(11.2), L(12.0)], [L(19.3), L(20.0)], [L(27.2), L(28.0)]];
-  const isQuiet = (tt) => quiet.some(([a, b]) => tt >= a && tt < b);
-  const dStart = g0 + Math.ceil((L(5.0) - g0) / B - 1e-6) * B;
-  const arpFrom = L(12);
-  let k = Math.round((dStart - g0) / B);
-  for (let tb = dStart; tb < L(28); tb += B, k++) {
-    if (isQuiet(tb)) continue;
-    const ch = chordAt(tb);
-    const kk = k;
-    add4(tb, ch, kk, tb >= arpFrom);
-  }
-  function add4(tb, ch, kk, busy) {
-    addM(tb, (A, w) => SND.kick(A, w, 0.75));
-    if (kk % 2 === 1) addM(tb, (A, w) => SND.clap(A, w, 0.65));
-    addM(tb + B / 2, (A, w) => SND.hat(A, w, 0.7, 0.25));
-    if (busy) addM(tb + B / 4, (A, w) => SND.hat(A, w, 0.3, -0.3));
-    addM(tb, (A, w) => SND.bass(A, w, ch.b, B * 0.45, 0.9));
-    addM(tb + B * 0.75, (A, w) => SND.bass(A, w, ch.b + 12, B * 0.2, 0.5));
-    if (busy) {
-      const arp = [0, 1, 2, 3, 2, 1];
-      [0, B / 2].forEach((o, j) => {
-        const n = ch.n[arp[(kk * 2 + j) % arp.length]] + 24;
-        addM(tb + o, (A, w) => SND.pluck(A, w, n, 0.55, j ? 0.35 : -0.35));
-      });
-    }
-  }
-  return m;
 }
 // duração no vídeo de um trecho da história (tempo local das cenas)
 const outDur = (t0, dur) => W(HOOK + t0 + dur) - W(HOOK + t0);
@@ -1228,7 +1186,6 @@ function buildEvents() {
     tone(A, w, { f: 180, f2: 900, glide: dur, dur, a: dur * 0.85, v: 0.04, send: 0.4 });
   });
   const hit = (t0, v = 1) => add(t0, (A, w) => {
-    SND.kick(A, w, 1.05 * v);
     tone(A, w, { f: 70, f2: 34, glide: 0.5, dur: 1.2, v: 0.45 * v, send: 0.2 });
     hiss(A, w, { type: "highpass", f: 6000, dur: 0.9, v: 0.06 * v, send: 0.4 });
     SND.shimmer(A, w, 0.8 * v);
@@ -1259,7 +1216,7 @@ function buildEvents() {
   PILLS.forEach((p, i) => add(p.t, (A, w) => { SND.bell(A, w, [84, 88, 91][i], 1, [-0.5, 0.5, -0.2][i]); SND.pop(A, w, 900 + i * 120, 0.08); }));
   riser(19.3, 0.7, 0.15);
   // Cena 4: linha, mão, pedido, sequência
-  add(20.0, (A, w) => { SND.kick(A, w, 0.9); hiss(A, w, { type: "highpass", f: 5000, dur: 0.7, v: 0.08, send: 0.5 }); SND.bell(A, w, 84, 0.9); });
+  add(20.0, (A, w) => { hiss(A, w, { type: "highpass", f: 5000, dur: 0.7, v: 0.08, send: 0.5 }); SND.bell(A, w, 84, 0.9); });
   add(20.35, (A, w) => hiss(A, w, { f: 800, f2: 5000, q: 1.5, dur: 1.0, v: 0.06, shape: "swell", pan: -0.6, panTo: 0.6 }));
   NODES.forEach((_, i) => add(20.35 + (i / 3) * 1.0, (A, w) => SND.pop(A, w, [520, 620, 740, 880][i], 0.13)));
   add(20.55, (A, w) => SND.swipe(A, w, 0.8));
@@ -1283,7 +1240,6 @@ function buildEvents() {
   riser(27.2, 0.6, 0.12);
   // persianas: um "swipe" curto por faixa, alternando os lados
   for (let j = 0; j < 6; j++) add(BLINDS + 0.2 + j * 0.05, (A, w) => hiss(A, w, { type: "highpass", f: 2500, f2: 6000, dur: 0.12, v: 0.06, shape: "swell", pan: j / 2.5 - 1 }));
-  add(BLINDS + 0.55, (A, w) => SND.kick(A, w, 0.7));
   // Cena 5: cadeado, ondas, barras
   add(28.05, (A, w) => tone(A, w, { f: 60, f2: 40, glide: 0.8, dur: 1.2, v: 0.4, send: 0.3 }));
   add(28.15, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 2000, to: 400, v: 0.12, pan: -0.4, panTo: 0 }));
@@ -1301,7 +1257,7 @@ function buildEvents() {
   // Final: corte claro, logo, digitação
   add(T.fin, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 300, to: 6000, v: 0.18, pan: 0, panTo: 0 }));
   hit(32.05, 1.1);
-  add(32.05, (A, w) => { SND.pad(A, w, [48, 52, 55, 59, 62], (FULL_DURATION - W(HOOK + 32.05)) * 1.25, 2600, 2.6); SND.sub(A, w, 36, 1.6, 1); cubeChime(A, w); });
+  add(32.05, (A, w) => { SND.sub(A, w, 36, 1.6, 0.8); cubeChime(A, w, 0.8); });
   [...WORDMARK].forEach((ch, i) => {
     if (ch !== " ") add(TYPE.w0 + i * TYPE.wd, (A, w) => { hiss(A, w, { type: "highpass", f: 5000, dur: 0.02, v: 0.09 }); tone(A, w, { type: "square", f: 1700 + (i % 4) * 140, dur: 0.008, v: 0.02 }); });
   });
@@ -1313,23 +1269,43 @@ function buildEvents() {
   add(CTA.rise, (A, w) => SND.swipe(A, w, 0.7));
   add(CTA.btn, (A, w) => SND.pop(A, w, 640, 0.16));
   add(CTA.tap - 0.75, (A, w) => SND.whoosh(A, w, { dur: 0.6, from: 600, to: 2500, v: 0.08, pan: 0.6, panTo: 0.1 }));
-  add(CTA.tap, (A, w) => { click(A, w); SND.kick(A, w, 0.6); });
+  add(CTA.tap, (A, w) => click(A, w));
   add(CTA.tap + 0.04, (A, w) => [79, 84, 88, 91].forEach((n, i) => SND.bell(A, w + i * 0.05, n, 0.8, i / 1.5 - 1)));
   add(CTA.tap + 0.05, (A, w) => SND.shimmer(A, w, 0.7));
   // tudo acima é tempo local; o gancho vem antes
   const out = ev.map((e) => ({ t: W(e.t + HOOK), fn: e.fn }));
   const addG = (t, fn) => out.push({ t: W(t), fn });
   const hookOut = W(HOOK);
-  addG(0, (A, w) => { SND.pad(A, w, [21, 28, 33], hookOut + 1.4, 700, 2.6); tone(A, w, { f: 58, f2: 46, glide: hookOut, dur: hookOut + 0.1, a: 0.25, v: 0.3, send: 0.3 }); hiss(A, w, { type: "lowpass", f: 600, dur: hookOut, v: 0.05, shape: "swell" }); SND.kick(A, w, 0.9); });
+  addG(0, (A, w) => { tone(A, w, { f: 58, f2: 46, glide: hookOut, dur: hookOut + 0.1, a: 0.25, v: 0.22, send: 0.3 }); hiss(A, w, { type: "lowpass", f: 600, dur: hookOut, v: 0.05, shape: "swell" }); });
   [0.15, 0.32, 0.5, 0.67].forEach((tt, i) => addG(tt, (A, w) => tone(A, w, { type: "square", f: i % 2 ? 784 : 988, dur: 0.09, v: 0.04, lp: 2600, pan: i % 2 ? 0.3 : -0.3 })));
   for (let tt = 0.3, i = 0; tt < 1.45; tt += 0.05 + i * 0.002, i++) addG(tt, (A, w) => SND.tick(A, w, 3200 - i * 40, 0.8));
   addG(0.2, (A, w) => SND.clap(A, w, 0.5));
   // tensão contínua: pulso grave tipo batimento + riser até a virada para o caos
-  [0, 0.5, 1.0, 1.25, 1.5].forEach((tt, i) => addG(tt, (A, w) => { SND.kick(A, w, 0.55 + i * 0.08); SND.sub(A, w, 31, 0.35, 0.9); }));
   addG(0.6, (A, w) => { const d = W(1.62) - W(0.6); hiss(A, w, { f: 300, f2: 5000, q: 1.2, dur: d, v: 0.14, shape: "rise", send: 0.3 }); tone(A, w, { type: "sawtooth", f: 110, f2: 330, glide: d, dur: d, a: d * 0.9, v: 0.035, lp: 1400 }); });
   addG(1.45, (A, w) => tone(A, w, { f: 300, f2: 110, glide: 0.4, dur: 0.5, v: 0.12 }));
   addG(1.6, (A, w) => SND.whoosh(A, w, { dur: 0.5, from: 4000, to: 300, v: 0.16, pan: 0, panTo: 0 }));
-  out.push(...buildMusic());
+  // Música ("Miami"): o drop da faixa cai no instante em que o caos entra no cubo
+  const drop = W(HOOK + 3.74);
+  const off0 = MUSIC.drop - drop;
+  const endF = off0 + FULL_DURATION;
+  out.push({
+    t: 0, dur: FULL_DURATION,
+    fn: (A, w, off = 0, cap = Infinity) => A.sample("music", w, {
+      off: off0 + off, dur: Math.min(FULL_DURATION - off, cap), gain: MUSIC.gain, fadeIn: off > 0 ? 0.03 : 0.004,
+      // intro da faixa (antes do drop) +5 dB; pausa final da faixa +3,5 dB; fade nos últimos 1,8s
+      env: [[0, 1.8], [MUSIC.drop - 0.4, 1.8], [MUSIC.drop - 0.02, 1], [off0 + W(HOOK + 32.3), 1], [off0 + W(HOOK + 32.8), 1.5], [endF - 1.8, 1.5], [endF, 0]],
+    }),
+  });
+  // Efeitos analógicos (fita/rádio) nas transições: o pico de cada efeito cai no corte
+  const tapeAt = (outT, name, gain) => out.push({ t: Math.max(0, outT - TAPE_PEAK[name]), fn: (A, w) => A.sample(name, w, { gain }) });
+  tapeAt(W(1.85), "fastScrub", 0.5); // gancho → caos
+  tapeAt(W(HOOK + 4.95), "sweep1", 0.55); // portal
+  tapeAt(W(HOOK + 12.0), "rewindTape", 0.5); // face do prisma → monitor
+  tapeAt(W(HOOK + 20.0), "sweep2", 0.55); // card atravessa a câmera
+  tapeAt(W(HOOK + 28.1), "rewindKick", 0.7); // persianas → cadeado
+  tapeAt(W(HOOK + 29.9), "dialTurn", 1.6); // cadeado vira barras
+  tapeAt(W(HOOK + 31.85), "fwdDown", 0.45); // corte para a logo
+  out.push({ t: FULL_DURATION - 2.29, fn: (A, w) => A.sample("dialDown", w, { gain: 0.4 }) }); // fecha o vídeo
   return out.sort((a, b) => a.t - b.t);
 }
 const FULL_EVENTS = buildEvents();
@@ -1358,13 +1334,22 @@ const mapTime = (u) => {
 };
 const Frame = SEGS ? ({ t, format }) => <PacedFrame t={mapTime(Math.min(t, DURATION - 1e-4))} format={format} /> : PacedFrame;
 const EVENTS = SEGS
-  ? SEGS.flatMap((sg, i) => FULL_EVENTS.filter((e) => e.t >= sg.from && e.t < sg.to).map((e) => ({ t: OFFS[i] + e.t - sg.from, fn: e.fn })))
+  ? SEGS.flatMap((sg, i) => FULL_EVENTS.flatMap((e) => {
+    if (e.dur) {
+      const a = Math.max(e.t, sg.from);
+      const b = Math.min(e.t + e.dur, sg.to);
+      if (b <= a) return [];
+      const base = a - e.t;
+      return [{ t: OFFS[i] + a - sg.from, dur: b - a, fn: (A, w, off = 0) => e.fn(A, w, base + off, b - a - off) }];
+    }
+    return e.t >= sg.from && e.t < sg.to ? [{ t: OFFS[i] + e.t - sg.from, fn: e.fn }] : [];
+  })).sort((x, y) => x.t - y.t)
   : FULL_EVENTS;
 const SCENES = SEGS ? SEGS.map((sg, i) => ({ name: sg.name, from: OFFS[i] })) : FULL_SCENES;
 // No corte, a trilha é a da versão completa recortada nos mesmos trechos (com micro-fades
 // de 6ms nas emendas), para notas e reverbs que atravessam o corte soarem inteiros.
 async function renderWav() {
-  const full = await renderEventsWav(FULL_EVENTS, FULL_DURATION);
+  const full = await renderEventsWav(FULL_EVENTS, FULL_DURATION, { samples: SAMPLES });
   if (!SEGS) return full;
   const bin = atob(full);
   const src = new Int16Array(new Uint8Array([...bin].map((c) => c.charCodeAt(0))).buffer, 44);
@@ -1402,6 +1387,6 @@ const MOTION = { Frame, duration: DURATION, formats: FORMATS, renderWav };
 export default function InventorySaaS() {
   return (
     <MotionPlayer Frame={Frame} duration={DURATION} events={EVENTS} formats={FORMATS} defaultFormat="9x16" renderWav={renderWav}
-      fontsToLoad={[`800 16px "Open Sauce Sans"`]} scenes={SCENES} />
+      fontsToLoad={[`800 16px "Open Sauce Sans"`]} scenes={SCENES} samples={SAMPLES} />
   );
 }

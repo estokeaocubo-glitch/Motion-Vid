@@ -5,6 +5,8 @@ import {
 } from "./motionKit";
 import { FLOW_SHOTS } from "./flowAssets";
 import { FLOW_VARIANT } from "./flow/variant";
+import { MUSIC_FLOW } from "./audio/miamiFlow";
+import { TAPE } from "./audio/tape";
 
 /* =============================================================================
    Estoke ao Cubo — "Venda no automático" (fluxo → projetos → cubo)
@@ -404,78 +406,60 @@ function cubeChime(A, w, v = 1) {
   tone(A, w, { type: "triangle", f: midi(108), dur: 0.25, v: 0.02 * v, send: 0.5 });
   SND.shimmer(A, w + 0.04, 0.6 * v);
 }
+// Música ("Miami") e efeitos analógicos gravados (scripts/build-audio-assets.sh).
+// drop: segundo do golpe do drop dentro do trecho embutido (24,97s na faixa; o trecho começa em 9,5s)
+const MUSIC = { drop: 15.47, gain: 0.55 };
+const TAPE_PEAK = { fastScrub: 0.85, sweep1: 1.05, sweep2: 1.25, rewindTape: 1.2, rewindKick: 0.85, dialTurn: 0.55, fwdDown: 0.45, dialDown: 0.7, shutDown: 1.1, tuning: 0.9 };
+const SAMPLES = { music: MUSIC_FLOW.miamiFlow, ...TAPE };
 function buildEvents() {
   const ev = [];
   const add = (t, fn) => ev.push({ t, fn });
-  const B = 0.6;
-  const PROG = [
-    { b: 38, n: [50, 54, 57, 61] }, // Dmaj7
-    { b: 45, n: [49, 52, 57, 61] }, // A/C#
-    { b: 47, n: [50, 54, 57, 59] }, // Bm7
-    { b: 43, n: [50, 55, 59, 62] }, // Gmaj
-  ];
-  const chordAt = (tt) => PROG[Math.floor(tt / (B * 4)) % 4];
-  for (let tb = 0; tb < T.cube - 0.1; tb += B * 4) {
-    const ch = chordAt(tb);
-    add(tb, (A, w) => SND.pad(A, w, ch.n, Math.min(B * 4 + 0.7, T.cube - tb + 0.2), tb < T.burst ? 1500 : 2100, 1.4));
-  }
-  const quiet = (tt) => tt >= T.collapse - 0.1 && tt < T.cube;
-  let k = 0;
-  for (let tb = 0; tb < T.cube - 0.05; tb += B, k++) {
-    if (quiet(tb)) continue;
-    const ch = chordAt(tb);
-    if (k % 2 === 0) add(tb, (A, w) => SND.kick(A, w, 0.6));
-    if (k % 2 === 1) add(tb, (A, w) => SND.clap(A, w, 0.35));
-    add(tb + B / 2, (A, w) => SND.hat(A, w, 0.45, 0.25));
-    if (k % 2 === 0) add(tb, (A, w) => SND.bass(A, w, ch.b, B * 0.8, 0.8));
-    add(tb + B * 0.75, (A, w) => SND.bass(A, w, ch.b + 12, B * 0.2, 0.4));
-  }
-  // cards do fluxo: linha "corre" e cada card toca uma nota subindo
-  const NOTES = [74, 76, 78, 81, 83, 86, 88, 90];
+  // música: a intro calma da faixa acompanha o fluxo e o drop entra na revelação do cubo
+  const off0 = MUSIC.drop - T.cube;
+  const endF = off0 + DURATION;
+  ev.push({
+    t: 0, dur: DURATION,
+    fn: (A, w, off = 0) => A.sample("music", w, {
+      off: off0 + off, dur: DURATION - off, gain: MUSIC.gain, fadeIn: off > 0 ? 0.03 : 0.004,
+      env: [[0, 1.8], [MUSIC.drop - 0.4, 1.8], [MUSIC.drop - 0.02, 1], [endF - 1.2, 1], [endF, 0]],
+    }),
+  });
+  const tapeAt = (t, name, gain, opts) => add(Math.max(0, t - TAPE_PEAK[name]), (A, w) => A.sample(name, w, { gain, ...opts }));
+  // cards do fluxo: a linha "corre" e cada card entra com um pop
   NODES.forEach((n, i) => {
     if (i > 0) add(n.t - 0.3, (A, w) => hiss(A, w, { type: "highpass", f: 3000, f2: 6000, dur: 0.25, v: 0.035, shape: "swell", pan: i % 2 ? 0.4 : -0.4 }));
-    add(n.t, (A, w) => { SND.pluck(A, w, NOTES[i], 1.2, (i / 7) * 1.2 - 0.6); SND.pop(A, w, 700 + i * 40, 0.07); });
+    add(n.t, (A, w) => { SND.pop(A, w, 700 + i * 40, 0.1); SND.tick(A, w, 2400 + i * 150, 0.8); });
   });
   // zoom out → bolinhas
-  add(T.morph, (A, w) => { SND.whoosh(A, w, { dur: 1.1, from: 3500, to: 300, v: 0.16, pan: 0.5, panTo: -0.5 }); tone(A, w, { f: 520, f2: 260, glide: 1.1, dur: 1.2, a: 0.4, v: 0.03, send: 0.4 }); });
+  tapeAt(T.morphEnd - 0.3, "sweep2", 0.5);
   NODES.forEach((_, i) => add(T.morphEnd - 0.15 + i * 0.04, (A, w) => SND.tick(A, w, 2600 + i * 120, 0.7)));
-  add(T.morphEnd + 0.1, (A, w) => SND.swipe(A, w, 0.8));
   // projetos saindo
-  add(T.burst - 0.05, (A, w) => hiss(A, w, { f: 600, f2: 5000, q: 1.2, dur: 0.5, v: 0.08, shape: "swell" }));
-  SHOTS.forEach((s, i) => add(T.burst + s.d, (A, w) => { SND.pop(A, w, 520 + i * 70, 0.12); SND.pluck(A, w, [79, 83, 86, 88, 91, 95][i], 0.8, (i / 5) * 1.4 - 0.7); }));
-  add(T.burst + 0.2, (A, w) => SND.shimmer(A, w, 0.7));
+  tapeAt(T.burst + 0.05, "rewindKick", 0.65);
+  SHOTS.forEach((s, i) => add(T.burst + s.d, (A, w) => SND.pop(A, w, 520 + i * 70, 0.12)));
   // viram pontos e colapsam
-  add(T.round, (A, w) => SND.whoosh(A, w, { dur: 0.6, from: 2500, to: 600, v: 0.1, pan: -0.3, panTo: 0.3 }));
-  add(T.collapse - 0.2, (A, w) => { tone(A, w, { f: 300, f2: 60, glide: 0.6, dur: 0.8, v: 0.25, send: 0.3 }); hiss(A, w, { type: "lowpass", f: 1800, f2: 300, dur: 0.6, v: 0.08 }); });
-  // ondas graves
-  [0, 0.35, 0.7].forEach((d, j) => add(T.collapse + 0.3 + d, (A, w) => tone(A, w, { f: 110 - j * 8, f2: 70, glide: 0.8, dur: 1.0, v: 0.2, send: 0.6 })));
-  add(T.collapse + 0.2, (A, w) => SND.pad(A, w, [50, 57, 61, 64], T.cube - T.collapse + 0.6, 1200, 1.8));
-  // cubo sendo desenhado: sinos subindo + riser até a materialização
-  [74, 78, 81, 85, 88, 90].forEach((n, j) => add(T.draw + j * 0.24, (A, w) => SND.bell(A, w, n, 0.8, j % 2 ? 0.4 : -0.4)));
-  add(T.draw, (A, w) => hiss(A, w, { f: 400, f2: 8000, q: 1.2, dur: T.cube - T.draw, v: 0.12, shape: "rise", send: 0.3 }));
-  // cubo + palavras
-  add(T.cube, (A, w) => {
-    SND.kick(A, w, 1.0);
-    tone(A, w, { f: 70, f2: 36, glide: 0.5, dur: 1.2, v: 0.4, send: 0.2 });
-    cubeChime(A, w);
-    SND.pad(A, w, [50, 54, 57, 61, 64], DURATION - T.cube + 0.6, 2600, 2.4);
-    SND.sub(A, w, 38, 1.6, 0.9);
-  });
+  tapeAt(T.round + 0.2, "dialTurn", 1.6);
+  tapeAt(T.collapse - 0.05, "shutDown", 0.55);
+  [0, 0.35, 0.7].forEach((d, j) => add(T.collapse + 0.3 + d, (A, w) => tone(A, w, { f: 110 - j * 8, f2: 70, glide: 0.8, dur: 1.0, v: 0.16, send: 0.6 })));
+  // cubo sendo desenhado: sintonia de rádio + subida até o drop
+  add(T.draw, (A, w) => A.sample("tuning", w, { gain: 0.3, dur: T.cube - T.draw - 0.1, fadeOut: 0.3 }));
+  add(T.draw, (A, w) => hiss(A, w, { f: 400, f2: 8000, q: 1.2, dur: T.cube - T.draw, v: 0.1, shape: "rise", send: 0.3 }));
+  // cubo + palavras (o drop da música marca o tempo)
+  add(T.cube, (A, w) => { tone(A, w, { f: 70, f2: 36, glide: 0.5, dur: 1.2, v: 0.3, send: 0.2 }); cubeChime(A, w, 0.7); });
   add(T.words, (A, w) => SND.swipe(A, w, 0.7));
   add(T.words + 0.4, (A, w) => SND.swipe(A, w, 0.7));
-  add(T.mark, (A, w) => SND.bell(A, w, 86, 0.6));
-  if (FLOW_VARIANT.defaultFormat === "story") add(T.mark + 0.35, (A, w) => { SND.pop(A, w, 640, 0.14); SND.bell(A, w + 0.05, 91, 0.6, 0.3); });
+  if (FLOW_VARIANT.defaultFormat === "story") add(T.mark + 0.35, (A, w) => SND.pop(A, w, 640, 0.14));
+  add(DURATION - 2.29, (A, w) => A.sample("dialDown", w, { gain: 0.35 }));
   return ev.sort((a, b) => a.t - b.t);
 }
 const EVENTS = buildEvents();
-const renderWav = () => renderEventsWav(EVENTS, DURATION);
+const renderWav = () => renderEventsWav(EVENTS, DURATION, { samples: SAMPLES });
 
 // Usado pelo exportador de vídeo (scripts/export-video.cjs)
 const MOTION = { Frame, duration: DURATION, formats: FORMATS, renderWav };
 
 export default function FlowReveal() {
   return (
-    <MotionPlayer Frame={Frame} duration={DURATION} events={EVENTS} formats={FORMATS} defaultFormat={FLOW_VARIANT.defaultFormat} renderWav={renderWav}
+    <MotionPlayer Frame={Frame} duration={DURATION} events={EVENTS} formats={FORMATS} defaultFormat={FLOW_VARIANT.defaultFormat} renderWav={renderWav} samples={SAMPLES}
       scenes={[
         { name: "Fluxo", from: 0 },
         { name: "Zoom out", from: T.morph },
