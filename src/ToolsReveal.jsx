@@ -4,7 +4,7 @@ import {
   Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer,
 } from "./motionKit";
 import { AD_CLIP_MP4, AD_CLIP_WEBM, AD_CLIP_DUR } from "./adAssets";
-import { TOOLS_DEV, TOOLS_DEV_DUR, TOOLS_DEV_PHOTOS, TOOLS_SITES } from "./toolsAssets";
+import { TOOLS_DEV, TOOLS_DEV_DUR, TOOLS_DEV_INTRO, TOOLS_DEV_INTRO_DUR, TOOLS_DEV_PHOTOS, TOOLS_SITES } from "./toolsAssets";
 import { MUSIC_TOOLS } from "./audio/toolsRef";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 
@@ -14,7 +14,7 @@ import { SFX, SFX_PEAK } from "./audio/sfx";
    faixas, os nomes "artist", "tools" e "art" aparecem um a um e, quando o beat volta,
    as três faixas viram vídeo ao mesmo tempo (a artista, os materiais na mesa, o desenho).
    Nossa versão, para programação:
-     - dev:   o programador — selfie, foto no espelho da Dizzy e o vídeo do celular com o
+     - dev:   o programador — vídeo de camisa vermelha, foto no espelho da Dizzy e o vídeo do celular com o
               site e do notebook com código, trocando na batida com zoom suave e clarão curto
      - tools: animação própria em neon — Pinterest, Python, Java, GitHub e Antigravity
               atravessando a câmera, um a cada duas batidas, com rastros de velocidade e o
@@ -180,10 +180,11 @@ function ToolsPanel({ t, PW, PH }) {
 /* ---------- dev: fotos e vídeo do programador, trocando na batida ---------- */
 // Cada plano: [início, tipo, foto/vídeo, centro vertical do recorte (fração da altura) no início e no fim, zoom no início e no fim]
 const DEV_SHOTS = [
-  { at: T.cut, photo: 0, cy: [0.55, 0.53], zoom: [1.0, 1.12] }, // selfie
-  { at: beat(4), photo: 1, cy: [0.41, 0.38], zoom: [1.12, 1.0] }, // no espelho da Dizzy
-  { at: beat(8), video: true, cy: [0.66, 0.5], zoom: [1.05, 1.0] }, // celular com o site → notebook com código
+  { at: T.cut, clip: "intro", cy: [0.38, 0.48], zoom: [1.1, 1.18] }, // camisa vermelha, céu azul: "shh" e aceno
+  { at: beat(4), photo: 0, cy: [0.41, 0.38], zoom: [1.12, 1.0] }, // no espelho da Dizzy
+  { at: beat(8), clip: "dev", cy: [0.66, 0.5], zoom: [1.05, 1.0] }, // celular com o site → notebook com código
 ];
+const DEV_CLIPS = { intro: [TOOLS_DEV_INTRO, TOOLS_DEV_INTRO_DUR], dev: [TOOLS_DEV, TOOLS_DEV_DUR] };
 function DevPanel({ t, PW, PH }) {
   let k = 0;
   DEV_SHOTS.forEach((sh, i) => { if (t >= sh.at) k = i; });
@@ -194,7 +195,7 @@ function DevPanel({ t, PW, PH }) {
   const inP = spring(t - sh.at, { stiffness: 220, damping: 20 });
   const zoom = lerp(sh.zoom[0], sh.zoom[1], easeInOut(p)) * lerp(1.12, 1, clamp(inP));
   const cy = lerp(sh.cy[0], sh.cy[1], easeInOut(p));
-  const ar = sh.video ? 16 / 9 : 4 / 3; // altura / largura
+  const ar = sh.clip ? 16 / 9 : 4 / 3; // altura / largura
   const vw = PW * zoom;
   const vh = vw * ar;
   const top = clamp(PH / 2 - cy * vh, PH - vh, 0);
@@ -202,8 +203,8 @@ function DevPanel({ t, PW, PH }) {
   const flash = k > 0 ? Math.exp(-(t - sh.at) * 10) : 0;
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#000" }}>
-      {sh.video
-        ? <SyncedVideo t={clamp(t - sh.at, 0, TOOLS_DEV_DUR - 0.04)} duration={TOOLS_DEV_DUR} webm={TOOLS_DEV.webm} mp4={TOOLS_DEV.mp4} style={{ ...box, inset: "auto" }} />
+      {sh.clip
+        ? <SyncedVideo key={sh.clip} t={clamp(t - sh.at, 0, DEV_CLIPS[sh.clip][1] - 0.04)} duration={DEV_CLIPS[sh.clip][1]} webm={DEV_CLIPS[sh.clip][0].webm} mp4={DEV_CLIPS[sh.clip][0].mp4} style={{ ...box, inset: "auto" }} />
         : <img src={TOOLS_DEV_PHOTOS[sh.photo]} alt="" draggable={false} style={{ ...box, objectFit: "cover" }} />}
       {flash > 0.02 && <div style={{ position: "absolute", inset: 0, background: "#fff", opacity: flash * 0.6 }} />}
     </div>
