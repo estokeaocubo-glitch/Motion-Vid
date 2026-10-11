@@ -4,7 +4,7 @@ import {
   Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer,
 } from "./motionKit";
 import { AD_CLIP_MP4, AD_CLIP_WEBM, AD_CLIP_DUR } from "./adAssets";
-import { TOOLS_DEV, TOOLS_DEV_DUR, TOOLS_SITES } from "./toolsAssets";
+import { TOOLS_DEV, TOOLS_DEV_DUR, TOOLS_DEV_PHOTOS, TOOLS_SITES } from "./toolsAssets";
 import { MUSIC_TOOLS } from "./audio/toolsRef";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 
@@ -14,8 +14,8 @@ import { SFX, SFX_PEAK } from "./audio/sfx";
    faixas, os nomes "artist", "tools" e "art" aparecem um a um e, quando o beat volta,
    as três faixas viram vídeo ao mesmo tempo (a artista, os materiais na mesa, o desenho).
    Nossa versão, para programação:
-     - dev:   o vídeo do programador (assets/dev-programador.mp4), com o recorte da faixa
-              acompanhando o rosto e um leve avanço de câmera nos planos abertos
+     - dev:   o programador — selfie, foto no espelho da Dizzy e o vídeo do celular com o
+              site e do notebook com código, trocando na batida com zoom suave e clarão curto
      - tools: animação própria em neon — Pinterest, Python, Java, GitHub e Antigravity
               atravessando a câmera, um a cada duas batidas, com rastros de velocidade e o
               fundo tingido pela cor do ícone; fecha com as cinco lado a lado, uma acendendo
@@ -177,28 +177,35 @@ function ToolsPanel({ t, PW, PH }) {
   return t < T.dock ? <FlyThrough t={t} PW={PW} PH={PH} /> : <Dock t={t} PW={PW} PH={PH} />;
 }
 
-/* ---------- dev: vídeo do programador, recorte seguindo o rosto ---------- */
-// [segundo do vídeo depois do corte, altura do rosto (fração da altura do vídeo), zoom]
-const FACE = [[0, 0.17, 1.0], [0.67, 0.3, 1.0], [1.22, 0.33, 1.08], [1.78, 0.4, 1.25], [6.22, 0.4, 1.3], [6.78, 0.36, 1.15], [7.33, 0.33, 1.1], [7.7, 0.31, 1.1]];
-function faceAt(u) {
-  for (let i = 0; i < FACE.length - 1; i++) {
-    const [a, fa, za] = FACE[i];
-    const [b, fb, zb] = FACE[i + 1];
-    if (u <= b) { const p = easeInOut(prog(u, a, b)); return [lerp(fa, fb, p), lerp(za, zb, p)]; }
-  }
-  return FACE[FACE.length - 1].slice(1);
-}
-function DevPanel({ t, PW, PH, tall }) {
-  const u = clamp(t - T.cut, 0, TOOLS_DEV_DUR - 0.04);
-  const [face, zoom] = faceAt(u);
+/* ---------- dev: fotos e vídeo do programador, trocando na batida ---------- */
+// Cada plano: [início, tipo, foto/vídeo, centro vertical do recorte (fração da altura) no início e no fim, zoom no início e no fim]
+const DEV_SHOTS = [
+  { at: T.cut, photo: 0, cy: [0.55, 0.53], zoom: [1.0, 1.12] }, // selfie
+  { at: beat(4), photo: 1, cy: [0.41, 0.38], zoom: [1.12, 1.0] }, // no espelho da Dizzy
+  { at: beat(8), video: true, cy: [0.66, 0.5], zoom: [1.05, 1.0] }, // celular com o site → notebook com código
+];
+function DevPanel({ t, PW, PH }) {
+  let k = 0;
+  DEV_SHOTS.forEach((sh, i) => { if (t >= sh.at) k = i; });
+  const sh = DEV_SHOTS[k];
+  const end = DEV_SHOTS[k + 1]?.at ?? DURATION;
+  const p = prog(t, sh.at, end);
+  // entrada de cada plano: um "soco" de zoom e um clarão curto
+  const inP = spring(t - sh.at, { stiffness: 220, damping: 20 });
+  const zoom = lerp(sh.zoom[0], sh.zoom[1], easeInOut(p)) * lerp(1.12, 1, clamp(inP));
+  const cy = lerp(sh.cy[0], sh.cy[1], easeInOut(p));
+  const ar = sh.video ? 16 / 9 : 4 / 3; // altura / largura
   const vw = PW * zoom;
-  const vh = vw * (1024 / 576);
-  // rosto a ~42% da faixa no story (abaixo da barra do Instagram) e ~36% no 3:4
-  const top = clamp(PH * (tall ? 0.46 : 0.38) - face * vh, PH - vh, 0);
+  const vh = vw * ar;
+  const top = clamp(PH / 2 - cy * vh, PH - vh, 0);
+  const box = { position: "absolute", left: (PW - vw) / 2, top, width: vw, height: vh };
+  const flash = k > 0 ? Math.exp(-(t - sh.at) * 10) : 0;
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#000" }}>
-      <SyncedVideo t={u} duration={TOOLS_DEV_DUR} webm={TOOLS_DEV.webm} mp4={TOOLS_DEV.mp4}
-        style={{ inset: "auto", left: (PW - vw) / 2, top, width: vw, height: vh, filter: "contrast(1.06) saturate(1.05)" }} />
+      {sh.video
+        ? <SyncedVideo t={clamp(t - sh.at, 0, TOOLS_DEV_DUR - 0.04)} duration={TOOLS_DEV_DUR} webm={TOOLS_DEV.webm} mp4={TOOLS_DEV.mp4} style={{ ...box, inset: "auto" }} />
+        : <img src={TOOLS_DEV_PHOTOS[sh.photo]} alt="" draggable={false} style={{ ...box, objectFit: "cover" }} />}
+      {flash > 0.02 && <div style={{ position: "absolute", inset: 0, background: "#fff", opacity: flash * 0.6 }} />}
     </div>
   );
 }
@@ -255,7 +262,7 @@ function Frame({ t, format = "9x16" }) {
     return 1 + 0.05 * Math.exp(-(t - at) * 7);
   };
   const panels = [
-    () => <DevPanel t={t} PW={W} PH={PH} tall={tall} />,
+    () => <DevPanel t={t} PW={W} PH={PH} />,
     () => <ToolsPanel t={t} PW={W} PH={PH} />,
     () => <SitePanel t={t} />,
   ];
