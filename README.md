@@ -27,7 +27,7 @@ Refeito a partir do vídeo "artist / tools / art", agora para programação, pen
 
 - **0–3,78s** tela branca dividida em três faixas; "dev", "tools" e "site" aparecem um a um (0,75 · 1,5 · 2,25s).
 - **3,78s (beat volta)** as três faixas viram vídeo juntas, com os nomes no canto:
-  - **dev**: o programador — vídeo de camisa vermelha sob o céu azul (`assets/dev-intro.mov`, o gesto de "shh" e o aceno), foto no espelho da Dizzy (`assets/dev-foto.jpg`) e o vídeo do celular com o site e do notebook com código (`assets/dev-video.mp4`, em leve câmera lenta), trocando a cada quatro batidas com zoom suave e um clarão curto.
+  - **dev**: o programador — vídeo de camisa vermelha sob o céu azul (`assets/dev-intro.mov`, 1,8–3,0s em câmera lenta, já lá atrás olhando para a câmera), selfie no morro com as montanhas ao fundo (`assets/dev-morro.mov`) e o vídeo do celular com o site e do notebook com código (`assets/dev-video.mp4`, em leve câmera lenta), trocando a cada quatro batidas com zoom suave e um clarão curto.
   - **tools**: animação própria em neon — Pinterest, Python, Java, GitHub e Antigravity atravessando a câmera (um a cada duas batidas), com profundidade, rastros de velocidade, desfoque de movimento e o fundo tingido pela cor do ícone; a partir de 8,36s as cinco lado a lado, uma acendendo por batida e todas juntas no fim.
   - **site**: a Dizzy (moeda 3D) e os prints de Kaiirós, YMB Cocktails, KDust, Trama e Bastos trocando a cada duas batidas.
 - No story, o nome da faixa de cima e a assinatura "estoke ao cubo" ficam fora das áreas cobertas pela barra do Instagram e pelo campo de resposta.
