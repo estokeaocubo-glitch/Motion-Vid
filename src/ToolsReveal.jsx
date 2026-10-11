@@ -4,7 +4,7 @@ import {
   Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer,
 } from "./motionKit";
 import { AD_CLIP_MP4, AD_CLIP_WEBM, AD_CLIP_DUR } from "./adAssets";
-import { TOOLS_DEV, TOOLS_DEV_DUR, TOOLS_DEV_INTRO, TOOLS_DEV_MORRO, TOOLS_SITES } from "./toolsAssets";
+import { TOOLS_DEV, TOOLS_DEV_DUR, TOOLS_DEV_INTRO, TOOLS_DEV_MORRO, TOOLS_SITE_MISU, TOOLS_SITE_LCS, TOOLS_TRAMA } from "./toolsAssets";
 import { MUSIC_TOOLS } from "./audio/toolsRef";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 
@@ -20,8 +20,7 @@ import { SFX, SFX_PEAK } from "./audio/sfx";
               atravessando a câmera, um a cada duas batidas, com rastros de velocidade e o
               fundo tingido pela cor do ícone; fecha com as cinco lado a lado, uma acendendo
               por batida
-     - site:  o que sai disso — a Dizzy (moeda 3D) e os prints de Kaiirós, YMB Cocktails,
-              KDust, Trama e Bastos trocando no beat
+     - site:  o que sai disso — Misú, Dizzy, LCS e Trama, nessa ordem, trocando no beat
    Música: a do vídeo de referência, inteira e no mesmo tempo: o beat volta em 3,78s e a
    grade é de 137,6 BPM (uma batida a cada 0,436s); todos os cortes caem nela.
 ============================================================================= */
@@ -213,20 +212,27 @@ function DevPanel({ t, PW, PH }) {
   );
 }
 
-/* ---------- site: Dizzy e os prints trocando no beat ---------- */
-const SITE_CUTS = [4, 6, 8, 10, 12].map(beat); // Kaiirós, YMB, KDust, Trama, Bastos
+/* ---------- site: Misú, Dizzy, LCS e Trama, trocando a cada quatro batidas ---------- */
+const SITE_SHOTS = [
+  { at: T.cut, clip: [TOOLS_SITE_MISU, TOOLS_SITE_MISU.dur] }, // hero do Misú (sushis)
+  { at: beat(4), clip: [{ webm: AD_CLIP_WEBM, mp4: AD_CLIP_MP4 }, AD_CLIP_DUR], scale: 1.04 }, // Dizzy: moeda 3D
+  { at: beat(8), clip: [TOOLS_SITE_LCS, TOOLS_SITE_LCS.dur] }, // hero da LCS (van)
+  { at: beat(12), img: TOOLS_TRAMA }, // Trama
+];
+const SITE_CUTS = SITE_SHOTS.slice(1).map((s) => s.at);
 function SitePanel({ t }) {
-  if (t < SITE_CUTS[0]) {
-    return <SyncedVideo t={clamp(t - T.cut, 0, AD_CLIP_DUR - 0.04)} duration={AD_CLIP_DUR} webm={AD_CLIP_WEBM} mp4={AD_CLIP_MP4} style={{ transform: "scale(1.04)" }} />;
-  }
   let i = 0;
-  SITE_CUTS.forEach((c, k) => { if (t >= c) i = k; });
-  const u = t - SITE_CUTS[i];
-  const len = (SITE_CUTS[i + 1] ?? DURATION) - SITE_CUTS[i];
-  const p = prog(u, 0, len);
+  SITE_SHOTS.forEach((sh, k) => { if (t >= sh.at) i = k; });
+  const sh = SITE_SHOTS[i];
+  const end = SITE_SHOTS[i + 1]?.at ?? DURATION;
+  const p = prog(t, sh.at, end);
+  if (sh.clip) {
+    const [c, dur] = sh.clip;
+    return <SyncedVideo key={i} t={clamp(t - sh.at, 0, dur - 0.04)} duration={dur} webm={c.webm} mp4={c.mp4} style={{ transform: `scale(${(sh.scale || 1) * lerp(1, 1.04, p)})` }} />;
+  }
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#000" }}>
-      <img src={TOOLS_SITES[i]} alt="" draggable={false} style={{
+      <img src={sh.img} alt="" draggable={false} style={{
         position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 0%",
         transform: `scale(${lerp(1.1, 1.02, easeOut(p))}) translateY(${lerp(1.5, -1.5, p)}%)`,
       }} />

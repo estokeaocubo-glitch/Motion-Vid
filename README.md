@@ -29,10 +29,10 @@ Refeito a partir do vídeo "artist / tools / art", agora para programação, pen
 - **3,78s (beat volta)** as três faixas viram vídeo juntas, com os nomes no canto:
   - **dev**: o programador — vídeo de camisa vermelha sob o céu azul (`assets/dev-intro.mov`, 3,65–5,39s: começa olhando para o lado e termina virando para a câmera, com sombras e meio-tons clareados por causa do contraluz, já lá atrás olhando para a câmera), selfie no morro com as montanhas ao fundo (`assets/dev-morro.mov`) e o vídeo do celular com o site e do notebook com código (`assets/dev-video.mp4`, em leve câmera lenta), trocando a cada quatro batidas com zoom suave e um clarão curto.
   - **tools**: animação própria em neon — Pinterest, Python, Java, GitHub e Antigravity atravessando a câmera (um a cada duas batidas), com profundidade, rastros de velocidade, desfoque de movimento e o fundo tingido pela cor do ícone; a partir de 8,36s as cinco lado a lado, uma acendendo por batida e todas juntas no fim.
-  - **site**: a Dizzy (moeda 3D) e os prints de Kaiirós, YMB Cocktails, KDust, Trama e Bastos trocando a cada duas batidas.
+  - **site**: Misú (hero com os sushis), Dizzy (moeda 3D), LCS (hero com a van) e Trama (print), nessa ordem, trocando a cada quatro batidas.
 - Nomes das faixas no canto de cima, só com sombra no texto; no story a assinatura "estoke ao cubo" fica longe do campo de resposta.
 - Som: a música do vídeo de referência (`dev-tools-site (audio original).m4a`), inteira e no tempo original — 137,6 BPM, beat voltando em 3,78s; todos os cortes caem nessa grade.
-- Vídeo e prints: `src/toolsAssets.js`, gerado por `bash scripts/build-tools-assets.sh`. Ícones: traços do Simple Icons (Python, GitHub, Pinterest), Devicon (Java) e Lobe Icons (Antigravity), embutidos no componente.
+- Vídeos e print: `src/toolsAssets.js`, gerado por `bash scripts/build-tools-assets.sh`. Ícones: traços do Simple Icons (Python, GitHub, Pinterest), Devicon (Java) e Lobe Icons (Antigravity), embutidos no componente.
 
 ## "Amplie seu alcance" (ReachAd)
 
