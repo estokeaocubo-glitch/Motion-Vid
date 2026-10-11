@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Gera src/toolsAssets.js para o motion ToolsReveal ("dev / tools / site"):
-#  - TOOLS_DEV_INTRO:  assets/dev-intro.mov (programador de camisa vermelha, céu azul), trecho 1,8–3,0s em câmera lenta (69%)
-#                      (já lá atrás, olhando para a câmera), abre a faixa "dev"
+#  - TOOLS_DEV_INTRO:  assets/dev-intro.mov (programador de camisa vermelha, céu azul), trecho 3,65–5,39s
+#                      (começa olhando para o lado e termina virando para a câmera), abre a faixa "dev"
 #  - TOOLS_DEV_MORRO:  assets/dev-morro.mov (selfie no morro, montanhas ao fundo), trecho 1,5–3,25s
 #  - TOOLS_DEV:        assets/dev-video.mp4 (celular com o site + notebook com código), 3,7s em leve
 #                      câmera lenta (90%) → 4,1s
@@ -20,7 +20,7 @@ clip() { # nome arquivo início duração [velocidade] [tratamento de cor]
   ffmpeg -v error -ss "$3" -t "$4" -i "$2" -an -vf "$v" -c:v libvpx-vp9 -b:v 0 -crf 33 -row-mt 1 -pix_fmt yuv420p "$tmp/$1.webm"
 }
 # contraluz: clareia sombras e meio-tons (o rosto) sem estourar o céu
-clip INTRO assets/dev-intro.mov 1.8 1.2 0.69 "curves=all='0/0 0.06/0.18 0.2/0.42 0.4/0.62 0.7/0.83 1/1',colorbalance=rs=0.03:rm=0.02,eq=saturation=1.12:contrast=1.05"
+clip INTRO assets/dev-intro.mov 3.65 1.74 1 "curves=all='0/0 0.06/0.18 0.2/0.42 0.4/0.62 0.7/0.83 1/1',colorbalance=rs=0.03:rm=0.02,eq=saturation=1.12:contrast=1.05"
 clip MORRO assets/dev-morro.mov 1.5 1.75
 for s in kaiiros ymb-cocktails kdust trama bastos; do
   f=$(ls assets/sites/$s.* | head -1)

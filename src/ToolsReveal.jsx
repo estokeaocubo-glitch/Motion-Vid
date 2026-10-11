@@ -185,7 +185,7 @@ const DEV_CLIPS = {
   dev: [TOOLS_DEV, TOOLS_DEV_DUR],
 };
 const DEV_SHOTS = [
-  { at: T.cut, clip: "intro", cy: [0.46, 0.47], zoom: [1.3, 1.22] }, // camisa vermelha, céu azul, olhando para a câmera
+  { at: T.cut, clip: "intro", cy: [0.45, 0.44], zoom: [1.25, 1.15] }, // camisa vermelha, céu azul: olha para o lado e vira para a câmera
   { at: beat(4), clip: "morro", cy: [0.61, 0.59], zoom: [1.0, 1.04] }, // selfie no morro, montanhas ao fundo
   { at: beat(8), clip: "dev", cy: [0.66, 0.5], zoom: [1.05, 1.0] }, // celular com o site → notebook com código
 ];
@@ -246,7 +246,7 @@ function Label({ text, t, at, cut, top = 9 }) {
     );
   }
   return (
-    <div style={{ position: "absolute", left: 12, top, fontFamily: FONT, fontWeight: 700, fontSize: 13, color: "#fff", letterSpacing: "-0.01em", textShadow: "0 1px 6px rgba(0,0,0,.55)", zIndex: 5 }}>{text}</div>
+    <div style={{ position: "absolute", left: 12, top, fontFamily: FONT, fontWeight: 700, fontSize: 13, color: "#fff", letterSpacing: "-0.01em", textShadow: "0 1px 2px rgba(0,0,0,.7), 0 0 8px rgba(0,0,0,.45)", zIndex: 5 }}>{text}</div>
   );
 }
 
@@ -270,15 +270,12 @@ function Frame({ t, format = "9x16" }) {
     () => <SitePanel t={t} />,
   ];
   const ats = [T.dev, T.tools, T.site];
-  // no story, o nome da faixa de cima desce para fugir da barra de progresso e do perfil
-  const labelTop = (k) => (tall && k === 0 ? 64 : 9);
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: cut ? "#000" : "#FFFFFF", fontFamily: FONT }}>
       {LABELS.map((lb, k) => (
         <div key={lb} style={{ position: "absolute", left: 0, top: k * PH, width: W, height: PH, overflow: "hidden" }}>
           {cut && <div style={{ position: "absolute", inset: 0, transform: `scale(${punch(k)})` }}>{panels[k]()}</div>}
-          {cut && <div style={{ position: "absolute", left: 0, top: labelTop(k) - 9, width: "45%", height: "40%", background: "radial-gradient(90% 100% at 0% 0%, rgba(0,0,0,.5), rgba(0,0,0,0) 70%)", zIndex: 4 }} />}
-          <Label text={lb} t={t} at={ats[k]} cut={cut} top={labelTop(k)} />
+          <Label text={lb} t={t} at={ats[k]} cut={cut} />
           {!cut && k < 2 && <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 1, background: hexA(C.ink, 0.14) }} />}
         </div>
       ))}
