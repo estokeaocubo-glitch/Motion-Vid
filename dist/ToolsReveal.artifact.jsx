@@ -994,14 +994,18 @@ function ToolsPanel({ t, PW, PH }) {
 function DevPanel({ t, PW, PH }) {
   const p = prog(t, T.cut, DURATION);
   const kick = [4, 8, 12].map(beat).reduce((m, b) => Math.max(m, t >= b ? Math.exp(-(t - b) * 7) : 0), 0);
-  const zoom = lerp(1.0, 1.16, easeInOut(p)) * (1 + kick * 0.03);
-  const cy = lerp(0.42, 0.38, easeInOut(p)); // rosto ~37% da altura da foto
+  // a borda direita da foto é a moldura escura do espelho (a partir de ~80% da largura): o
+  // enquadramento fica centrado na pessoa e o zoom mínimo mantém a moldura sempre fora do quadro
+  const zoom = lerp(1.5, 1.66, easeInOut(p)) * (1 + kick * 0.03);
+  const cx = lerp(0.45, 0.44, easeInOut(p));
+  const cy = lerp(0.4, 0.37, easeInOut(p)); // rosto ~37% da altura da foto
   const vw = PW * zoom;
   const vh = vw * (4 / 3);
+  const left = clamp(PW / 2 - cx * vw, PW - vw * 0.79, 0);
   const top = clamp(PH / 2 - cy * vh, PH - vh, 0);
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#000" }}>
-      <img src={TOOLS_DEV_PHOTO} alt="" draggable={false} style={{ position: "absolute", left: (PW - vw) / 2, top, width: vw, height: vh, objectFit: "cover" }} />
+      <img src={TOOLS_DEV_PHOTO} alt="" draggable={false} style={{ position: "absolute", left, top, width: vw, height: vh, objectFit: "cover" }} />
     </div>
   );
 }
