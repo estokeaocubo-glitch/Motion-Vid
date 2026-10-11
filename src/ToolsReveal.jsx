@@ -1,7 +1,7 @@
 import React from "react";
 import {
   C, FONT, clamp, lerp, prog, easeOut, easeInOut, spring, hexA, rnd,
-  Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer,
+  Grain, SyncedVideo, renderEventsWav, MotionPlayer,
 } from "./motionKit";
 import { AD_CLIP_MP4, AD_CLIP_WEBM, AD_CLIP_DUR } from "./adAssets";
 import { TOOLS_DEV, TOOLS_DEV_DUR, TOOLS_DEV_INTRO, TOOLS_DEV_MORRO, TOOLS_SITE_MISU, TOOLS_SITE_LCS, TOOLS_TRAMA } from "./toolsAssets";
@@ -261,7 +261,6 @@ function Frame({ t, format = "9x16" }) {
   const W = F.w;
   const H = F.h;
   const PH = H / 3;
-  const tall = format === "9x16";
   const cut = t >= T.cut;
   // no corte, cada faixa entra com um leve "soco" de escala; os prints também a cada troca
   const punch = (k) => {
@@ -285,14 +284,6 @@ function Frame({ t, format = "9x16" }) {
           {!cut && k < 2 && <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 1, background: hexA(C.ink, 0.14) }} />}
         </div>
       ))}
-      {cut && (
-        // assinatura (como a marca d'água da referência); no story fica no alto da faixa de baixo,
-        // longe do campo de resposta
-        <div style={{ position: "absolute", right: 10, ...(tall ? { top: PH * 2 + 9 } : { bottom: 9 }), display: "flex", alignItems: "center", gap: 5, opacity: 0.85, zIndex: 6 }}>
-          <CubeLogo size={15} />
-          <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 10, color: "#fff", textShadow: "0 1px 4px rgba(0,0,0,.6)" }}>estoke ao cubo</div>
-        </div>
-      )}
       {cut && <div style={{ position: "absolute", left: 0, right: 0, top: PH, height: 1, background: "rgba(0,0,0,.6)", zIndex: 4 }} />}
       {cut && <div style={{ position: "absolute", left: 0, right: 0, top: PH * 2, height: 1, background: "rgba(0,0,0,.6)", zIndex: 4 }} />}
       {cut && <Grain t={t} opacity={0.04} />}
