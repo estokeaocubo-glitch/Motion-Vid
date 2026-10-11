@@ -27,7 +27,7 @@ Refeito a partir do vídeo "artist / tools / art", agora para programação, pen
 
 - **0–3,78s** tela branca dividida em três faixas; "dev", "tools" e "site" aparecem um a um (0,75 · 1,5 · 2,25s).
 - **3,78s (beat volta)** as três faixas viram vídeo juntas, com os nomes no canto:
-  - **dev**: a foto do programador no espelho da Dizzy (`assets/dev-foto.jpg`), com avanço lento de câmera e um leve "soco" de zoom a cada quatro batidas.
+  - **dev**: a foto do programador no espelho da Dizzy (`assets/dev-foto.jpg`, recortada sem a moldura do espelho), inteira na altura da faixa sobre ela mesma ampliada e desfocada, com avanço lento e um leve "soco" de zoom a cada quatro batidas.
   - **tools**: animação própria em neon — Pinterest, Python, Java, GitHub e Antigravity atravessando a câmera (um a cada duas batidas), com profundidade, rastros de velocidade, desfoque de movimento e o fundo tingido pela cor do ícone; a partir de 8,36s as cinco lado a lado, uma acendendo por batida e todas juntas no fim.
   - **site**: Misú (hero com os sushis), Dizzy (moeda 3D), LCS (hero com a van) e Trama (print), nessa ordem, trocando a cada quatro batidas.
 - Nomes das faixas no canto de cima, só com sombra no texto; sem logo nem assinatura.

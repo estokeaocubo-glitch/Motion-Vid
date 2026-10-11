@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Gera src/toolsAssets.js para o motion ToolsReveal ("dev / tools / site"):
-#  - TOOLS_DEV_PHOTO:  assets/dev-foto.jpg (o programador no espelho da Dizzy, convertida do HEIC do iPhone)
+#  - TOOLS_DEV_PHOTO:  assets/dev-foto.jpg (o programador no espelho da Dizzy, convertida do HEIC do iPhone),
+#                      recortada sem a moldura escura do espelho (direita) e com a cabeça perto do topo
 #  - TOOLS_SITE_MISU / TOOLS_SITE_LCS: trechos das gravações de tela (dist/media/*-site.mp4): o hero do
 #                      Misú com os sushis (2,0s) e o hero da LCS com a van (3,1s), 1,75s cada
 #  - TOOLS_TRAMA:      print do site da Trama (assets/sites/trama.webp), em 1280px de largura
@@ -8,7 +9,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 tmp=$(mktemp -d)
-ffmpeg -v error -i assets/dev-foto.jpg -c:v libwebp -quality 85 "$tmp/foto.webp"
+ffmpeg -v error -i assets/dev-foto.jpg -vf "crop=iw*0.8:ih*0.79:0:ih*0.21" -c:v libwebp -quality 85 "$tmp/foto.webp"
 svf="fps=30,scale=1024:576"
 site() { # nome arquivo início
   ffmpeg -v error -ss "$3" -t 1.75 -i "$2" -an -vf "$svf" -c:v libx264 -preset slow -crf 23 -pix_fmt yuv420p -movflags +faststart "$tmp/$1.mp4"

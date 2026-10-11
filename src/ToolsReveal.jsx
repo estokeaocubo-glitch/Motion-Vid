@@ -14,8 +14,8 @@ import { SFX, SFX_PEAK } from "./audio/sfx";
    faixas, os nomes "artist", "tools" e "art" aparecem um a um e, quando o beat volta,
    as três faixas viram vídeo ao mesmo tempo (a artista, os materiais na mesa, o desenho).
    Nossa versão, para programação:
-     - dev:   a foto do programador no espelho da Dizzy, com avanço lento de câmera e um leve
-              "soco" de zoom a cada quatro batidas
+     - dev:   a foto do programador no espelho da Dizzy, inteira na altura da faixa sobre ela
+              mesma desfocada, com avanço lento e um leve "soco" de zoom a cada quatro batidas
      - tools: animação própria em neon — Pinterest, Python, Java, GitHub e Antigravity
               atravessando a câmera, um a cada duas batidas, com rastros de velocidade e o
               fundo tingido pela cor do ícone; fecha com as cinco lado a lado, uma acendendo
@@ -177,23 +177,25 @@ function ToolsPanel({ t, PW, PH }) {
 }
 
 /* ---------- dev: a foto do programador no espelho da Dizzy ---------- */
-// Avanço lento de câmera (zoom e leve subida) durante todo o trecho, com um "soco" de zoom a cada
-// quatro batidas para a foto acompanhar o ritmo
-function DevPanel({ t, PW, PH }) {
+// A foto inteira (da cabeça às pernas) cabe na altura da faixa, sobre a mesma foto ampliada e
+// desfocada; avanço lento de câmera e um leve "soco" de zoom a cada quatro batidas
+const DEV_PHOTO_AR = 0.77; // largura / altura do recorte
+function DevPanel({ t, PH }) {
   const p = prog(t, T.cut, DURATION);
   const kick = [4, 8, 12].map(beat).reduce((m, b) => Math.max(m, t >= b ? Math.exp(-(t - b) * 7) : 0), 0);
-  // a borda direita da foto é a moldura escura do espelho (a partir de ~80% da largura): o
-  // enquadramento fica centrado na pessoa e o zoom mínimo mantém a moldura sempre fora do quadro
-  const zoom = lerp(1.5, 1.66, easeInOut(p)) * (1 + kick * 0.03);
-  const cx = lerp(0.45, 0.44, easeInOut(p));
-  const cy = lerp(0.4, 0.37, easeInOut(p)); // rosto ~37% da altura da foto
-  const vw = PW * zoom;
-  const vh = vw * (4 / 3);
-  const left = clamp(PW / 2 - cx * vw, PW - vw * 0.79, 0);
-  const top = clamp(PH / 2 - cy * vh, PH - vh, 0);
+  const zoom = lerp(1.0, 1.08, easeInOut(p)) * (1 + kick * 0.025);
+  const h = PH * zoom;
+  const img = { position: "absolute", maxWidth: "none", display: "block" };
   return (
     <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#000" }}>
-      <img src={TOOLS_DEV_PHOTO} alt="" draggable={false} style={{ position: "absolute", left, top, width: vw, height: vh, objectFit: "cover" }} />
+      <img src={TOOLS_DEV_PHOTO} alt="" draggable={false} style={{
+        ...img, inset: 0, width: "100%", height: "100%", objectFit: "cover",
+        filter: "blur(14px) brightness(0.55) saturate(1.2)", transform: `scale(${1.25 + p * 0.05})`,
+      }} />
+      <img src={TOOLS_DEV_PHOTO} alt="" draggable={false} style={{
+        ...img, left: "50%", top: "50%", height: h, width: h * DEV_PHOTO_AR,
+        transform: "translate(-50%, -48%)", boxShadow: "0 8px 30px rgba(0,0,0,.5)",
+      }} />
     </div>
   );
 }
@@ -256,7 +258,7 @@ function Frame({ t, format = "9x16" }) {
     return 1 + 0.05 * Math.exp(-(t - at) * 7);
   };
   const panels = [
-    () => <DevPanel t={t} PW={W} PH={PH} />,
+    () => <DevPanel t={t} PH={PH} />,
     () => <ToolsPanel t={t} PW={W} PH={PH} />,
     () => <SitePanel t={t} />,
   ];
