@@ -14,12 +14,13 @@ vf="setpts=PTS/0.9,fps=30,scale=720:1280,eq=contrast=1.04:saturation=1.08"
 ffmpeg -v error -i assets/dev-video.mp4 -an -vf "$vf" -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p -movflags +faststart "$tmp/DEV.mp4"
 ffmpeg -v error -i assets/dev-video.mp4 -an -vf "$vf" -c:v libvpx-vp9 -b:v 0 -crf 33 -row-mt 1 -pix_fmt yuv420p "$tmp/DEV.webm"
 ivf="fps=30,scale=720:1280,eq=contrast=1.04:saturation=1.06"
-clip() { # nome arquivo início duração [velocidade]
-  local v="setpts=PTS/${5:-1},$ivf"
+clip() { # nome arquivo início duração [velocidade] [tratamento de cor]
+  local v="setpts=PTS/${5:-1},${6:-null},$ivf"
   ffmpeg -v error -ss "$3" -t "$4" -i "$2" -an -vf "$v" -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p -movflags +faststart "$tmp/$1.mp4"
   ffmpeg -v error -ss "$3" -t "$4" -i "$2" -an -vf "$v" -c:v libvpx-vp9 -b:v 0 -crf 33 -row-mt 1 -pix_fmt yuv420p "$tmp/$1.webm"
 }
-clip INTRO assets/dev-intro.mov 1.8 1.2 0.69
+# contraluz: clareia sombras e meio-tons (o rosto) sem estourar o céu
+clip INTRO assets/dev-intro.mov 1.8 1.2 0.69 "curves=all='0/0 0.06/0.18 0.2/0.42 0.4/0.62 0.7/0.83 1/1',colorbalance=rs=0.03:rm=0.02,eq=saturation=1.12:contrast=1.05"
 clip MORRO assets/dev-morro.mov 1.5 1.75
 for s in kaiiros ymb-cocktails kdust trama bastos; do
   f=$(ls assets/sites/$s.* | head -1)
