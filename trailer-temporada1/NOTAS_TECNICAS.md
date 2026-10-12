@@ -49,4 +49,5 @@ npx hyperframes@0.8.149 render --quality delivery --fps 30 --output out/trailer_
 - **Valores fixos:** os valores "aleatórios" (cacos, gotas, respingos, corações, partículas do selo) vêm de `mulberry32(24)` em `src/shapes.js` e são calculados uma vez no carregamento.
 - **Sem relógio nem timers:** não há `Math.random`, `Date.now`, `setTimeout`, `setInterval`, `requestAnimationFrame`, `@keyframes` nem `transition`.
 - **Cursor e pulsos:** o cursor piscando é uma sequência de `tl.set` na timeline. Os pulsos (card vazio e halo do poste) usam `repeat` finito.
-- **Verificação:** dois renders seguidos comparados quadro a quadro (resultado no resumo final da entrega).
+- **Verificação:** dois renders seguidos (`render --quality delivery --fps 30`) geraram arquivos idênticos byte a byte (SHA-256 `aeff4b68…0a67` nos dois), e os 1050 quadros batem no `ffmpeg -f framemd5`.
+- **Render:** captura `beginframe`, GPU por software, cerca de 2 min para 1050 quadros. Saída validada com `ffprobe`: 35,000 s, 1080 × 1920, 30 fps, H.264, yuv420p.
