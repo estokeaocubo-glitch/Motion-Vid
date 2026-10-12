@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="pt-BR" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Trailer Temporada 1 · Perder um cliente e nem perceber</title>
+    <link rel="stylesheet" href="./styles/main.css" />
+  </head>
+  <body>
+    <div id="stage" data-composition-id="trailer-temporada1" data-start="0" data-duration="35" data-width="1080" data-height="1920" data-fps="30">
+      <!-- camada global: fundo -->
+      <div id="bg" class="clip" data-start="0" data-duration="35" data-track-index="0"></div>
+
+      <!-- câmera: recebe os tremores; as cenas ficam dentro dela -->
+      <div id="cam">
+        <!-- CENA 1 — A caneca -->
+        <section id="s1" class="clip scene" data-start="0" data-duration="3" data-track-index="1">
+          <div id="s1-floor"></div>
+          <div id="s1-shadow"></div>
+          <div id="mug">
+            <div class="speed-line" id="speed-1"></div>
+            <div class="speed-line" id="speed-2"></div>
+            <div class="speed-line" id="speed-3"></div>
+            <svg id="mug-svg" viewBox="0 0 230 260" width="230" height="260" aria-hidden="true">
+              <path d="M20 30 H190 V200 Q190 250 140 250 H70 Q20 250 20 200 Z" fill="#F5F8FC" />
+              <path d="M150 30 H190 V200 Q190 250 140 250 H128 Q160 236 160 196 V30 Z" fill="#BFD3FF" opacity="0.3" />
+              <rect x="20" y="112" width="170" height="44" fill="#3DDBB0" />
+              <path d="M190 72 H204 A36 36 0 0 1 204 180 H190" fill="none" stroke="#F5F8FC" stroke-width="18" stroke-linecap="round" />
+              <ellipse cx="105" cy="30" rx="85" ry="14" fill="#E8EEF7" />
+              <ellipse cx="105" cy="32" rx="72" ry="10" fill="#3B2416" />
+            </svg>
+          </div>
+        </section>
+
+        <!-- Cacos e café: atravessam as cenas 1 e 2 -->
+        <div id="debris" class="clip" data-start="0" data-duration="8" data-track-index="2"></div>
+
+        <!-- CENA 2 — A frase -->
+        <section id="s2" class="clip scene" data-start="3" data-duration="5" data-track-index="1">
+          <div id="blockA">
+            <div class="mask-line"><div class="line-in" id="a1">SABE O QUE É</div></div>
+            <div class="mask-line"><div class="line-in" id="a2">PIOR QUE PERDER</div></div>
+            <div class="mask-line"><div class="line-in" id="a3">UMA CANECA?</div></div>
+          </div>
+          <div id="blockB">
+            <div id="b1">PERDER UM</div>
+            <div id="cliente-wrap">
+              <div id="cliente">
+                <div class="cliente-half" id="cliente-a">CLIENTE</div>
+                <div class="cliente-half" id="cliente-b">CLIENTE</div>
+                <svg id="crack" viewBox="0 0 760 230" width="760" height="230" aria-hidden="true">
+                  <polyline id="crack-line" points="232,-4 300,62 266,92 352,136 318,164 420,234" fill="none" stroke="#07122A" stroke-width="6" stroke-linejoin="miter" stroke-linecap="square" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div id="silent">e nem perceber.</div>
+        </section>
+
+        <!-- CENA 3 — A busca -->
+        <section id="s3" class="clip scene" data-start="8" data-duration="6" data-track-index="1">
+          <div id="s3-whip">
+            <div class="headline" id="h3a">
+              <div class="hl-line">TEM GENTE PROCURANDO</div>
+              <div class="hl-line">O QUE VOCÊ VENDE</div>
+            </div>
+            <div class="headline" id="h3b">
+              <div class="hl-line">SE NÃO TE ACHA,</div>
+              <div class="hl-line accent">COMPRA DE OUTRO</div>
+            </div>
+            <div id="phone">
+              <div id="screen">
+                <div id="statusbar">
+                  <span id="clock"></span>
+                  <svg viewBox="0 0 90 24" width="90" height="24" aria-hidden="true">
+                    <rect x="0" y="14" width="6" height="10" rx="1.5" fill="#07122A" />
+                    <rect x="9" y="10" width="6" height="14" rx="1.5" fill="#07122A" />
+                    <rect x="18" y="6" width="6" height="18" rx="1.5" fill="#07122A" />
+                    <rect x="27" y="2" width="6" height="22" rx="1.5" fill="#07122A" />
+                    <rect x="46" y="4" width="38" height="18" rx="5" fill="none" stroke="#07122A" stroke-width="2.5" />
+                    <rect x="50" y="8" width="24" height="10" rx="2" fill="#07122A" />
+                    <rect x="86" y="10" width="3" height="6" rx="1" fill="#07122A" />
+                  </svg>
+                </div>
+                <div id="search">
+                  <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+                    <circle cx="13" cy="13" r="9" fill="none" stroke="#8A97AD" stroke-width="3.5" />
+                    <line x1="20" y1="20" x2="29" y2="29" stroke="#8A97AD" stroke-width="3.5" stroke-linecap="round" />
+                  </svg>
+                  <div id="query"><span id="typed"></span><span id="caret"></span></div>
+                </div>
+                <div id="results"></div>
+                <div id="toast">
+                  <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+                    <circle cx="16" cy="16" r="14" fill="none" stroke="#3DDBB0" stroke-width="3" />
+                    <polyline points="9,16.5 14,21.5 23,11.5" fill="none" stroke="#3DDBB0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                  <span>Pedido enviado</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CENA 4 — O lojista -->
+        <section id="s4" class="clip scene" data-start="14" data-duration="4" data-track-index="1">
+          <div id="s4-sky"></div>
+          <div id="s4-in">
+            <div id="s4-cam">
+              <svg id="storefront" viewBox="0 0 1080 1920" width="1080" height="1920" aria-hidden="true">
+                <defs>
+                  <radialGradient id="halo-grad">
+                    <stop offset="0" stop-color="#3DDBB0" stop-opacity="1" />
+                    <stop offset="1" stop-color="#3DDBB0" stop-opacity="0" />
+                  </radialGradient>
+                </defs>
+                <!-- calçada -->
+                <rect x="0" y="1500" width="1080" height="420" fill="#0B1A38" />
+                <rect x="0" y="1500" width="1080" height="6" fill="#BFD3FF" opacity="0.18" />
+                <!-- poste e halo -->
+                <g id="lamp">
+                  <circle id="halo" cx="985" cy="760" r="210" fill="url(#halo-grad)" opacity="0.15" />
+                  <rect x="979" y="760" width="12" height="740" fill="#0E2147" />
+                  <rect x="950" y="740" width="70" height="26" rx="8" fill="#0E2147" />
+                  <rect x="958" y="764" width="54" height="12" rx="4" fill="#3DDBB0" opacity="0.55" />
+                </g>
+                <!-- fachada -->
+                <rect x="110" y="820" width="800" height="680" fill="#0E2147" />
+                <rect x="110" y="820" width="800" height="680" fill="none" stroke="#BFD3FF" stroke-opacity="0.18" stroke-width="3" />
+                <!-- toldo listrado -->
+                <g id="awning">
+                  <rect x="90" y="820" width="840" height="96" fill="#0E2147" />
+                  <g fill="#F5F8FC">
+                    <rect x="90" y="820" width="60" height="96" />
+                    <rect x="210" y="820" width="60" height="96" />
+                    <rect x="330" y="820" width="60" height="96" />
+                    <rect x="450" y="820" width="60" height="96" />
+                    <rect x="570" y="820" width="60" height="96" />
+                    <rect x="690" y="820" width="60" height="96" />
+                    <rect x="810" y="820" width="60" height="96" />
+                  </g>
+                  <path d="M90 916 q30 26 60 0 q30 26 60 0 q30 26 60 0 q30 26 60 0 q30 26 60 0 q30 26 60 0 q30 26 60 0 q30 26 60 0 q30 26 60 0 q30 26 60 0 q30 26 60 0 q30 26 60 0 q30 26 60 0 q30 26 60 0 z" fill="#F5F8FC" opacity="0.85" />
+                </g>
+                <!-- porta de vidro -->
+                <rect x="160" y="980" width="250" height="520" rx="6" fill="#07122A" stroke="#BFD3FF" stroke-opacity="0.35" stroke-width="5" />
+                <rect x="180" y="1000" width="210" height="480" rx="4" fill="#BFD3FF" opacity="0.06" />
+                <rect x="372" y="1220" width="10" height="60" rx="5" fill="#BFD3FF" opacity="0.5" />
+                <!-- vitrine -->
+                <rect x="450" y="980" width="420" height="420" rx="6" fill="#07122A" stroke="#BFD3FF" stroke-opacity="0.35" stroke-width="5" />
+                <g fill="#BFD3FF" opacity="0.25">
+                  <!-- silhuetas de produtos: cabide com camisa, bolsa, caixa -->
+                  <path d="M520 1050 l20 -14 h40 l20 14 l-12 22 l-10 -6 v60 h-56 v-60 l-10 6 z" />
+                  <path d="M650 1080 h70 l8 60 h-86 z M668 1080 q17 -34 34 0" fill="none" stroke="#BFD3FF" stroke-width="6" />
+                  <path d="M650 1080 h70 l8 60 h-86 z" />
+                  <rect x="770" y="1060" width="70" height="80" rx="6" />
+                </g>
+                <!-- balcão visto pela vitrine -->
+                <rect x="470" y="1290" width="380" height="20" rx="4" fill="#1B3466" />
+                <rect x="490" y="1310" width="340" height="88" fill="#12284F" />
+                <!-- celular deitado no balcão, tela apagada -->
+                <g id="counter-phone">
+                  <rect x="602" y="1270" width="96" height="22" rx="8" fill="#050B1A" stroke="#BFD3FF" stroke-opacity="0.45" stroke-width="3" />
+                  <rect x="610" y="1275" width="80" height="11" rx="4" fill="#0A1430" />
+                </g>
+              </svg>
+              <!-- placa de dois lados pendurada na porta -->
+              <div id="sign-hang">
+                <div id="sign-string"></div>
+                <div id="sign-flip">
+                  <div class="sign-face" id="sign-front">ABERTO</div>
+                  <div class="sign-face" id="sign-back"><span>FECHADO</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="notif">
+            <div id="notif-dot">0</div>
+            <div id="notif-label">notificações</div>
+          </div>
+          <div class="headline" id="h4">
+            <div class="hl-line">E VOCÊ</div>
+            <div class="hl-line">NEM FICA <span class="accent">SABENDO.</span></div>
+          </div>
+        </section>
+
+        <!-- CENA 5 — O anúncio -->
+        <section id="s5" class="clip scene" data-start="18" data-duration="7" data-track-index="1">
+          <div id="porisso-wrap"><div id="porisso">POR ISSO</div></div>
+          <div id="s5-row"></div>
+          <div id="s5-label">5 LOJAS DE PETRÓPOLIS</div>
+          <div id="s5-pill-wrap"><div id="s5-pill">TEMPORADA 1</div></div>
+          <div id="s5-line">5 LOJAS <span class="dot">·</span> 5 SITES <span class="dot">·</span> 1 POR SEMANA</div>
+        </section>
+
+        <!-- CENA 6 — A votação -->
+        <section id="s6" class="clip scene" data-start="25" data-duration="6" data-track-index="1">
+          <div id="s6-out">
+            <div class="headline" id="h6">
+              <div class="hl-line">NO FINAL,</div>
+              <div class="hl-line">VOCÊS ESCOLHEM</div>
+            </div>
+            <div id="vote-rows"></div>
+            <div id="stamp-wrap">
+              <div id="stamp">
+                <svg viewBox="0 0 300 300" width="300" height="300" aria-hidden="true">
+                  <circle cx="150" cy="150" r="145" fill="#07122A" fill-opacity="0.85" stroke="#3DDBB0" stroke-width="6" />
+                  <circle cx="150" cy="150" r="126" fill="none" stroke="#3DDBB0" stroke-width="6" />
+                </svg>
+                <div id="stamp-text"><div>VAI PRO AR</div><div>SEM CUSTO</div></div>
+              </div>
+              <div id="stamp-particles"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CENA 7 — A chamada e a marca -->
+        <section id="s7" class="clip scene" data-start="31" data-duration="4" data-track-index="1">
+          <div id="s7-texts">
+            <div id="cta1">TEM LOJA?</div>
+            <div id="cta2-row">
+              <div id="cta2-mask"><div id="cta2">ME CHAMA NO DIRECT</div></div>
+              <svg id="plane" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+                <path d="M6 30 L58 8 L44 56 L30 38 Z" fill="none" stroke="#3DDBB0" stroke-width="4" stroke-linejoin="round" />
+                <path d="M30 38 L58 8 M30 38 L28 52 L36 44" fill="none" stroke="#3DDBB0" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div id="cta3">NÃO TEM? SEGUE PRA VOTAR</div>
+            <div id="brian">
+              <div id="brian-photo"></div>
+              <div id="brian-caption">Brian · Estoke ao Cubo</div>
+            </div>
+          </div>
+          <div id="brand">
+            <div id="logo">
+              <!-- LOGO PLACEHOLDER (cubo isométrico): trocar por assets/logo.svg quando existir -->
+              <svg id="cube" viewBox="0 0 120 130" width="150" height="162" aria-hidden="true">
+                <path class="cube-face" id="face-top" d="M60 6 L112 34 L60 62 L8 34 Z" fill="#2563EB" />
+                <path class="cube-face" id="face-left" d="M8 34 L60 62 L60 124 L8 96 Z" fill="#0E2147" />
+                <path class="cube-face" id="face-right" d="M112 34 L60 62 L60 124 L112 96 Z" fill="#3DDBB0" />
+                <path id="cube-outline" d="M60 6 L112 34 L112 96 L60 124 L8 96 L8 34 Z M8 34 L60 62 L112 34 M60 62 L60 124" fill="none" stroke="#F5F8FC" stroke-width="3" stroke-linejoin="round" />
+              </svg>
+              <div id="wordmark-mask"><div id="wordmark">ESTOKE AO CUBO</div></div>
+            </div>
+            <div id="handle"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- camadas globais: grão e flash -->
+      <div id="grain" class="clip" data-start="0" data-duration="35" data-track-index="9">
+        <svg width="1080" height="1920" aria-hidden="true">
+          <filter id="noise" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="24" stitchTiles="stitch" />
+            <feColorMatrix type="saturate" values="0" />
+          </filter>
+          <rect width="1080" height="1920" filter="url(#noise)" />
+        </svg>
+      </div>
+      <div id="flash" class="clip" data-start="0" data-duration="35" data-track-index="10"><div id="flash-fill"></div></div>
+
+      <script src="./assets/vendor/gsap.min.js"></script>
+      <script src="./src/config.js"></script>
+      <script src="./src/shapes.js"></script>
+      <script src="./src/timeline.js"></script>
+      <script>
+        window.__timelines["trailer-temporada1"] = window.buildTrailerTimeline();
+      </script>
+    </div>
+  </body>
+</html>

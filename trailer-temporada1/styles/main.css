@@ -1,0 +1,164 @@
+/* Trailer Temporada 1 · Estoke ao Cubo — tokens, fontes locais e layout das cenas.
+   Estados iniciais de transform/opacity animados ficam na timeline (tl.set/fromTo), não aqui. */
+
+@font-face { font-family: "Bebas Neue"; src: url("../assets/fonts/BebasNeue-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: block; }
+@font-face { font-family: "Montserrat"; src: url("../assets/fonts/Montserrat-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: block; }
+@font-face { font-family: "Montserrat"; src: url("../assets/fonts/Montserrat-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: block; }
+@font-face { font-family: "Montserrat"; src: url("../assets/fonts/Montserrat-800.woff2") format("woff2"); font-weight: 800; font-style: normal; font-display: block; }
+
+:root {
+  --navy-950: #07122A; /* fundo base */
+  --navy-800: #0E2147; /* gradiente, cartões escuros */
+  --blue-500: #2563EB; /* azul de apoio */
+  --blue-200: #BFD3FF; /* azul claro, detalhes */
+  --mint-400: #3DDBB0; /* acento: destaque, CTA, selo */
+  --white: #F5F8FC;    /* texto principal */
+  --gray-400: #8A97AD; /* texto silencioso */
+  --coffee: #3B2416;   /* só o café da cena 1 */
+  --display: "Bebas Neue", sans-serif;
+  --sans: "Montserrat", sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--navy-950); }
+
+#stage { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: var(--sans); color: var(--white); }
+#bg { position: absolute; inset: 0; background: radial-gradient(120% 70% at 50% 40%, var(--navy-800) 0%, var(--navy-950) 70%); }
+#cam { position: absolute; inset: 0; }
+.scene { position: absolute; inset: 0; overflow: hidden; }
+#grain { position: absolute; inset: 0; opacity: 0.05; mix-blend-mode: screen; pointer-events: none; }
+#flash { position: absolute; inset: 0; pointer-events: none; }
+#flash-fill { position: absolute; inset: 0; background: #FFFFFF; opacity: 0; }
+
+.accent { color: var(--mint-400); }
+.headline { position: absolute; left: 80px; width: 860px; font-family: var(--display); font-weight: 400; letter-spacing: 0.01em; text-align: center; color: var(--white); }
+.hl-line { display: block; line-height: 1; }
+
+/* ---------- CENA 1 ---------- */
+#s1-floor { position: absolute; left: 80px; top: 1399px; width: 920px; height: 3px; background: var(--mint-400); opacity: 0.25; }
+#s1-shadow { position: absolute; left: 420px; top: 1386px; width: 240px; height: 30px; border-radius: 50%; background: #000; filter: blur(8px); }
+#mug { position: absolute; left: 425px; top: -130px; width: 230px; height: 260px; }
+#mug-svg { display: block; position: absolute; left: 0; top: 0; }
+.speed-line { position: absolute; width: 4px; border-radius: 2px; background: var(--white); opacity: 0.2; }
+#speed-1 { left: 60px; top: -190px; height: 150px; }
+#speed-2 { left: 108px; top: -240px; height: 190px; }
+#speed-3 { left: 156px; top: -200px; height: 140px; }
+
+#debris { position: absolute; inset: 0; pointer-events: none; }
+.shard, .drop { position: absolute; display: block; }
+.drop { border-radius: 50%; background: var(--coffee); }
+
+/* ---------- CENA 2 ---------- */
+#blockA { position: absolute; left: 80px; top: 606px; width: 860px; font-family: var(--display); font-size: 150px; line-height: 0.95; letter-spacing: 0.01em; text-align: center; }
+.mask-line { display: block; overflow: hidden; height: 143px; }
+.line-in { display: block; height: 143px; }
+#blockB { position: absolute; left: 80px; top: 675px; width: 860px; text-align: center; font-family: var(--display); letter-spacing: 0.01em; }
+#b1 { display: block; font-size: 150px; line-height: 0.95; height: 143px; }
+#cliente-wrap { position: relative; width: 860px; height: 230px; }
+#cliente { position: absolute; left: 50px; top: 0; width: 760px; height: 230px; }
+.cliente-half { position: absolute; left: 0; top: 0; width: 760px; height: 230px; font-size: 240px; line-height: 230px; color: var(--mint-400); text-align: center; }
+#cliente-a { clip-path: polygon(0 0, 232px 0, 300px 62px, 266px 92px, 352px 136px, 318px 164px, 420px 230px, 0 230px); }
+#cliente-b { clip-path: polygon(232px 0, 760px 0, 760px 230px, 420px 230px, 318px 164px, 352px 136px, 266px 92px, 300px 62px); }
+#crack { position: absolute; left: 0; top: 0; overflow: visible; }
+#silent { position: absolute; left: 80px; top: 1050px; width: 860px; text-align: center; font-family: var(--sans); font-weight: 500; font-size: 48px; line-height: 60px; color: var(--gray-400); }
+
+/* ---------- CENA 3 ---------- */
+#s3-whip { position: absolute; inset: 0; }
+#h3a, #h3b { top: 250px; font-size: 104px; }
+#phone { position: absolute; left: 240px; top: 520px; width: 600px; height: 1020px; border-radius: 64px; background: var(--navy-800); border: 6px solid rgba(191, 211, 255, 0.4); padding: 16px; }
+#screen { position: relative; width: 100%; height: 100%; border-radius: 48px; background: var(--white); overflow: hidden; color: var(--navy-950); }
+#statusbar { position: absolute; left: 40px; right: 40px; top: 22px; height: 40px; display: flex; align-items: center; justify-content: space-between; }
+#clock { font-family: var(--sans); font-weight: 600; font-size: 30px; color: var(--navy-950); }
+#search { position: absolute; left: 24px; right: 24px; top: 92px; height: 88px; border-radius: 44px; background: #EEF2F8; border: 2px solid #E3E8F0; display: flex; align-items: center; gap: 14px; padding: 0 20px; }
+#search svg { flex: none; }
+#query { font-family: var(--sans); font-weight: 600; font-size: 28px; color: var(--navy-950); white-space: nowrap; display: flex; align-items: center; }
+#typed span { display: none; }
+#caret { display: inline-block; width: 3px; height: 34px; margin-left: 2px; background: var(--blue-500); }
+#results { position: absolute; left: 24px; right: 24px; top: 204px; display: flex; flex-direction: column; gap: 16px; }
+.card { position: relative; height: 150px; border-radius: 20px; background: #FFFFFF; border: 2px solid #E3E8F0; padding: 20px 24px; overflow: hidden; }
+.card-name { font-family: var(--sans); font-weight: 800; font-size: 34px; line-height: 40px; color: var(--navy-950); }
+.card-stars { display: flex; gap: 6px; margin-top: 8px; }
+.card-chips { position: absolute; right: 22px; top: 20px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.chip { font-family: var(--sans); font-weight: 600; font-size: 24px; line-height: 30px; padding: 2px 14px; border: 2px solid #C9D2E0; border-radius: 999px; color: #4A5B76; }
+.card-ring { position: absolute; inset: 0; border-radius: 20px; border: 4px solid var(--mint-400); opacity: 0; }
+.card-empty { height: 120px; border: 3px dashed var(--gray-400); background: transparent; display: flex; flex-direction: column; justify-content: center; }
+.card-empty .card-name { color: var(--gray-400); }
+.card-empty .card-sub { font-family: var(--sans); font-weight: 500; font-size: 24px; color: var(--gray-400); }
+.ripple { position: absolute; width: 240px; height: 240px; margin: -120px 0 0 -120px; border-radius: 50%; background: var(--mint-400); opacity: 0; }
+#toast { position: absolute; left: 50%; bottom: 40px; margin-left: -170px; width: 340px; height: 76px; border-radius: 38px; background: var(--navy-950); display: flex; align-items: center; justify-content: center; gap: 14px; font-family: var(--sans); font-weight: 600; font-size: 28px; color: var(--white); }
+
+/* ---------- CENA 4 ---------- */
+#s4-sky { position: absolute; inset: 0; background: var(--navy-950); }
+#s4-in, #s4-cam { position: absolute; inset: 0; }
+#storefront { position: absolute; left: 0; top: 0; display: block; }
+#sign-hang { position: absolute; left: 165px; top: 1030px; width: 240px; height: 140px; }
+#sign-string { position: absolute; left: 60px; top: 0; width: 120px; height: 40px; border: 3px solid var(--blue-200); border-bottom: none; border-radius: 60px 60px 0 0; opacity: 0.6; }
+#sign-flip { position: absolute; left: 0; top: 36px; width: 240px; height: 92px; }
+.sign-face { position: absolute; inset: 0; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-size: 64px; line-height: 1; letter-spacing: 0.02em; }
+#sign-front { background: var(--white); color: var(--navy-950); }
+#sign-back { background: var(--navy-950); color: var(--white); border: 3px solid var(--white); }
+#sign-back span { display: block; transform: scaleX(-1); }
+#notif { position: absolute; left: 560px; top: 1130px; display: flex; align-items: center; gap: 16px; }
+#notif-dot { width: 76px; height: 76px; border-radius: 50%; background: var(--gray-400); color: var(--navy-950); font-family: var(--sans); font-weight: 800; font-size: 40px; display: flex; align-items: center; justify-content: center; }
+#notif-label { font-family: var(--sans); font-weight: 500; font-size: 32px; color: var(--gray-400); }
+#h4 { top: 270px; font-size: 124px; }
+
+/* ---------- CENA 5 ---------- */
+#porisso-wrap { position: absolute; left: 80px; top: 660px; width: 860px; height: 200px; }
+#porisso { width: 860px; height: 200px; font-family: var(--display); font-size: 200px; line-height: 200px; text-align: center; color: var(--mint-400); letter-spacing: 0.01em; }
+#s5-row { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+.shop, .win { position: absolute; }
+.win { width: 160px; height: 230px; border-radius: 14px; background: #FFFFFF; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+.win-bar { position: absolute; left: 0; top: 0; right: 0; height: 22px; background: #E6EBF2; display: flex; gap: 5px; align-items: center; padding-left: 9px; }
+.win-bar i { display: block; width: 7px; height: 7px; border-radius: 50%; background: #B6C1D2; }
+.win-layer { position: absolute; left: 0; right: 0; top: 22px; bottom: 0; }
+.draft b { position: absolute; display: block; border-radius: 4px; background: #D5DCE6; }
+.site-hero { position: absolute; left: 0; right: 0; top: 0; height: 72px; }
+.site-grid { position: absolute; left: 12px; right: 12px; top: 84px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.site-grid b { display: block; height: 42px; border-radius: 5px; background: #EDF1F7; }
+.site-btn { position: absolute; left: 30px; right: 30px; bottom: 12px; height: 20px; border-radius: 10px; background: var(--mint-400); }
+#s5-label { position: absolute; left: 80px; top: 1410px; width: 860px; text-align: center; font-family: var(--sans); font-weight: 800; font-size: 52px; line-height: 62px; color: var(--white); }
+#s5-pill-wrap { position: absolute; left: 80px; top: 1376px; width: 860px; height: 52px; display: flex; justify-content: center; }
+#s5-pill { height: 52px; padding: 0 30px; border-radius: 26px; background: var(--mint-400); color: var(--navy-950); font-family: var(--sans); font-weight: 800; font-size: 32px; line-height: 52px; letter-spacing: 0.04em; }
+#s5-line { position: absolute; left: 80px; top: 1452px; width: 860px; text-align: center; font-family: var(--sans); font-weight: 800; font-size: 46px; line-height: 56px; color: var(--white); white-space: nowrap; }
+#s5-line .dot { color: var(--mint-400); }
+
+/* ---------- CENA 6 ---------- */
+#s6-out { position: absolute; inset: 0; }
+#h6 { top: 270px; font-size: 116px; }
+#vote-rows { position: absolute; left: 80px; top: 560px; width: 860px; }
+.vrow { position: absolute; left: 0; width: 860px; height: 160px; border-radius: 26px; background: rgba(14, 33, 71, 0.75); border: 3px solid rgba(191, 211, 255, 0.16); }
+.vrow-ring { position: absolute; inset: -3px; border-radius: 26px; border: 4px solid var(--mint-400); opacity: 0; }
+.vmini { position: absolute; left: 18px; top: 14px; width: 92px; height: 132px; border-radius: 10px; background: #FFFFFF; overflow: hidden; }
+.vmini .site-hero { height: 40px; }
+.vmini b { position: absolute; display: block; border-radius: 3px; background: #EDF1F7; }
+.vmini .site-btn { left: 16px; right: 16px; bottom: 8px; height: 12px; }
+.vlabel { position: absolute; left: 140px; top: 22px; font-family: var(--sans); font-weight: 800; font-size: 36px; line-height: 44px; color: var(--white); }
+.vtrack { position: absolute; left: 140px; top: 96px; width: 680px; height: 30px; border-radius: 15px; background: var(--navy-800); overflow: hidden; }
+.vfill { position: absolute; left: 0; top: 0; width: 680px; height: 30px; border-radius: 15px; background: var(--blue-500); }
+.vfill-win { position: absolute; left: 0; top: 0; width: 680px; height: 30px; border-radius: 15px; background: var(--mint-400); opacity: 0; }
+.heart { position: absolute; width: 28px; height: 28px; opacity: 0; }
+#stamp-wrap { position: absolute; left: 600px; top: 1024px; width: 300px; height: 300px; }
+#stamp { position: absolute; left: 0; top: 0; width: 300px; height: 300px; }
+#stamp svg { display: block; }
+#stamp-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--display); font-size: 64px; line-height: 0.95; color: var(--mint-400); text-align: center; }
+#stamp-particles { position: absolute; left: 150px; top: 150px; width: 0; height: 0; }
+.spark { position: absolute; border-radius: 50%; background: var(--mint-400); opacity: 0; }
+
+/* ---------- CENA 7 ---------- */
+#s7-texts { position: absolute; inset: 0; }
+#cta1 { position: absolute; left: 80px; top: 625px; width: 860px; height: 150px; text-align: center; font-family: var(--display); font-size: 150px; line-height: 150px; letter-spacing: 0.01em; }
+#cta2-row { position: absolute; left: 80px; top: 800px; width: 860px; height: 120px; display: flex; align-items: center; justify-content: center; gap: 14px; }
+#cta2-mask { display: block; }
+#cta2 { font-family: var(--display); font-size: 120px; line-height: 120px; color: var(--mint-400); letter-spacing: 0.01em; white-space: nowrap; }
+#plane { flex: none; display: block; }
+#cta3 { position: absolute; left: 80px; top: 972px; width: 860px; text-align: center; font-family: var(--sans); font-weight: 800; font-size: 46px; line-height: 56px; color: rgba(245, 248, 252, 0.8); }
+#brian { position: absolute; left: 80px; top: 1080px; width: 860px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+#brian-photo { width: 240px; height: 240px; border-radius: 50%; border: 5px solid var(--mint-400); background: var(--navy-800) center / cover no-repeat; }
+#brian-caption { font-family: var(--sans); font-weight: 600; font-size: 34px; color: var(--white); }
+#brand { position: absolute; left: 80px; top: 1150px; width: 860px; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+#logo { display: flex; align-items: center; gap: 26px; }
+#cube { display: block; flex: none; }
+#wordmark-mask { display: block; }
+#wordmark { font-family: var(--sans); font-weight: 800; font-size: 52px; line-height: 64px; color: var(--white); white-space: nowrap; letter-spacing: 0.02em; }
+#handle { font-family: var(--sans); font-weight: 600; font-size: 38px; line-height: 46px; color: var(--blue-200); }
