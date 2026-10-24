@@ -30,12 +30,12 @@ Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver 
 
 ## Posts do Instagram (`posts-insta/`)
 
-São 8 posts estáticos em 4:5 (1080×1350), seguindo as referências: produto em fundo claro, ciclo em azul escuro, card de dados em vidro, camadas de vidro e lançamento de site num notebook. Só aparecem os sites da Dizzy, LCS, Arteiro, K-Dust, Ruppel e Kairós. Os prints da Ruppel e da Arteiro foram tirados dos sites no ar (páginas de lançamento). Os emojis são as feições do Emoji Primordial (o rosto da Estoke ao Cubo). Elas são recortadas do fundo de estúdio #D1D1D1 por `posts-insta/cutout_faces.py` em `posts-insta/img/face/`, porque só 6 das 36 transparentes estão no repositório. A feição 36 fica de fora (lista "Não usar").
+São 8 posts estáticos em 4:5 (1080×1350), seguindo as referências: produto em fundo claro, ciclo em azul escuro, card de dados em vidro, camadas de vidro e lançamento de site num notebook. Só aparecem os sites da Dizzy, LCS, Arteiro, K-Dust, Ruppel e Kairós. Os prints da Ruppel e da Arteiro foram tirados dos sites no ar (páginas de lançamento). Os emojis são as feições do Emoji Primordial (o rosto da Estoke ao Cubo), recortadas por `posts-insta/cutout_faces.py` em `posts-insta/img/face/`. O script parte das 36 feições de estúdio (#D1D1D1), fica só com o rosto (sem os pontinhos soltos), suaviza a borda e estende a cor da pele até ela, então não sobra fio branco. Entram só as feições de frente; as de ângulo, as de olhos fechados ou piscando (06, 07 e 08) e a 36 (lista "Não usar") ficam de fora dos posts.
 
 1. `01-site-de-cara-nova`: "Seu negócio merece um site de cara nova!", com a LCS no notebook.
 2. `02-combo-que-vende`: "O combo que vende!", com a loja da Dizzy, o selo de vidro "24h" e o rosto em "estrategista".
 3. `03-acontece-com-todo-mundo`: o ciclo "Sem site → Cliente não te acha → Venda perdida", e a Estoke ao Cubo resolve.
-4. `04-vendendo-24-7`: o card "Seu site vendendo 24/7", com o pedido às 03:15, o rosto surpreso e o rosto de olhos fechados.
+4. `04-vendendo-24-7`: o card "Seu site vendendo 24/7", com o pedido às 03:15, o rosto surpreso e o sorrindo.
 5. `05-sites-que-vendem`: "Sites que vendem de verdade", com Kairós, Dizzy e K-Dust em camadas de vidro.
 6. `06-feitos-pela-estoke`: o portfólio com Dizzy, LCS, Arteiro, K-Dust, Ruppel e Kairós.
 7. `07-ruppel-rompa-o-padrao`: "O site da Ruppel tá na contagem regressiva!".
