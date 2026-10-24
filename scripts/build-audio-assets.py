@@ -8,6 +8,7 @@
   src/audio/toolsRef.js   música do vídeo de referência "artist / tools / art" para o "dev / tools / site" (MUSIC_TOOLS)
   src/audio/voSite.js     narração (ElevenLabs) e trilha de fundo do anúncio "Site é oxigênio" (VO_SITE, MUSIC_OXI)
   src/audio/wordsRef.js   música do vídeo de referência "we don't just edit" para o "Venda 24h" (MUSIC_WORDS)
+  src/audio/autoPilotRef.js música do vídeo de referência "Auto Pilot" para o "WhatsApp no automático" (MUSIC_AUTOPILOT)
   src/audio/sfxVo.js      efeitos extras do anúncio "Site é oxigênio" (SFXV, SFXV_PEAK)
   src/audio/tape.js       efeitos analógicos do repositório (TAPE, TAPE_PEAK)
   src/audio/sfx.js        efeitos gravados da Mixkit (SFX, SFX_PEAK)
@@ -29,6 +30,7 @@ TOOLS_REF = os.path.join(ROOT, "dev-tools-site (audio original).m4a")
 VO_SITE = os.path.join(ROOT, "VO - Voce gasta horas gravando Reels (ElevenLabs).mp3")
 DISTANCE = os.path.join(ROOT, "TRAP TYPE BEAT - _DISTANCE_ _ FREESTYLE BEAT _ HARD TYPE BEAT _ FREE RAP INSTRUMENTAL 2026 [zuHucgfzkoA].mp3")
 WORDS_REF = os.path.join(ROOT, "venda-24h (audio original).m4a")
+AUTOPILOT_REF = os.path.join(ROOT, "auto-pilot (audio original).m4a")
 TAPE_DIR = os.path.join(ROOT, "Efeitos Analógicos (15)")
 
 # Música: id → (arquivo, constante exportada, início na faixa, duração)
@@ -39,8 +41,9 @@ MUSIC = {
     "alexaReach": (ALEXA, "MUSIC_REACH", 1.3, 32.0),   # drop da "Alexa 2" (17,47s) em 16,17s do trecho
     "toolsRef": (TOOLS_REF, "MUSIC_TOOLS", 0.0, None),
     "voSite": (VO_SITE, "VO_SITE", 0.0, None),               # narração inteira (55,07s)
-    "oxiMusic": (DISTANCE, "MUSIC_OXI", 67.29, 56.0),
-    "wordsRef": (WORDS_REF, "MUSIC_WORDS", 0.0, None),          # inteira (9,52s), com os cortes da referência         # "DISTANCE" a partir da volta do beat, por baixo da voz  # inteira (11,39s): beat volta em 3,78s, 137,6 BPM
+    "oxiMusic": (DISTANCE, "MUSIC_OXI", 67.29, 56.0),        # "DISTANCE" a partir da volta do beat, por baixo da voz
+    "wordsRef": (WORDS_REF, "MUSIC_WORDS", 0.0, None),       # inteira (9,52s), com os cortes da referência
+    "autoPilotRef": (AUTOPILOT_REF, "MUSIC_AUTOPILOT", 0.0, None),  # inteira (9,22s), com os cortes da referência
 }
 # Efeitos analógicos do repositório: id → (arquivo, início, duração)
 TAPE = {

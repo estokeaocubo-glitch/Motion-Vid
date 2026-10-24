@@ -8,6 +8,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
+| "WhatsApp no automático" (UI motion, 3 opções de texto) | 9,2s | 16:9 e 9:16 | `src/AutoPilotAd.jsx` + `src/autopilot/` | `dist/whatsapp-automatico-opcao{1,2,3}-16x9.mp4`, `dist/whatsapp-automatico-opcao{1,2,3}-9x16.mp4` |
 | "Venda 24h" (só tipografia, 3 opções de texto) | 9,5s | 9:16 | `src/WordsAd.jsx` + `src/words/` | `dist/venda-24h-opcao1-9x16.mp4`, `dist/venda-24h-opcao2-9x16.mp4`, `dist/venda-24h-opcao3-9x16.mp4` |
 | "Site é oxigênio" (Reels narrado) | 55,2s | 9:16 | `src/OxigenioAd.jsx` + `src/oxi/` | `dist/site-oxigenio-9x16.mp4` |
 | "dev / tools / site" (três faixas) | 11,4s | Story 9:16 e 3:4 | `src/ToolsReveal.jsx` | `dist/dev-tools-site-9x16.mp4`, `dist/dev-tools-site-3x4.mp4` |
@@ -25,6 +26,23 @@ Biblioteca do **Emoji Primordial 3D** (36 feições, 12 animações, documentaç
 Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver [`trailer-temporada1/`](trailer-temporada1/).
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## "WhatsApp no automático" (AutoPilotAd)
+
+Feito a partir do vídeo "Auto Pilot": interface limpa com vidro fosco, que vende pela tranquilidade em vez da urgência.
+
+- **Abertura:** o cursor liga a chave, que fica verde WhatsApp e mostra "ON".
+- **Lista e cards:** a lista da esquerda acende um item por vez, e a bolinha colorida desce. Na direita, um card de vidro prova cada função e é trocado de baixo para cima:
+  - conversa respondida na hora
+  - cliente recuperado (ou dúvida tirada, na opção 2)
+  - agenda de horários confirmados
+  - madrugada, com pedidos via PIX subindo e a régua de horário passando por 01:00 a 05:00
+- **Fim:** a câmera avança e desfoca, como na referência. Fecha com a chave ON, a frase da opção e a logo.
+- **Três textos, mesmo componente:**
+  - `src/autopilot/v1.js`, direta: "Piloto automático" → Responde clientes / Fecha vendas / Agenda horários / 24/7
+  - `src/autopilot/v2.js`, curta: "Seu WhatsApp no automático" → Responde clientes / Tira dúvidas / Agenda e vende / 24/7 sem pausas
+  - `src/autopilot/v3.js`, dor e solução: "Chega de perder cliente no vácuo." → Atende na hora / Faz follow-up / Agenda sozinho / 24h por dia
+- **Áudio e tempos:** o áudio original da referência (`auto-pilot (audio original).m4a`), com os tempos medidos quadro a quadro na própria referência: clique em 0,24–0,44s, itens em 1,0 / 2,9 / 4,85 / 6,65s e saída em 8,0s.
 
 ## "Venda 24h" (WordsAd)
 
