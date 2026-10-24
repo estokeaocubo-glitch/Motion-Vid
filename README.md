@@ -31,7 +31,7 @@ Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver 
 
 ## "Tem site?" (EmojiStoryAd)
 
-É uma historinha contada só com as variações 3D do Emoji Primordial (`EMOJI_PRIMORDIAL/06_VARIACOES_3D`). Cada cena tem uma expressão:
+É uma historinha contada só com as variações 3D do Emoji Primordial (`EMOJI_PRIMORDIAL/06_VARIACOES_3D`). O rosto vai se transformando de uma expressão para a outra:
 
 1. segunda sem venda (tédio)
 2. "vocês têm site?" (choque)
@@ -44,10 +44,14 @@ Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver 
 9. Pix caindo (derretido)
 10. agora (nariz empinado) e o card "site que vende 24h"
 
-- **Ritmo:** a expressão troca a cada compasso do "BAILAR" (o drop em 2,02s cai no "vocês têm site?"), com um pop que achata e volta com mola.
+- **Ritmo:** a expressão muda a cada compasso do "BAILAR" (o drop em 2,02s cai no "vocês têm site?").
 - **Legenda:** entra palavra por palavra.
 - **Efeitos:** um por cena (balões de conversa, "+1 pedido", chip da Estoke ao Cubo, navegador com a loja da Dizzy e notificações de Pix), cada um com o seu som.
-- **Feições:** ficam com contorno vetorial (sem borda branca). São geradas por `python3 scripts/build-emoji-story-assets.py` em `src/emojiStory/faces.js`.
+- **Rosto animado de verdade** (não troca de imagem): `python3 scripts/render-emoji-story-face.py` esculpe cada quadro com a engine 3D do Emoji Primordial e grava `dist/media/tem-site-emoji-face.webm`, com transparência.
+  - **Transição:** entre as cenas, sobrancelhas, pálpebras, olhar, boca, inclinação e blush se interpolam em 0,42s, com uma piscada e um leve mergulho de cabeça no meio.
+  - **Dentro da cena:** piscadas naturais, olhar com micro-movimento, balanço, aceno em cada batida e a boca falando em "é… só pelo direct".
+  - **Recorte:** cada quadro passa pelo recorte limpo dos posts, então não aparece borda branca.
+  - **Sincronia:** o motion toca esse vídeo sincronizado com a linha do tempo.
 
 ## Posts do Instagram (`posts-insta/`)
 

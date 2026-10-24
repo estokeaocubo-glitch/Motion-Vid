@@ -1,6 +1,5 @@
 import React from "react";
-import { C, FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, renderEventsWav, MotionPlayer } from "./motionKit";
-import { FACES } from "./emojiStory/faces";
+import { C, FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer } from "./motionKit";
 import { SITE_PRINT } from "./emojiStory/sitePrint";
 import { MUSIC_AD } from "./audio/bailarAd";
 import { SFX, SFX_PEAK } from "./audio/sfx";
@@ -11,8 +10,11 @@ import { SFXV, SFXV_PEAK } from "./audio/sfxVo";
    Historinha contada só com as variações 3D do Emoji Primordial (EMOJI_PRIMORDIAL/06_VARIACOES_3D):
    segunda sem venda → cliente pergunta "tem site?" → só pelo direct → visualizou e sumiu →
    concorrente vendendo → chama a Estoke ao Cubo → site no ar → Pix às 3h → nariz empinado.
-   A expressão troca a cada compasso do "BAILAR" (drop em 2,02s, compasso de 2s), com um "pop"
-   (achata e volta com mola), legenda que entra palavra por palavra e um efeito por cena.
+   O rosto é ANIMADO (não troca de imagem): um vídeo com transparência renderizado quadro a quadro
+   pela engine 3D (scripts/render-emoji-story-face.py → media/tem-site-emoji-face.webm). A
+   expressão se transforma a cada compasso do "BAILAR" (drop em 2,02s, compasso de 2s), com
+   piscadas, olhar vivo, aceno na batida e boca falando. Legenda palavra por palavra e um efeito
+   por cena.
 ============================================================================= */
 const DURATION = 21.5;
 const BAR = (n) => 2.02 + 2 * n; // início de cada compasso depois do drop
@@ -42,24 +44,20 @@ function sceneAt(t) {
 }
 
 /* ---------- peças ---------- */
+const FACE_VIDEO = { webm: "media/tem-site-emoji-face.webm", size: 414 };
 function Face({ t, i }) {
   const [at, id] = SCENES[i];
-  const lt = t - at;
-  // troca: achata e volta com mola (sem fade, a feição nova já entra)
-  const pop = spring(lt, { stiffness: 320, damping: 13 });
-  const sx = lerp(1.14, 1, clamp(pop, 0, 1.2));
-  const sy = lerp(0.82, 1, clamp(pop, 0, 1.2));
-  const bob = Math.sin(t * 2.6) * 4;
-  const sway = Math.sin(t * 1.7 + 1) * 2.2;
+  // a transformação da expressão está no vídeo; aqui só um leve "respiro" na troca e a flutuação
+  const kick = 1 + 0.03 * Math.exp(-Math.max(0, t - at) * 7) * Math.sin(Math.max(0, t - at) * 18);
+  const float = Math.sin(t * 2.2) * 3;
   const dark = id === "sonolento" || id === "derretido";
+  const S = FACE_VIDEO.size;
   return (
     <>
-      <div style={{ position: "absolute", left: 225 - 105, top: 640, width: 210, height: 34, borderRadius: "50%", background: dark ? "rgba(0,0,0,.45)" : "rgba(20,30,60,.18)", filter: "blur(8px)", transform: `scaleX(${lerp(1.15, 1, clamp(pop))})` }} />
-      <img src={FACES[id]} alt="" style={{
-        position: "absolute", left: 225 - 160, top: 300 + bob, width: 320, height: 320,
-        transform: `rotate(${sway}deg) scale(${sx}, ${sy})`, transformOrigin: "50% 92%",
-        filter: "drop-shadow(0 18px 26px rgba(10,20,50,.28))",
-      }} />
+      <div style={{ position: "absolute", left: 225 - 105, top: 640, width: 210, height: 34, borderRadius: "50%", background: dark ? "rgba(0,0,0,.45)" : "rgba(20,30,60,.18)", filter: "blur(8px)" }} />
+      <div style={{ position: "absolute", left: 225 - S / 2, top: 254 + float, width: S, height: S, transform: `scale(${kick})`, transformOrigin: "50% 80%", filter: "drop-shadow(0 18px 26px rgba(10,20,50,.28))" }}>
+        <SyncedVideo t={t} duration={DURATION} webm={FACE_VIDEO.webm} style={{ objectFit: "contain" }} />
+      </div>
     </>
   );
 }
