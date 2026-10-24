@@ -1621,7 +1621,7 @@ function BioScene({ t }) {
         {/* perfil */}
         <div style={{ position: "absolute", inset: 0, transform: `translateX(${-toPost * 100}%)` }}>
           <div style={{ ...abs(20, 24, 84, 84), borderRadius: "50%", padding: 4, background: GRAD }}>
-            <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#D1D1D1", overflow: "hidden" }}><img src={EMO["01_neutro_focado"]} alt="" style={{ width: "112%", height: "112%", maxWidth: "none", marginLeft: "-6%", marginTop: "-2%" }} /></div>
+            <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: C.night, display: "grid", placeItems: "center" }}><CubeLogo size={46} glow={0.6} /></div>
           </div>
           <div style={{ ...abs(120, 34, 240, 60), display: "flex", justifyContent: "space-around", fontFamily: FONT, color: C.ink, textAlign: "center", lineHeight: 1.2 }}>
             {[["128", "posts"], ["3,4 mil", "seguidores"], ["180", "seguindo"]].map(([a, b]) => <div key={b}><div style={{ fontWeight: 800, fontSize: 16 }}>{a}</div><div style={{ fontWeight: 600, fontSize: 11, color: C.slate }}>{b}</div></div>)}
