@@ -9,6 +9,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
 | Roda Cultural do CDC: navegação no site com zoom e efeitos | 22,5s | 16:9 e 9:16 | `roda-cultural/edit.py` (captura no zip da raiz) | `dist/roda-cultural-site-16x9.mp4`, `dist/roda-cultural-site-9x16.mp4` |
+| "Quanto você lucrou?" (sistema de estoque/PDV, UI motion) | 22s | 9:16 | `src/LucroAd.jsx` + `src/lucro/` | `dist/quanto-voce-lucrou-9x16.mp4` |
 | "Tem site?" (historinha com o Emoji Primordial 3D) | 21,5s | 9:16 | `src/EmojiStoryAd.jsx` + `src/emojiStory/` | `dist/tem-site-emoji-9x16.mp4` |
 | "WhatsApp no automático" (UI motion, 3 opções de texto) | 9,2s | 16:9 e 9:16 | `src/AutoPilotAd.jsx` + `src/autopilot/` | `dist/whatsapp-automatico-opcao{1,2,3}-16x9.mp4`, `dist/whatsapp-automatico-opcao{1,2,3}-9x16.mp4` |
 | "Venda 24h" (só tipografia, 3 opções de texto) | 9,5s | 9:16 | `src/WordsAd.jsx` + `src/words/` | `dist/venda-24h-opcao1-9x16.mp4`, `dist/venda-24h-opcao2-9x16.mp4`, `dist/venda-24h-opcao3-9x16.mp4` |
@@ -28,6 +29,24 @@ Biblioteca do **Emoji Primordial 3D** (36 feições, 12 animações, documentaç
 Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver [`trailer-temporada1/`](trailer-temporada1/).
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## "Quanto você lucrou?" (LucroAd)
+
+Reels da Ideia 3 do guia de vídeos: UI motion com tipografia cinética para o sistema de estoque, PDV e financeiro. Os valores são ilustrativos.
+
+| Tempo | Cena |
+|---|---|
+| 0–2s | "QUANTO VOCÊ VENDEU?", palavra por palavra |
+| 2s | Risco vermelho e glitch: vira "LUCROU?", no drop da "Miami" |
+| 3–5s | Caderninho rasurado escrito à mão, com luz quente, e as etiquetas "caixa: ???" e "estoque: acho que 8" |
+| 5–6s | O cubo da marca suga o caderno |
+| 6–9s | Bento do sistema, com PDV, estoque, fluxo de caixa, reposição e lucro |
+| 9–13s | O cursor clica em "Vender": venda registrada → estoque 8 → 7 → caixa + R$ 89,90 ("vendeu → baixou → somou.") |
+| 13–16s | Zoom no lucro, que conta até R$ 18.430 |
+| 16–19s | "SEM PLANILHA. SEM CADERNINHO. SEM ACHISMO." |
+| 19–22s | Logo e "comenta CONTROLE" |
+
+Cada ação tem o seu efeito sonoro. As fontes Caveat e Space Mono (OFL) ficam embutidas em `src/lucro/fonts.js`.
 
 ## "Tem site?" (EmojiStoryAd)
 
