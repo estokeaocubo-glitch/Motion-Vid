@@ -57,7 +57,8 @@ def smooth_path(mask):
     return "".join(d) + "Z"
 
 
-def build(path):
+def build(path, max_px=None, quality=90):
+    """max_px: lado máximo da imagem embutida (o contorno continua vetorial no tamanho original)."""
     a = np.asarray(Image.open(path).convert("RGB")).astype(np.float32)
     dist = np.abs(a - BG).max(-1)
     mask = ndimage.binary_erosion(face_mask(dist), iterations=3)
@@ -84,7 +85,10 @@ def build(path):
     _, (iy, ix) = ndimage.distance_transform_edt(~ndimage.binary_erosion(cm, iterations=1), return_indices=True)
     canvas = canvas[iy, ix]
     buf = io.BytesIO()
-    Image.fromarray(canvas.clip(0, 255).astype(np.uint8)).save(buf, "WEBP", quality=90, method=6)
+    im = Image.fromarray(canvas.clip(0, 255).astype(np.uint8))
+    if max_px and side > max_px:
+        im = im.resize((max_px, max_px), Image.LANCZOS)
+    im.save(buf, "WEBP", quality=quality, method=6)
     img = base64.b64encode(buf.getvalue()).decode()
     d = smooth_path(cm)
     return (f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 {side} {side}" width="{side}" height="{side}">'

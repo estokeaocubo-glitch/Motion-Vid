@@ -9,6 +9,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
 | Roda Cultural do CDC: navegação no site com zoom e efeitos | 22,5s | 16:9 e 9:16 | `roda-cultural/edit.py` (captura no zip da raiz) | `dist/roda-cultural-site-16x9.mp4`, `dist/roda-cultural-site-9x16.mp4` |
+| "Tem site?" (historinha com o Emoji Primordial 3D) | 21,5s | 9:16 | `src/EmojiStoryAd.jsx` + `src/emojiStory/` | `dist/tem-site-emoji-9x16.mp4` |
 | "WhatsApp no automático" (UI motion, 3 opções de texto) | 9,2s | 16:9 e 9:16 | `src/AutoPilotAd.jsx` + `src/autopilot/` | `dist/whatsapp-automatico-opcao{1,2,3}-16x9.mp4`, `dist/whatsapp-automatico-opcao{1,2,3}-9x16.mp4` |
 | "Venda 24h" (só tipografia, 3 opções de texto) | 9,5s | 9:16 | `src/WordsAd.jsx` + `src/words/` | `dist/venda-24h-opcao1-9x16.mp4`, `dist/venda-24h-opcao2-9x16.mp4`, `dist/venda-24h-opcao3-9x16.mp4` |
 | "Site é oxigênio" (Reels narrado) | 55,2s | 9:16 | `src/OxigenioAd.jsx` + `src/oxi/` | `dist/site-oxigenio-9x16.mp4` |
@@ -27,6 +28,26 @@ Biblioteca do **Emoji Primordial 3D** (36 feições, 12 animações, documentaç
 Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver [`trailer-temporada1/`](trailer-temporada1/).
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## "Tem site?" (EmojiStoryAd)
+
+É uma historinha contada só com as variações 3D do Emoji Primordial (`EMOJI_PRIMORDIAL/06_VARIACOES_3D`). Cada cena tem uma expressão:
+
+1. segunda sem venda (tédio)
+2. "vocês têm site?" (choque)
+3. "é… só pelo direct" (sorriso forçado)
+4. visualizou e sumiu (quase chorando)
+5. o concorrente vendendo (julgando de lado)
+6. chama a Estoke ao Cubo (teve ideia)
+7. site no ar (confiante)
+8. 3h da manhã (sonolento)
+9. Pix caindo (derretido)
+10. agora (nariz empinado) e o card "site que vende 24h"
+
+- **Ritmo:** a expressão troca a cada compasso do "BAILAR" (o drop em 2,02s cai no "vocês têm site?"), com um pop que achata e volta com mola.
+- **Legenda:** entra palavra por palavra.
+- **Efeitos:** um por cena (balões de conversa, "+1 pedido", chip da Estoke ao Cubo, navegador com a loja da Dizzy e notificações de Pix), cada um com o seu som.
+- **Feições:** ficam com contorno vetorial (sem borda branca). São geradas por `python3 scripts/build-emoji-story-assets.py` em `src/emojiStory/faces.js`.
 
 ## Posts do Instagram (`posts-insta/`)
 
