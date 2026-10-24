@@ -8,7 +8,7 @@
   (produto com fundo claro, ciclo em azul escuro, card de dados em vidro, foto com
   camadas de vidro, lançamento de site com notebook).
   Prints: gravações e capturas dos sites feitos pela Estoke ao Cubo (img/sites).
-  Emojis 3D: Fluent Emoji da Microsoft, licença MIT (img/emoji).
+  Emojis: as feições do Emoji Primordial da Estoke ao Cubo (EMOJI_PRIMORDIAL), recortadas em img/face por cutout_faces.py.
   Gerar os PNGs: node posts-insta/render.cjs  →  posts-insta/out/
 -->
 <style>
@@ -24,7 +24,7 @@
   body { background: #777; font-family: "Open Sauce Sans", system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; gap: 40px; padding: 40px 0; }
   .post { width: 1080px; height: 1350px; position: relative; overflow: hidden; flex: none; }
   .abs { position: absolute; }
-  .emo { position: absolute; filter: drop-shadow(0 18px 24px rgba(0, 20, 60, .28)); }
+  .emo { position: absolute; filter: drop-shadow(0 16px 22px rgba(0, 15, 40, .35)); }
   .disp { font-family: "EAC Display", "Open Sauce Sans", sans-serif; text-transform: uppercase; }
   .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 30px; letter-spacing: -0.01em; }
   .brand img { width: 40px; height: 44px; }
@@ -69,8 +69,8 @@
     <div style="width: 54px; height: 6px; border-radius: 3px; background: #4FB3E8; margin-bottom: 26px;"></div>
     Rápido no celular, bonito de verdade e com orçamento direto no WhatsApp.
   </div>
-  <img class="emo" src="img/emoji/rocket.webp" style="width: 170px; right: 70px; top: 520px; transform: rotate(8deg);">
-  <img class="emo" src="img/emoji/sparkles.webp" style="width: 110px; left: 60px; top: 600px;">
+  <img class="emo" src="img/face/03_sorriso_largo_feliz.webp" style="width: 221px; right: 70px; top: 520px; transform: rotate(8deg);">
+  <img class="emo" src="img/face/06_piscadinha_wink_direito.webp" style="width: 143px; left: 60px; top: 600px;">
 </section>
 
 <!-- 02 · O combo que vende (ref. Volutech) -->
@@ -88,14 +88,14 @@
     <div class="bar"><i></i><i></i><i></i><span>Dizzy House Shop · loja virtual</span></div>
     <img class="shot" src="img/sites/dizzy-shop.jpg">
   </div>
-  <img class="emo" src="img/emoji/cart.webp" style="width: 230px; left: 70px; top: 760px; transform: rotate(-10deg);">
-  <img class="emo" src="img/emoji/moneybag.webp" style="width: 190px; right: 120px; top: 410px; transform: rotate(10deg);">
+  <img class="emo" src="img/face/35_estrategista_maos_piramide.webp" style="width: 299px; left: 70px; top: 760px; transform: rotate(-10deg);">
+  <img class="emo" src="img/face/04_sorriso_maroto_smirk_dir.webp" style="width: 247px; right: 120px; top: 410px; transform: rotate(10deg);">
   <div class="abs" style="right: 110px; top: 800px; width: 250px; height: 250px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.85), rgba(225,230,255,.55) 60%, rgba(120,140,255,.45)); border: 2px solid rgba(255,255,255,.95); backdrop-filter: blur(14px); box-shadow: 0 30px 60px rgba(40,60,200,.3); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-shadow: 0 2px 12px rgba(30,40,140,.35);">
     <div style="font-weight: 800; font-size: 96px; letter-spacing: -0.04em; line-height: 1;">24h</div>
     <div style="font-weight: 700; font-size: 24px; margin-top: 4px;">vendendo</div>
   </div>
   <div class="abs" style="top: 1090px; width: 100%; text-align: center; font-size: 36px; line-height: 1.35; color: #3B4472; letter-spacing: -0.015em;">
-    Site profissional <b style="color: #2D3FD0;">+ loja virtual + WhatsApp</b><br>no automático. Tudo pronto pra vender. 🛒
+    Site profissional <b style="color: #2D3FD0;">+ loja virtual + WhatsApp</b><br>no automático. Tudo pronto pra vender.
   </div>
   <div class="abs brand" style="bottom: 70px; width: 100%; justify-content: center; color: #1D2560;"><img src="img/cube-logo.webp">estoke ao cubo</div>
 </section>
@@ -123,10 +123,10 @@
     <div style="font-weight: 600; font-size: 28px; margin-top: 18px; letter-spacing: .02em; color: #CFE2FF;">a Estoke ao Cubo resolve</div>
     <img src="img/cube-logo.webp" style="width: 56px; margin-top: 18px;">
   </div>
-  <div class="pill" style="left: 90px; top: 380px; background: linear-gradient(180deg, #2F8CFF, #1767E0); color: #04122A; box-shadow: 0 10px 30px rgba(20,110,255,.45);"><img src="img/emoji/thinking.webp">Sem site</div>
-  <div class="pill" style="right: 40px; top: 790px; background: linear-gradient(180deg, #2F8CFF, #1767E0); color: #04122A; box-shadow: 0 10px 30px rgba(20,110,255,.45);"><img src="img/emoji/eyes.webp">Cliente não te acha</div>
-  <div class="pill" style="left: 120px; top: 960px; background: linear-gradient(180deg, #2F8CFF, #1767E0); color: #04122A; box-shadow: 0 10px 30px rgba(20,110,255,.45);"><img src="img/emoji/flyingmoney.webp">Venda perdida</div>
-  <div class="abs" style="bottom: 120px; width: 100%; text-align: center; color: #fff; font-size: 34px; font-weight: 600; letter-spacing: -0.01em;">Quebre o ciclo: site que aparece e vende. 👉 chama no direct</div>
+  <div class="pill" style="left: 90px; top: 380px; background: linear-gradient(180deg, #2F8CFF, #1767E0); color: #04122A; box-shadow: 0 10px 30px rgba(20,110,255,.45);"><img src="img/face/16_pensativo_olhando_cima.webp">Sem site</div>
+  <div class="pill" style="right: 40px; top: 790px; background: linear-gradient(180deg, #2F8CFF, #1767E0); color: #04122A; box-shadow: 0 10px 30px rgba(20,110,255,.45);"><img src="img/face/10_desconfiado_side_eye_dir.webp">Cliente não te acha</div>
+  <div class="pill" style="left: 120px; top: 960px; background: linear-gradient(180deg, #2F8CFF, #1767E0); color: #04122A; box-shadow: 0 10px 30px rgba(20,110,255,.45);"><img src="img/face/14_triste_desapontado.webp">Venda perdida</div>
+  <div class="abs" style="bottom: 120px; width: 100%; text-align: center; color: #fff; font-size: 34px; font-weight: 600; letter-spacing: -0.01em;">Quebre o ciclo: site que aparece e vende. Chama no direct!</div>
 </section>
 
 <!-- 04 · Card 24/7 (ref. Conversion rate) -->
@@ -140,15 +140,15 @@
       <path d="M0 400 C 120 360, 200 430, 300 400 C 360 380, 360 120, 430 120 C 500 120, 500 380, 580 390 C 660 400, 720 370, 800 380" fill="none" stroke="url(#ln)" stroke-width="9"/>
       <circle cx="430" cy="120" r="30" fill="#8FB8FF" opacity=".35"/><circle cx="430" cy="120" r="17" fill="#E7F0FF"/>
     </svg>
-    <div class="abs" style="left: 470px; top: 170px; display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 16px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); color: #fff; font-weight: 700; font-size: 24px;"><img src="img/emoji/moneybag.webp" style="width: 40px;">Novo pedido · 03:15</div>
+    <div class="abs" style="left: 470px; top: 170px; display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 16px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); color: #fff; font-weight: 700; font-size: 24px;"><img src="img/face/03_sorriso_largo_feliz.webp" style="width: 40px;">Novo pedido · 03:15</div>
     <div class="abs" style="top: 640px; width: 100%; text-align: center; color: #fff;">
       <div style="font-size: 38px; color: #C9D6EA; font-weight: 600;">Seu site vendendo</div>
       <div style="font-weight: 700; font-size: 220px; letter-spacing: -0.05em; line-height: 1; margin-top: 6px;">24/7</div>
       <div style="font-size: 26px; color: #9FB0CB; margin-top: 10px;">inclusive enquanto você dorme</div>
     </div>
   </div>
-  <img class="emo" src="img/emoji/moon.webp" style="width: 150px; left: 40px; top: 30px; transform: rotate(-12deg); filter: drop-shadow(0 0 40px rgba(255,210,90,.35));">
-  <img class="emo" src="img/emoji/sleeping.webp" style="width: 150px; right: 70px; top: 1080px; filter: drop-shadow(0 20px 30px rgba(0,0,0,.5));">
+  <img class="emo" src="img/face/12_surpreso_uau_chocado.webp" style="width: 195px; left: 40px; top: 30px; transform: rotate(-12deg); filter: drop-shadow(0 0 40px rgba(255,210,90,.35));">
+  <img class="emo" src="img/face/08_olhos_fechados_zen.webp" style="width: 195px; right: 70px; top: 1080px; filter: drop-shadow(0 20px 30px rgba(0,0,0,.5));">
   <div class="abs brand" style="bottom: 60px; left: 0; width: 100%; justify-content: center; color: #fff;"><img src="img/cube-logo.webp">estoke ao cubo</div>
 </section>
 
@@ -162,29 +162,29 @@
   <div class="browser" style="left: 170px; top: 510px; width: 740px;"><div class="bar"><i></i><i></i><i></i><span>Kairós Streetwear</span></div><img class="shot" src="img/sites/kairos.jpg"></div>
   <div class="browser" style="left: 60px; top: 800px; width: 420px; transform: rotate(-5deg);"><div class="bar"><i></i><i></i><i></i><span>Dizzy House Studio</span></div><img class="shot" src="img/sites/dizzy-enter.jpg"></div>
   <div class="browser" style="right: 50px; top: 840px; width: 420px; transform: rotate(5deg);"><div class="bar"><i></i><i></i><i></i><span>K-Dust</span></div><img class="shot" src="img/sites/kdust.jpg"></div>
-  <img class="emo" src="img/emoji/fire.webp" style="width: 150px; left: 70px; top: 330px; transform: rotate(-10deg);">
-  <div class="abs" style="left: 70px; bottom: 90px; color: #fff; font-size: 32px; font-weight: 600;">Petrópolis · RJ 📍</div>
-  <div class="abs" style="right: 70px; bottom: 80px; color: #fff; font-size: 34px; font-weight: 800; display: flex; align-items: center; gap: 10px;">orçamento no direct <img src="img/emoji/pointing.webp" style="width: 52px;"></div>
+  <img class="emo" src="img/face/09_sobrancelha_arqueada_rock.webp" style="width: 195px; left: 70px; top: 330px; transform: rotate(-10deg);">
+  <div class="abs" style="left: 70px; bottom: 90px; color: #fff; font-size: 32px; font-weight: 600;">Petrópolis · RJ</div>
+  <div class="abs" style="right: 70px; bottom: 80px; color: #fff; font-size: 34px; font-weight: 800; display: flex; align-items: center; gap: 10px;">orçamento no direct <img src="img/face/07_piscadinha_wink_esquerdo.webp" style="width: 52px;"></div>
 </section>
 
 <!-- 06 · Feitos pela Estoke ao Cubo (portfólio) -->
 <section class="post" id="06-feitos-pela-estoke" style="background: linear-gradient(180deg, #F5F9FD, #DCEBF8);">
   <div class="abs" style="top: 64px; width: 100%; text-align: center;">
     <div style="font-weight: 800; font-size: 28px; letter-spacing: .14em; color: var(--blue);">PORTFÓLIO</div>
-    <div style="font-weight: 800; font-size: 80px; line-height: 1; letter-spacing: -0.045em; color: var(--ink); margin-top: 14px;">Feitos pela<br>Estoke ao Cubo <img src="img/emoji/fire.webp" style="width: 84px; vertical-align: -6px;"></div>
+    <div style="font-weight: 800; font-size: 80px; line-height: 1; letter-spacing: -0.045em; color: var(--ink); margin-top: 14px;">Feitos pela<br>Estoke ao Cubo <img src="img/face/35_estrategista_maos_piramide.webp" style="width: 84px; vertical-align: -6px;"></div>
   </div>
   <div class="abs portfolio" style="left: 110px; top: 330px; width: 860px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px 30px;">
     <!-- cada card: print + nome + emoji -->
-    <div style="position: relative;"><div class="browser" style="position: relative; width: 100%;"><div class="bar"><i></i><i></i><i></i><span>Dizzy House Shop</span></div><img class="shot" src="img/sites/dizzy-shop.jpg"></div><img class="emo" src="img/emoji/crown.webp" style="width: 90px; right: -16px; top: -26px; transform: rotate(10deg);"></div>
-    <div style="position: relative;"><div class="browser" style="position: relative; width: 100%;"><div class="bar"><i></i><i></i><i></i><span>LCS Transporte e Turismo</span></div><img class="shot" src="img/sites/lcs-hero.jpg"></div><img class="emo" src="img/emoji/bus.webp" style="width: 90px; right: -16px; top: -26px; transform: rotate(10deg);"></div>
-    <div style="position: relative;"><div class="browser" style="position: relative; width: 100%;"><div class="bar"><i></i><i></i><i></i><span>Loja Arteiro</span></div><img class="shot" src="img/sites/arteiro.jpg"></div><img class="emo" src="img/emoji/palette.webp" style="width: 90px; right: -16px; top: -26px; transform: rotate(10deg);"></div>
-    <div style="position: relative;"><div class="browser" style="position: relative; width: 100%;"><div class="bar"><i></i><i></i><i></i><span>K-Dust</span></div><img class="shot" src="img/sites/kdust.jpg"></div><img class="emo" src="img/emoji/fire.webp" style="width: 90px; right: -16px; top: -26px; transform: rotate(10deg);"></div>
-    <div style="position: relative;"><div class="browser" style="position: relative; width: 100%;"><div class="bar"><i></i><i></i><i></i><span>Ruppel Streetwear</span></div><img class="shot" src="img/sites/ruppel.jpg"></div><img class="emo" src="img/emoji/bolt.webp" style="width: 90px; right: -16px; top: -26px; transform: rotate(10deg);"></div>
-    <div style="position: relative;"><div class="browser" style="position: relative; width: 100%;"><div class="bar"><i></i><i></i><i></i><span>Kairós Streetwear</span></div><img class="shot" src="img/sites/kairos.jpg"></div><img class="emo" src="img/emoji/gem.webp" style="width: 90px; right: -16px; top: -26px; transform: rotate(10deg);"></div>
+    <div style="position: relative;"><div class="browser" style="position: relative; width: 100%;"><div class="bar"><i></i><i></i><i></i><span>Dizzy House Shop</span></div><img class="shot" src="img/sites/dizzy-shop.jpg"></div><img class="emo" src="img/face/04_sorriso_maroto_smirk_dir.webp" style="width: 90px; right: -16px; top: -26px; transform: rotate(10deg);"></div>
+    <div style="position: relative;"><div class="browser" style="position: relative; width: 100%;"><div class="bar"><i></i><i></i><i></i><span>LCS Transporte e Turismo</span></div><img class="shot" src="img/sites/lcs-hero.jpg"></div><img class="emo" src="img/face/32_angulo_3d_25_dir_sorriso.webp" style="width: 90px; right: -16px; top: -26px; transform: rotate(10deg);"></div>
+    <div style="position: relative;"><div class="browser" style="position: relative; width: 100%;"><div class="bar"><i></i><i></i><i></i><span>Loja Arteiro</span></div><img class="shot" src="img/sites/arteiro.jpg"></div><img class="emo" src="img/face/12_surpreso_uau_chocado.webp" style="width: 90px; right: -16px; top: -26px; transform: rotate(10deg);"></div>
+    <div style="position: relative;"><div class="browser" style="position: relative; width: 100%;"><div class="bar"><i></i><i></i><i></i><span>K-Dust</span></div><img class="shot" src="img/sites/kdust.jpg"></div><img class="emo" src="img/face/09_sobrancelha_arqueada_rock.webp" style="width: 90px; right: -16px; top: -26px; transform: rotate(10deg);"></div>
+    <div style="position: relative;"><div class="browser" style="position: relative; width: 100%;"><div class="bar"><i></i><i></i><i></i><span>Ruppel Streetwear</span></div><img class="shot" src="img/sites/ruppel.jpg"></div><img class="emo" src="img/face/33_inclinado_desconfiado_original.webp" style="width: 90px; right: -16px; top: -26px; transform: rotate(10deg);"></div>
+    <div style="position: relative;"><div class="browser" style="position: relative; width: 100%;"><div class="bar"><i></i><i></i><i></i><span>Kairós Streetwear</span></div><img class="shot" src="img/sites/kairos.jpg"></div><img class="emo" src="img/face/03_sorriso_largo_feliz.webp" style="width: 90px; right: -16px; top: -26px; transform: rotate(10deg);"></div>
   </div>
   <div class="abs" style="bottom: 70px; left: 60px; right: 60px; display: flex; align-items: center; justify-content: space-between; color: var(--ink);">
     <div class="brand"><img src="img/cube-logo.webp">estoke ao cubo</div>
-    <div style="font-size: 30px; font-weight: 700; color: var(--slate);">o próximo pode ser o seu 👀</div>
+    <div style="font-size: 30px; font-weight: 700; color: var(--slate);">o próximo pode ser o seu</div>
   </div>
 </section>
 
@@ -204,8 +204,8 @@
     <div style="width: 54px; height: 6px; border-radius: 3px; background: #fff; margin-bottom: 24px;"></div>
     Streetwear original. Drop 01 com lista VIP e cupom pra quem chegar primeiro.
   </div>
-  <img class="emo" src="img/emoji/tshirt.webp" style="width: 170px; right: 60px; top: 460px; transform: rotate(14deg);">
-  <img class="emo" src="img/emoji/bolt.webp" style="width: 120px; left: 70px; top: 590px; transform: rotate(-8deg);">
+  <img class="emo" src="img/face/12_surpreso_uau_chocado.webp" style="width: 221px; right: 60px; top: 460px; transform: rotate(14deg);">
+  <img class="emo" src="img/face/31_angulo_3d_45_dir_tres_quartos.webp" style="width: 156px; left: 70px; top: 590px; transform: rotate(-8deg);">
 </section>
 
 <!-- 08 · Lançamento: Arteiro (ref. Volutech, com o print no centro) -->
@@ -217,11 +217,11 @@
     <div style="font-weight: 800; font-size: 150px; line-height: 1; background: linear-gradient(90deg, #F6C66B, #FFE9B8, #E7A93F); -webkit-background-clip: text; background-clip: text; color: transparent;">vem aí</div>
   </div>
   <div class="browser" style="left: 140px; top: 470px; width: 800px;"><div class="bar"><i></i><i></i><i></i><span>Loja Arteiro · arte popular brasileira</span></div><img class="shot" src="img/sites/arteiro.jpg"></div>
-  <img class="emo" src="img/emoji/palette.webp" style="width: 200px; left: 50px; top: 360px; transform: rotate(-12deg);">
-  <img class="emo" src="img/emoji/hourglass.webp" style="width: 150px; right: 70px; top: 880px; transform: rotate(10deg);">
-  <img class="emo" src="img/emoji/sparkles.webp" style="width: 110px; right: 110px; top: 380px;">
+  <img class="emo" src="img/face/34_inclinado_curioso_esquerda.webp" style="width: 260px; left: 50px; top: 360px; transform: rotate(-12deg);">
+  <img class="emo" src="img/face/16_pensativo_olhando_cima.webp" style="width: 195px; right: 70px; top: 880px; transform: rotate(10deg);">
+  <img class="emo" src="img/face/06_piscadinha_wink_direito.webp" style="width: 143px; right: 110px; top: 380px;">
   <div class="abs" style="top: 1060px; width: 100%; text-align: center; font-size: 36px; line-height: 1.35; color: #E9DCC6; letter-spacing: -0.015em;">
-    Arte popular brasileira e marcenaria nobre.<br><b style="color: #F6C66B;">A loja online da Arteiro está chegando.</b> ✨
+    Arte popular brasileira e marcenaria nobre.<br><b style="color: #F6C66B;">A loja online da Arteiro está chegando.</b>
   </div>
   <div class="abs" style="bottom: 70px; width: 100%; text-align: center; font-size: 28px; font-weight: 700; color: #B8A88C;">desde 1978 · Itaipava / RJ</div>
 </section>
