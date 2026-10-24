@@ -1,6 +1,8 @@
 import React from "react";
 import { FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer } from "./motionKit";
-import { MUSIC_CHROME } from "./audio/chromeRef";
+import { MUSIC_SAAS } from "./audio/miamiSaas";
+import { SFX, SFX_PEAK } from "./audio/sfx";
+import { SFXV, SFXV_PEAK } from "./audio/sfxVo";
 
 /* =============================================================================
    Estoke ao Cubo — "Site no navegador" (16:9 e 9:16, 17,2s)
@@ -11,7 +13,8 @@ import { MUSIC_CHROME } from "./audio/chromeRef";
    fundo amarelo com o zigue-zague verde e os prints do site em colagem → nome do cliente →
    fundo preto com a logo da LCS e "site por Estoke ao Cubo".
    O ícone do navegador é genérico (globo), não a marca de um navegador específico.
-   Áudio e tempos: os da própria referência (cortes medidos quadro a quadro).
+   Tempos: os da própria referência (cortes medidos quadro a quadro). O áudio da referência veio
+   praticamente mudo, então o som é a "Miami" (drop no círculo verde) e um efeito por ação.
 ============================================================================= */
 const DURATION = 17.2;
 const T = { dock: 0.55, click: 1.85, green: 2.07, blue: 3.38, ring: 3.5, pill: 3.95, type: 4.3, up: 5.05, win: 5.35, yellow: 12.3, collage: 13.2, name: 15.0, black: 16.3 };
@@ -253,11 +256,32 @@ function Frame({ t, format = "16x9" }) {
 }
 
 /* =============================================================================
-   Som — o áudio original da referência, inteiro.
+   Som — "Miami" com o drop no círculo verde (2,07s) e um efeito para cada ação.
 ============================================================================= */
-const SAMPLES = { music: MUSIC_CHROME.chromeRef };
+const MUSIC_OFF = 8.96 - T.green; // drop do trecho em 8,96s
+const SAMPLES = { music: MUSIC_SAAS.miamiSaas, ...SFX, ...SFXV };
+const PEAK = { ...SFX_PEAK, ...SFXV_PEAK };
 function buildEvents() {
-  return [{ t: 0, dur: DURATION, fn: (A, w, off = 0) => A.sample("music", w, { off, dur: DURATION - off, gain: 1, fadeIn: 0.005 }) }];
+  const ev = [];
+  const fx = (at, name, gain, opts = {}) => ev.push({ t: Math.max(0, at - (PEAK[name] || 0) / (opts.rate || 1)), fn: (A, w) => A.sample(name, w, { gain, ...opts }) });
+  ev.push({ t: 0, dur: DURATION, fn: (A, w, off = 0) => A.sample("music", w, { off: MUSIC_OFF + off, dur: DURATION - off, gain: 0.5, fadeIn: 0.05,
+    env: [[0, 0.55], [2.0, 0.55], [2.07, 1], [T.black - 0.1, 1], [T.black, 0.6], [DURATION - 0.4, 0.6], [DURATION, 0]] }) });
+  fx(T.dock, "lightPop", 0.12);
+  DOCK.forEach((_, i) => fx(T.dock + 0.08 + i * 0.07, "bubblePop", 0.07, { rate: 1 + i * 0.07 }));
+  fx(1.5, "smallSweep", 0.05);
+  fx(T.click, "mouseClick", 0.2);
+  fx(T.green, "zoomImpact", 0.16); fx(T.green + 0.05, "airWhoosh", 0.1);
+  fx(T.blue, "windSwoosh", 0.12);
+  fx(T.ring, "techSlide", 0.08);
+  fx(T.type, "typing", 0.12, { dur: T.up - T.type - 0.1 });
+  fx(T.up, "confirm", 0.08);
+  fx(T.win, "airSweep", 0.12); fx(T.win + 0.1, "hardPop", 0.1);
+  [7.5, 8.9, 9.9, 10.9, 11.6].forEach((at, i) => fx(at, "dryPop", 0.07, { rate: 1 + (i % 3) * 0.06 }));
+  fx(T.yellow, "windSwoosh", 0.12);
+  [0, 1, 2, 3, 4, 5, 6].forEach((i) => fx(T.collage + i * 0.16, "shutter", 0.06, { rate: 1 + (i % 3) * 0.05 }));
+  fx(T.name, "airWhoosh", 0.1); fx(T.name + 0.15, "sparkleTouch", 0.1);
+  fx(T.black, "logoImpact", 0.16);
+  return ev;
 }
 const EVENTS = buildEvents();
 const renderWav = () => renderEventsWav(EVENTS, DURATION, { samples: SAMPLES });

@@ -33,7 +33,7 @@ Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver 
 
 ## "Site no navegador" (ChromeSiteAd)
 
-Refaz a referência do navegador com um site nosso, o da LCS Transporte e Turismo. Os tempos e o áudio são os originais da referência.
+Refaz a referência do navegador com um site nosso, o da LCS Transporte e Turismo. Os tempos são os da referência. O áudio original dela veio praticamente mudo, então o som é a "Miami", com o drop no círculo verde, e um efeito para cada ação.
 
 | Tempo | Cena |
 |---|---|
