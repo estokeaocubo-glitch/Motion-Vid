@@ -9,6 +9,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
 | Roda Cultural do CDC: navegação no site com zoom e efeitos | 22,5s | 16:9 e 9:16 | `roda-cultural/edit.py` (captura no zip da raiz) | `dist/roda-cultural-site-16x9.mp4`, `dist/roda-cultural-site-9x16.mp4` |
+| "Carrossel de sites" (cover flow 3D, loop) | 14s | 4:5 e 9:16 | `src/CoverflowAd.jsx` + `dist/media/coverflow/` | `dist/carrossel-sites-4x5.mp4`, `dist/carrossel-sites-9x16.mp4` |
 | "Site no navegador" (LCS, refeito da referência do navegador) | 18,8s | 16:9 e 9:16 | `src/ChromeSiteAd.jsx` + `dist/media/chrome/` | `dist/site-no-navegador-16x9.mp4`, `dist/site-no-navegador-9x16.mp4` |
 | "Quanto você lucrou?" (sistema de estoque/PDV, UI motion) | 22s | 9:16 | `src/LucroAd.jsx` + `src/lucro/` | `dist/quanto-voce-lucrou-9x16.mp4` |
 | "Tem site?" (historinha com o Emoji Primordial 3D) | 21,5s | 9:16 | `src/EmojiStoryAd.jsx` + `src/emojiStory/` | `dist/tem-site-emoji-9x16.mp4` |
@@ -30,6 +31,18 @@ Biblioteca do **Emoji Primordial 3D** (36 feições, 12 animações, documentaç
 Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver [`trailer-temporada1/`](trailer-temporada1/).
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## "Carrossel de sites" (CoverflowAd)
+
+Refaz a referência do carrossel em perspectiva com os sites que fizemos.
+
+| Tempo | Cena |
+|---|---|
+| 0–5s | Fundo cinza-claro. O card de vidro escuro com "Sites que vendem o dia todo" respira no centro, com o reflexo desfocado atrás |
+| 5s | O card ganha o degradê azul da marca e abre um carrossel 3D (cover flow) que gira card a card: Dizzy House, LCS Turismo, Arteiro, K-Dust, Ruppel e Kairós, com a paginação embaixo |
+| 12,8–14s | Volta ao card do título e fecha o loop |
+
+A referência veio sem áudio. O som é a "Alexa 2", com o drop no início do carrossel, e um swoosh a cada giro.
 
 ## "Site no navegador" (ChromeSiteAd)
 
