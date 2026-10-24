@@ -832,9 +832,10 @@ function Big({ t, at, children, y, color = CREAM, size = 96, glow }) {
 /* ---------- conteúdo do player (área 380×280) ---------- */
 function Countdown({ t }) {
   if (t >= T.ficou) return null;
-  const left = Math.max(0, T.sale - t);
+  // a contagem dura exatamente 5s (de 1s a 6s); antes disso o 5,00 fica parado com o botão pulsando
+  const left = Math.min(5, Math.max(0, T.sale - t));
   const shown = left.toFixed(2).replace(".", ",");
-  const ring = clamp(1 - left / T.sale);
+  const ring = clamp(1 - left / 5);
   const sold = t >= T.sale;
   const sp = pop(t, T.sale, 300, 13);
   const press = t >= T.sale - 0.12 && t < T.sale + 0.08;
