@@ -42,6 +42,14 @@ Os tempos de cada palavra saem da transcrição com faster-whisper, revisada à 
   - "Loja do Zé!!!" amadora, com teia e preço só no direct, contra o concorrente bonito, com as vendas indo para ele.
   - A virada para "Sua loja ✓", com o carimbo PRO.
   - O perfil com "LINK NA BIO", a mãozinha no comentário com "EU QUERO" pulsando, a logo e "SAI DO AMADORISMO.".
+- **Protagonista:** o Emoji Primordial (`EMOJI_PRIMORDIAL/`) reage à narração com as feições e animações 3D da biblioteca.
+  - Grava o Reels dentro do celular, usa o filtro de cachorrinho e balança a cabeça dizendo "não" no "NADA.".
+  - Revira os olhos no direct, olha desconfiado no "2026" e acena "sim" no "oxigênio".
+  - Dorme no travesseiro, faz as mãos de estrategista no "profissionalizar" e segura o coração no "EU QUERO".
+  - Vira para sorrir na logo e pisca no final.
+  - Os recortes saem de `python3 scripts/build-oxi-assets.py`, com o mesmo método de recorte da engine da biblioteca e a borda descontaminada do cinza.
+- **Objetos 3D:** vêm do Fluent Emoji da Microsoft (licença MIT): robô, relógio, moedas, cartão, saco de dinheiro, estourador de festa, sino, lua, Zzz, grilo, teia, lupa, ampulheta, câmera, X e a mãozinha.
+- **Profundidade:** celulares, navegador e maquininha aparecem inclinados em 3D, com espessura e reflexo.
 - **Som:** narração por cima de tudo e a trilha "DISTANCE" baixa por baixo.
   - A trilha some no "Nada." (só os grilos) e baixa no "Em pleno 2026".
   - Efeitos em cada ação: obturador, digitação, cliques, pops do direct, impactos, carimbos, tique-taque, moedas da venda, corneta do confete, ronco e sininhos de venda.

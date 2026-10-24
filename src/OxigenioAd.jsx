@@ -1,8 +1,9 @@
 import React from "react";
 import {
   C, FONT, DISP, clamp, lerp, prog, easeOut, easeIn, easeInOut, spring, hexA, rnd, gradText, gradLight, GRAD,
-  Grain, CubeLogo, renderEventsWav, MotionPlayer, fitSize,
+  Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer, fitSize,
 } from "./motionKit";
+import { EMO, EMO_ANIM, ICON3D } from "./oxi/assets3d";
 import { PHRASES } from "./oxi/captions";
 import { VO_SITE } from "./audio/voSite";
 import { MUSIC_OXI } from "./audio/oxiMusic";
@@ -22,6 +23,9 @@ import { SFXV, SFXV_PEAK } from "./audio/sfxVo";
      41,4–55,2 CTA: sua loja amadora com teia × concorrente bonito, a virada "profissionalizar",
                "Link na bio", mãozinha no comentário com "EU QUERO", logo e "SAI DO AMADORISMO."
    Legendas cinéticas: cada palavra entra na hora em que é falada (destaques em ciano/azul).
+   Protagonista: o Emoji Primordial (EMOJI_PRIMORDIAL/), recortado do fundo de estúdio, reagindo à
+   narração com as feições e animações 3D da biblioteca; objetos 3D do Fluent Emoji (Microsoft, MIT);
+   celulares, navegador e maquininha com inclinação 3D, espessura e reflexo.
 ============================================================================= */
 const DURATION = 55.2;
 const FORMATS = { "9x16": { w: 450, h: 800, label: "9:16" } };
@@ -74,24 +78,26 @@ function Captions({ t }) {
 }
 
 /* ---------------- peças ---------------- */
-function Phone({ x, y, w, h, light = false, children, style }) {
+// espessura 3D: camadas deslocadas para o lado que a inclinação revela
+const depth = (tilt, n = 9, col = "#2A3654") => Array.from({ length: n }, (_, i) => `${-Math.sign(tilt || 1) * (i + 1) * 0.9}px ${(i + 1) * 0.55}px 0 ${i === n - 1 ? "#0B1020" : col}`).join(", ");
+function Phone({ x, y, w, h, light = false, tilt = -12, children, style }) {
   return (
-    <div style={{ ...abs(x, y, w, h), borderRadius: w * 0.16, background: "#0A0F1C", padding: 7, boxShadow: "0 30px 70px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.08)", ...style }}>
-      <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: w * 0.13, overflow: "hidden", background: light ? "#FFFFFF" : "#000" }}>
-        {children}
-        <div style={{ ...abs(w / 2 - 7 - w * 0.16, 7, w * 0.32, 15), borderRadius: 10, background: "#05080F", zIndex: 30 }} />
+    <div style={{ ...abs(x, y, w, h), perspective: 1100, ...style }}>
+      <div style={{ position: "absolute", inset: 0, borderRadius: w * 0.16, background: "linear-gradient(145deg,#2B3550,#0A0F1C 45%)", padding: 7, transform: `rotateY(${tilt}deg) rotateX(5deg)`, boxShadow: `${depth(tilt)}, 0 40px 70px rgba(0,0,0,.45)` }}>
+        <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: w * 0.13, overflow: "hidden", background: light ? "#FFFFFF" : "#000" }}>
+          {children}
+          <div style={{ ...abs(w / 2 - 7 - w * 0.16, 7, w * 0.32, 15), borderRadius: 10, background: "#05080F", zIndex: 30 }} />
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(115deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,0) 32%)", zIndex: 31, pointerEvents: "none" }} />
+        </div>
       </div>
     </div>
   );
 }
 // entra deslizando da direita quando a tela do celular troca
 const slideIn = (t, at) => `translateX(${(1 - easeOut(prog(t, at, at + 0.22))) * 100}%)`;
-function Hand({ x, y, s = 1, press = 0 }) {
-  return (
-    <svg viewBox="0 0 48 56" width={44 * s} height={52 * s} style={{ position: "absolute", left: x, top: y, transform: `scale(${1 - press * 0.12})`, transformOrigin: "30% 10%", zIndex: 40, filter: "drop-shadow(0 6px 10px rgba(0,0,0,.35))" }}>
-      <path d="M17 4c3 0 5 2 5 5v15l2-1c2-1 5 0 6 2l1 1c2-1 5 0 6 2l1 1c3-1 6 1 6 4v10c0 7-5 12-12 12h-6c-5 0-8-2-11-6L6 34c-2-3 0-6 3-6 2 0 3 1 4 2l0 0V9c0-3 2-5 4-5z" fill="#FFFFFF" stroke="#0A0F1C" strokeWidth="2.6" strokeLinejoin="round" />
-    </svg>
-  );
+// mãozinha 3D apontando (Fluent): a ponta do dedo fica no canto superior esquerdo da caixa
+function Point({ x, y, press = 0, size = 92 }) {
+  return <img src={ICON3D.point} alt="" draggable={false} style={{ ...abs(x - size * 0.42, y - size * 0.06, size, size), maxWidth: "none", zIndex: 40, transform: `rotate(-14deg) scale(${1 - press * 0.12})`, transformOrigin: "45% 5%", filter: "drop-shadow(0 10px 14px rgba(0,0,0,.35))" }} />;
 }
 function Ripple({ x, y, t, at, color = "#FFFFFF" }) {
   if (t < at || t > at + 0.5) return null;
@@ -119,9 +125,7 @@ function Toast({ t, at, text, sub, y = 232, light = true }) {
   const s = pop(t, at, { stiffness: 300, damping: 18 });
   return (
     <div style={{ ...abs(55, y, 340, 56), borderRadius: 18, background: light ? "#FFFFFF" : "#141B2E", boxShadow: "0 14px 40px rgba(0,36,80,.22)", display: "flex", alignItems: "center", gap: 12, padding: "0 16px", transform: `translateY(${(1 - clamp(s)) * -30}px) scale(${lerp(0.85, 1, clamp(s))})`, opacity: clamp(s * 2), zIndex: 46 }}>
-      <div style={{ width: 32, height: 32, borderRadius: 10, background: GRAD, display: "grid", placeItems: "center", flex: "none" }}>
-        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 10a6 6 0 0 1 12 0v4l2 3H4l2-3z M10 19a2 2 0 0 0 4 0" fill="none" stroke="#fff" strokeWidth="2" strokeLinejoin="round" /></svg>
-      </div>
+      <img src={ICON3D.bell} alt="" style={{ width: 38, height: 38, maxWidth: "none", flex: "none", transform: `rotate(${Math.sin((t - at) * 30) * 18 * Math.exp(-(t - at) * 3)}deg)` }} />
       <div style={{ fontFamily: FONT, lineHeight: 1.2 }}>
         <div style={{ fontWeight: 800, fontSize: 15, color: light ? C.ink : "#fff" }}>{text}</div>
         {sub && <div style={{ fontWeight: 600, fontSize: 12, color: C.slate }}>{sub}</div>}
@@ -135,6 +139,54 @@ function Giant({ t, a, b, children, dim = 0.6 }) {
   return <div style={{ position: "absolute", inset: 0, background: hexA("#03060E", dim * o), zIndex: 60 }}>{children}</div>;
 }
 
+/* ---------------- Emoji Primordial e objetos 3D ---------------- */
+// respiração contínua das diretrizes da biblioteca: dy = sin(t·2,5)·4 px, roll = cos(t·1,8)·1,5°
+const breathe = (t) => `translateY(${Math.sin(t * 2.5) * 4}px) rotate(${Math.cos(t * 1.8) * 1.5}deg)`;
+function enterOut(t, at, out) {
+  const s = spring(t - at, { stiffness: 240, damping: 15 });
+  const o = out != null ? easeIn(prog(t, out, out + 0.25)) : 0;
+  return { s, o, scale: lerp(0.55, 1, clamp(s)) * (1 - o * 0.4), op: clamp(s * 3) * (1 - o) };
+}
+// feição estática (sempre com mola na entrada e respiração, nunca "recorte parado")
+function Emo({ name, x, y, size, t, at = 0, out, flip = false, z = 20, shadow = true }) {
+  if (t < at || (out != null && t > out + 0.25)) return null;
+  const e = enterOut(t, at, out);
+  return (
+    <div style={{ ...abs(x, y, size, size), zIndex: z, transform: `scale(${e.scale})`, transformOrigin: "50% 90%", opacity: e.op }}>
+      {shadow && <div style={{ ...abs(size * 0.2, size * 0.9, size * 0.6, size * 0.12), borderRadius: "50%", background: "radial-gradient(closest-side, rgba(0,0,0,.35), rgba(0,0,0,0))" }} />}
+      <img src={EMO[name]} alt="" draggable={false} style={{ ...abs(0, 0, size, size), maxWidth: "none", transform: `${breathe(t + at)}${flip ? " scaleX(-1)" : ""}` }} />
+    </div>
+  );
+}
+// animação 3D da biblioteca (WebM com alpha); segura o último quadro depois de terminar
+function EmoAnim({ name, x, y, size, t, at = 0, out, z = 20, loop = false, shadow = true }) {
+  if (t < at || (out != null && t > out + 0.25)) return null;
+  const a = EMO_ANIM[name];
+  const e = enterOut(t, at, out);
+  const lt = t - at;
+  const vt = loop ? lt % a.dur : clamp(lt, 0, a.dur - 0.05);
+  return (
+    <div style={{ ...abs(x, y, size, size), zIndex: z, transform: `scale(${e.scale})`, transformOrigin: "50% 90%", opacity: e.op }}>
+      {shadow && <div style={{ ...abs(size * 0.2, size * 0.9, size * 0.6, size * 0.12), borderRadius: "50%", background: "radial-gradient(closest-side, rgba(0,0,0,.35), rgba(0,0,0,0))" }} />}
+      <div style={{ ...abs(0, 0, size, size), transform: breathe(t + at) }}>
+        <SyncedVideo t={vt} duration={a.dur} webm={a.webm} style={{ objectFit: "contain", background: "transparent" }} />
+      </div>
+    </div>
+  );
+}
+// objeto 3D (Fluent Emoji): entra com mola e flutua
+function Ico({ name, x, y, size, t, at = 0, out, rot = 0, float = 1, z = 22, style }) {
+  if (t < at || (out != null && t > out + 0.25)) return null;
+  const e = enterOut(t, at, out);
+  return (
+    <img src={ICON3D[name]} alt="" draggable={false} style={{
+      ...abs(x, y, size, size), maxWidth: "none", zIndex: z, opacity: e.op,
+      transform: `translateY(${Math.sin(t * 2.2 + x) * 5 * float}px) rotate(${rot + Math.cos(t * 1.7 + y) * 4 * float}deg) scale(${e.scale})`,
+      filter: "drop-shadow(0 14px 18px rgba(0,0,0,.35))", ...style,
+    }} />
+  );
+}
+
 /* ---------------- 0–10,7s: o gancho ---------------- */
 const SW = 216; // largura útil da tela do celular do gancho
 function ReelsScreen({ t }) {
@@ -145,8 +197,7 @@ function ReelsScreen({ t }) {
   const blink = Math.sin(t * 9) > -0.2 ? 1 : 0.15;
   return (
     <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg,#2B3A55,#111725)" }}>
-      <div style={{ ...abs(SW / 2 - 36, 130, 72, 72), borderRadius: "50%", background: "#41516F" }} />
-      <div style={{ ...abs(SW / 2 - 85, 215, 170, 190), borderRadius: "85px 85px 20px 20px", background: "#3A4864" }} />
+      <EmoAnim name="11_falando_locucao_loop" x={-2} y={110} size={220} t={t} at={-0.6} loop shadow={false} />
       <div style={{ ...abs(14, 34, 64, 24), borderRadius: 12, background: "rgba(0,0,0,.45)", display: "flex", alignItems: "center", gap: 6, padding: "0 9px", fontFamily: FONT, fontWeight: 800, fontSize: 12, color: "#fff" }}>
         <span style={{ width: 9, height: 9, borderRadius: "50%", background: "#FF3B3B", opacity: blink }} />REC
       </div>
@@ -203,17 +254,17 @@ function StoryScreen({ t }) {
           </div>
         ))}
       </div>
-      <svg viewBox="-110 -120 220 240" width={SW} height={240} style={{ position: "absolute", left: 0, top: 110 }}>
-        <g transform={`rotate(${-18 - flap} -58 -66)`}><ellipse cx="-70" cy="-30" rx="26" ry="52" fill="#8B5A3C" /><ellipse cx="-70" cy="-26" rx="15" ry="38" fill="#B07A55" /></g>
-        <g transform={`rotate(${18 + flap} 58 -66)`}><ellipse cx="70" cy="-30" rx="26" ry="52" fill="#8B5A3C" /><ellipse cx="70" cy="-26" rx="15" ry="38" fill="#B07A55" /></g>
-        <circle cx="0" cy="0" r="66" fill="#FFD36E" />
-        <ellipse cx="-24" cy="-10" rx="8" ry="10" fill="#1B1B1B" /><ellipse cx="24" cy="-10" rx="8" ry="10" fill="#1B1B1B" />
-        <circle cx="-21" cy="-14" r="3" fill="#fff" /><circle cx="27" cy="-14" r="3" fill="#fff" />
-        <ellipse cx="-42" cy="16" rx="11" ry="7" fill="#FF8A8A" opacity=".6" /><ellipse cx="42" cy="16" rx="11" ry="7" fill="#FF8A8A" opacity=".6" />
-        <path d="M-14 26 Q0 38 14 26" fill="none" stroke="#1B1B1B" strokeWidth="4" strokeLinecap="round" />
-        <g transform={`translate(0 ${32 + tongue * 4}) scale(1 ${clamp(tongue, 0, 1.3)})`}><path d="M-10 0 h20 v14 a10 10 0 0 1 -20 0 z" fill="#FF6B8B" /><line x1="0" y1="2" x2="0" y2="14" stroke="#E0466A" strokeWidth="2" /></g>
-        <ellipse cx="0" cy="14" rx="15" ry="10" fill="#2A1A12" /><ellipse cx="-4" cy="10" rx="5" ry="3" fill="#6B4A3A" />
-      </svg>
+      <div style={{ ...abs(8, 100, 200, 200) }}>
+        {/* orelhas 3D do filtro, balançando */}
+        {[-1, 1].map((sd) => (
+          <div key={sd} style={{ ...abs(sd < 0 ? 6 : 132, 0, 62, 112), borderRadius: "50% 50% 46% 46% / 40% 40% 60% 60%", background: "radial-gradient(circle at 40% 30%, #B07A55, #7A4A2C 70%)", boxShadow: "inset -6px -10px 14px rgba(0,0,0,.35)", transformOrigin: "50% 8%", transform: `rotate(${sd * (24 + flap)}deg)`, zIndex: 1 }}>
+            <div style={{ ...abs(14, 18, 34, 72), borderRadius: "50%", background: "radial-gradient(circle at 40% 30%, #E7A98A, #C27E5E)" }} />
+          </div>
+        ))}
+        <img src={EMO["02_sorriso_gentil"]} alt="" draggable={false} style={{ ...abs(0, 6, 200, 200), maxWidth: "none", zIndex: 2, transform: breathe(t) }} />
+        <div style={{ ...abs(84, 116 + tongue * 2, 32, 34 * clamp(tongue, 0, 1.2)), borderRadius: "0 0 16px 16px", background: "linear-gradient(#FF6B8B,#E0466A)", zIndex: 3 }} />
+        <div style={{ ...abs(80, 100, 40, 26), borderRadius: "50%", background: "radial-gradient(circle at 35% 30%, #6B4A3A, #1B0F0A 65%)", boxShadow: "0 3px 6px rgba(0,0,0,.4)", zIndex: 4 }} />
+      </div>
       <div style={{ ...abs(12, 400, SW - 24, 36), borderRadius: 18, border: "2px solid rgba(255,255,255,.7)", fontFamily: FONT, fontWeight: 600, fontSize: 12, color: "#fff", lineHeight: "32px", paddingLeft: 14 }}>Enviar mensagem</div>
     </div>
   );
@@ -293,9 +344,23 @@ function HookPhone({ t }) {
   const dimDuringGiant = inWin(t, T.pleno, T.back) ? 0.3 : 1;
   const screen = t < T.feed ? <ReelsScreen t={t} /> : t < T.story ? <FeedScreen t={t} /> : t < T.search ? <StoryScreen t={t} /> : t < T.dm ? <SearchScreen t={t} /> : <DMScreen t={t} />;
   return (
-    <Phone x={110} y={240} w={230} h={470} style={{ transform: `translateY(${out * 90}px) scale(${lerp(0.88, 1, clamp(inS)) * lerp(1, 0.7, out)})`, opacity: (1 - out) * dimDuringGiant, zIndex: 10 }}>
+    <Phone x={110} y={240} w={230} h={470} tilt={-14 + Math.sin(t * 0.9) * 6} style={{ transform: `translateY(${out * 90}px) scale(${lerp(0.88, 1, clamp(inS)) * lerp(1, 0.7, out)})`, opacity: (1 - out) * dimDuringGiant, zIndex: 10 }}>
       {screen}
     </Phone>
+  );
+}
+function HookExtras({ t }) {
+  if (t >= 23.0) return null;
+  const shutter = [2.3, 2.75, 3.25, 3.6].reduce((m, a) => Math.max(m, t >= a ? Math.exp(-(t - a) * 10) : 0), 0);
+  return (
+    <>
+      <Ico name="camera" x={18} y={300} size={96} t={t} at={T.feed} out={T.story - 0.2} rot={-12} style={{ filter: `drop-shadow(0 14px 18px rgba(0,0,0,.35)) brightness(${1 + shutter * 0.6})` }} />
+      <Ico name="dog" x={330} y={270} size={84} t={t} at={T.story + 0.2} out={T.search - 0.2} rot={10} />
+      <Ico name="magnifier" x={318} y={250} size={100} t={t} at={T.search + 0.1} out={T.nada - 0.25} rot={t >= T.go && t < T.go + 0.3 ? -20 : 8} />
+      <EmoAnim name="10_revirando_olhos_eye_roll" x={-18} y={560} size={190} t={t} at={14.25} out={T.pleno - 0.1} z={15} />
+      <Ico name="hourglass" x={322} y={252} size={88} t={t} at={18.1} out={22.55} rot={Math.floor((t - 18.1) / 1.2) % 2 ? 180 : 0} />
+      <Emo name="15_revirando_olhos_tedio" x={-14} y={565} size={180} t={t} at={T.back + 0.1} out={22.55} z={15} />
+    </>
   );
 }
 function Nada({ t }) {
@@ -305,8 +370,10 @@ function Nada({ t }) {
         const lt = t - T.nada - k * 0.14;
         if (lt < 0) return null;
         const s = k === 0 ? spring(lt, { stiffness: 420, damping: 15 }) : 1;
-        return <div key={k} style={{ ...abs(0, 350, 450, 160), textAlign: "center", ...DISP, fontSize: fitSize("NADA.", 400, 120), lineHeight: "160px", color: k ? "transparent" : "#fff", WebkitTextStroke: k ? `2px ${hexA("#FFFFFF", 0.5 - k * 0.15)}` : "none", transform: `scale(${k ? 1 + lt * 0.5 : lerp(1.6, 1, clamp(s))})`, opacity: k ? clamp(1 - lt * 1.6) : clamp(s * 3) }}>NADA.</div>;
+        return <div key={k} style={{ ...abs(0, 250, 450, 160), textAlign: "center", ...DISP, fontSize: fitSize("NADA.", 400, 120), lineHeight: "160px", color: k ? "transparent" : "#fff", WebkitTextStroke: k ? `2px ${hexA("#FFFFFF", 0.5 - k * 0.15)}` : "none", transform: `scale(${k ? 1 + lt * 0.5 : lerp(1.6, 1, clamp(s))})`, opacity: k ? clamp(1 - lt * 1.6) : clamp(s * 3) }}>NADA.</div>;
       })}
+      <Ico name="cricket" x={lerp(-90, 470, prog(t, T.nada + 0.1, 10.68))} y={600 - Math.abs(Math.sin((t - T.nada) * 9)) * 50} size={74} t={t} at={T.nada + 0.1} float={0} z={61} />
+      <EmoAnim name="02_dizendo_NAO_cabeca_3d" x={120} y={420} size={210} t={t} at={T.nada + 0.05} z={61} />
     </Giant>
   );
 }
@@ -316,16 +383,19 @@ function Pleno({ t }) {
   return (
     <Giant t={t} a={T.pleno} b={T.back} dim={0.82}>
       <div style={{ ...abs(0, 300, 450, 70), textAlign: "center", ...DISP, fontSize: 54, lineHeight: "70px", color: "#fff", transform: `scale(${lerp(1.5, 1, clamp(s1))})`, opacity: clamp(s1 * 3) }}>EM PLENO</div>
+      <Ico name="collision" x={95} y={330} size={260} t={t} at={T.ano - 0.02} float={0.3} z={0} style={{ opacity: 0.85, filter: "blur(.5px) drop-shadow(0 14px 18px rgba(0,0,0,.35))" }} />
+      <EmoAnim name="08_desconfiado_side_eye_rock" x={130} y={560} size={190} t={t} at={T.pleno + 0.25} z={61} />
       {t >= T.ano && <div style={{ ...abs(0, 372, 450, 170), textAlign: "center", ...DISP, fontSize: fitSize("2026", 400, 150), lineHeight: "170px", ...gradLight, transform: `scale(${lerp(2.2, 1, clamp(s2))})`, opacity: clamp(s2 * 3), filter: "drop-shadow(0 10px 30px rgba(47,212,255,.35))" }}>2026</div>}
     </Giant>
   );
 }
 
 /* ---------------- 23–41,4s: a solução ---------------- */
-function Browser({ x, y, w, h, t, at, children, url = "sualoja.com.br", style }) {
+function Browser({ x, y, w, h, t, at, children, url = "sualoja.com.br", style, tilt = 0 }) {
   const s = pop(t, at, { stiffness: 220, damping: 18 });
+  const ry = lerp(-35, tilt, clamp(s)) + Math.sin(t * 0.8) * 3;
   return (
-    <div style={{ ...abs(x, y, w, h), borderRadius: 16, background: "#fff", overflow: "hidden", boxShadow: "0 24px 60px rgba(0,36,80,.18)", transform: `scale(${lerp(0.85, 1, clamp(s))})`, opacity: clamp(s * 2), ...style }}>
+    <div style={{ ...abs(x, y, w, h), borderRadius: 16, background: "#fff", overflow: "hidden", boxShadow: `${depth(ry, 7, "#C9D6E6")}, 0 30px 60px rgba(0,36,80,.22)`, transform: `perspective(1200px) rotateY(${ry}deg) rotateX(${lerp(14, 6, clamp(s))}deg) scale(${lerp(0.85, 1, clamp(s))})`, opacity: clamp(s * 2), ...style }}>
       <div style={{ height: 26, background: "#EDF1F7", display: "flex", alignItems: "center", gap: 5, padding: "0 10px" }}>
         {["#FF6159", "#FFBD2E", "#28C940"].map((c) => <span key={c} style={{ width: 8, height: 8, borderRadius: "50%", background: c }} />)}
         <span style={{ marginLeft: 10, flex: 1, height: 16, borderRadius: 8, background: "#fff", fontFamily: FONT, fontWeight: 600, fontSize: 9.5, color: C.slate, lineHeight: "16px", paddingLeft: 8 }}>{url}</span>
@@ -364,7 +434,7 @@ function SiteScene({ t }) {
   const out = easeIn(prog(t, T.flow, T.flow + 0.3));
   return (
     <div style={{ position: "absolute", inset: 0, opacity: 1 - out, transform: `scale(${1 - out * 0.1})` }}>
-      <Browser x={30} y={232} w={390} h={290} t={t} at={T.site + 0.05}>
+      <Browser x={30} y={232} w={390} h={290} t={t} at={T.site + 0.05} tilt={-8}>
         <SiteContent t={t} at={T.site + 0.05} w={390} />
       </Browser>
       {/* bolhas de O₂ subindo do site */}
@@ -375,6 +445,7 @@ function SiteScene({ t }) {
         const r = 16 + rnd(i, 7) * 14;
         return <div key={i} style={{ ...abs(50 + rnd(i, 8) * 330, 470 - s * 210, r * 2, r * 2), borderRadius: "50%", background: "rgba(47,212,255,.18)", border: `2px solid ${C.cyan}`, display: "grid", placeItems: "center", fontFamily: FONT, fontWeight: 800, fontSize: r * 0.62, color: C.blue, opacity: clamp(s * 5) * (1 - prog(s, 1.0, 1.4)), transform: `scale(${spring(s, { stiffness: 300, damping: 12 })})` }}>O₂</div>;
       })}
+      <EmoAnim name="07_aceno_SIM_aprovando" x={120} y={540} size={210} t={t} at={T.oxi - 0.1} out={T.robo - 0.2} />
       <Robot t={t} />
       <Orders t={t} />
       <Clock24 t={t} />
@@ -385,29 +456,12 @@ function SiteScene({ t }) {
 const STAMPS = [27.0, 27.6, 28.2, 31.3, 32.5, 34.2];
 function Robot({ t }) {
   if (t < T.robo) return null;
-  const s = pop(t, T.robo, { stiffness: 200, damping: 15 });
+  const s = pop(t, T.robo, { stiffness: 200, damping: 14 });
   const st = STAMPS.reduce((m, a) => (t >= a - 0.12 && t < a + 0.25 ? Math.max(m, t < a ? prog(t, a - 0.12, a) : 1 - prog(t, a + 0.05, a + 0.25)) : m), 0);
-  const wave = inWin(t, 26.5, 26.95) ? Math.sin((t - 26.5) * 28) * 22 : 0;
-  const blink = (t % 2.6) < 0.1 ? 0.15 : 1;
   return (
-    <div style={{ ...abs(305, 548, 130, 210), transform: `translateX(${(1 - clamp(s)) * 200}px)`, zIndex: 20 }}>
-      <svg viewBox="0 0 130 210" width="130" height="210">
-        <line x1="65" y1="10" x2="65" y2="34" stroke={C.ink} strokeWidth="4" />
-        <circle cx="65" cy="10" r="8" fill={C.cyan} opacity={0.75 + Math.sin(t * 6) * 0.25} />
-        <rect x="18" y="32" width="94" height="72" rx="24" fill={C.ink} />
-        <rect x="28" y="44" width="74" height="48" rx="16" fill="#0B1A33" />
-        <rect x="42" y="56" width="14" height={18 * blink} rx="7" fill={C.cyan} />
-        <rect x="74" y="56" width="14" height={18 * blink} rx="7" fill={C.cyan} />
-        <path d="M52 80 Q65 88 78 80" fill="none" stroke={C.cyan} strokeWidth="3.5" strokeLinecap="round" />
-        <rect x="30" y="110" width="70" height="72" rx="20" fill={C.blue} />
-        <circle cx="65" cy="138" r="10" fill={C.cyan} />
-        <g transform={`rotate(${-30 + wave} 104 120)`}><rect x="100" y="114" width="36" height="13" rx="6.5" fill={C.ink} /></g>
-        <g transform={`rotate(${lerp(-25, 55, st)} 28 120)`}>
-          <rect x="-12" y="114" width="42" height="13" rx="6.5" fill={C.ink} />
-          <rect x="-30" y="104" width="24" height="16" rx="4" fill={C.deep} /><rect x="-34" y="118" width="32" height="10" rx="3" fill={RED} />
-        </g>
-        <rect x="40" y="182" width="16" height="22" rx="6" fill={C.ink} /><rect x="74" y="182" width="16" height="22" rx="6" fill={C.ink} />
-      </svg>
+    <div style={{ ...abs(282, 560, 160, 160), transform: `translateX(${(1 - clamp(s)) * 220}px) translateY(${Math.sin(t * 3) * 6 + st * 10}px) rotate(${-st * 16}deg)`, transformOrigin: "30% 80%", zIndex: 20 }}>
+      <div style={{ ...abs(26, 146, 108, 16), borderRadius: "50%", background: "radial-gradient(closest-side, rgba(0,36,80,.3), rgba(0,36,80,0))" }} />
+      <img src={ICON3D.robot} alt="" draggable={false} style={{ ...abs(0, 0, 160, 160), maxWidth: "none", filter: "drop-shadow(0 16px 20px rgba(0,36,80,.3))" }} />
     </div>
   );
 }
@@ -441,13 +495,7 @@ function Clock24({ t }) {
   const lt = t - T.h24;
   return (
     <div style={{ position: "absolute", inset: 0, opacity: clamp(s * 2) * (1 - out), transform: `translateX(${-out * 300}px)` }}>
-      <svg viewBox="-70 -70 140 140" width="140" height="140" style={{ position: "absolute", left: 30, top: 585, transform: `scale(${lerp(0.6, 1, clamp(s))})` }}>
-        <circle r="64" fill="#fff" stroke={C.ink} strokeWidth="6" />
-        {Array.from({ length: 12 }, (_, i) => <line key={i} x1="0" y1="-52" x2="0" y2={i % 3 ? -47 : -42} stroke={C.ink} strokeWidth="3" transform={`rotate(${i * 30})`} />)}
-        <line x1="0" y1="0" x2="0" y2="-30" stroke={C.ink} strokeWidth="6" strokeLinecap="round" transform={`rotate(${lt * 200})`} />
-        <line x1="0" y1="0" x2="0" y2="-46" stroke={C.blue} strokeWidth="4" strokeLinecap="round" transform={`rotate(${lt * 2400})`} />
-        <circle r="6" fill={C.ink} />
-      </svg>
+      <img src={ICON3D.clock} alt="" draggable={false} style={{ ...abs(26, 578, 140, 140), maxWidth: "none", transform: `scale(${lerp(0.6, 1, clamp(s))}) rotate(${Math.sin(lt * 60) * 7}deg)`, filter: "drop-shadow(0 16px 20px rgba(0,36,80,.3))" }} />
       <div style={{ ...abs(180, 590, 140, 100), ...DISP, fontSize: 88, lineHeight: "100px", ...gradText }}>24H</div>
       <div style={{ ...abs(184, 688, 140, 22), fontFamily: FONT, fontWeight: 800, fontSize: 16, color: C.ink }}>por dia, todo dia</div>
     </div>
@@ -464,8 +512,8 @@ function NoList({ t }) {
         const strike = easeOut(prog(t, cross - 0.05, cross + 0.2));
         return (
           <div key={i} style={{ ...abs(26, 562 + i * 64, 270, 54), borderRadius: 14, background: "#fff", boxShadow: "0 8px 24px rgba(0,36,80,.12)", display: "flex", alignItems: "center", gap: 10, padding: "0 12px", transform: `translateX(${(1 - clamp(s)) * -60}px)`, opacity: clamp(s * 2) }}>
-            <div style={{ width: 30, height: 30, borderRadius: "50%", background: strike > 0.5 ? RED : "#E3ECF5", display: "grid", placeItems: "center", flex: "none", transform: `scale(${1 + (strike > 0 && strike < 1 ? 0.2 : 0)})` }}>
-              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M6 6 L18 18 M18 6 L6 18" stroke="#fff" strokeWidth="3.4" strokeLinecap="round" /></svg>
+            <div style={{ width: 34, height: 34, flex: "none", display: "grid", placeItems: "center" }}>
+              {strike > 0 ? <img src={ICON3D.cross} alt="" style={{ width: 34, height: 34, maxWidth: "none", transform: `scale(${spring(t - cross + 0.05, { stiffness: 500, damping: 12 })})` }} /> : <div style={{ width: 26, height: 26, borderRadius: "50%", background: "#E3ECF5" }} />}
             </div>
             <div style={{ position: "relative", fontFamily: FONT, fontWeight: 800, fontSize: 14.5, color: strike > 0.5 ? C.slate : C.ink }}>
               {label}
@@ -489,7 +537,7 @@ function FlowScene({ t }) {
   const done = t >= 38.6;
   return (
     <div style={{ position: "absolute", inset: 0, opacity: clamp(s * 2) * (1 - out), transform: `translateY(${(1 - clamp(s)) * 40}px)` }}>
-      <Phone x={40} y={240} w={210} h={430} light>
+      <Phone x={40} y={240} w={210} h={430} light tilt={10 + Math.sin(t * 0.9) * 4}>
         <div style={{ position: "absolute", inset: 0, background: "#fff" }}>
           {stage < 2 && (
             <div style={{ position: "absolute", left: 0, top: -scroll * (stage === 1 ? 1 : 0), width: PW }}>
@@ -531,12 +579,15 @@ function FlowScene({ t }) {
         </div>
       </Phone>
       {/* cursor/mão tocando */}
-      {inWin(t, 34.95, 35.7) && <Hand x={lerp(260, 112, easeInOut(prog(t, 34.95, 35.3)))} y={lerp(700, 350, easeInOut(prog(t, 34.95, 35.3)))} press={t >= 35.35 && t < 35.5 ? 1 : 0} />}
+      {inWin(t, 34.95, 35.7) && <Point x={lerp(280, 118, easeInOut(prog(t, 34.95, 35.3)))} y={lerp(720, 352, easeInOut(prog(t, 34.95, 35.3)))} press={t >= 35.35 && t < 35.5 ? 1 : 0} />}
       <Ripple x={118} y={352} t={t} at={35.35} color={C.blue} />
-      {inWin(t, 38.2, 39.0) && <Hand x={lerp(250, 130, easeInOut(prog(t, 38.2, 38.5)))} y={lerp(720, 470, easeInOut(prog(t, 38.2, 38.5)))} press={t >= buy && t < buy + 0.12 ? 1 : 0} />}
+      {inWin(t, 38.2, 39.0) && <Point x={lerp(280, 146, easeInOut(prog(t, 38.2, 38.5)))} y={lerp(740, 474, easeInOut(prog(t, 38.2, 38.5)))} press={t >= buy && t < buy + 0.12 ? 1 : 0} />}
       <Ripple x={146} y={474} t={t} at={buy} color={MINT} />
       <Pos t={t} />
       <Confetti x={146} y={470} t={t} at={38.6} />
+      <Ico name="party" x={190} y={360} size={110} t={t} at={38.6} rot={-15} z={44} />
+      <Ico name="moneybag" x={300} y={640} size={96} t={t} at={38.7} z={44} />
+      {[0, 1, 2].map((k) => t >= 38.62 + k * 0.08 && t < 39.6 && <img key={k} src={ICON3D.coin} alt="" style={{ ...abs(330 + k * 22 - (t - 38.62) * 60, 520 - (t - 38.62 - k * 0.08) * 420 + (t - 38.62) ** 2 * 520, 48, 48), maxWidth: "none", transform: `rotateY(${(t - 38.62) * 900}deg)`, zIndex: 44 }} />)}
       <Toast t={t} at={38.62} text="Nova venda!" sub="R$ 189,90 · agora" y={236} />
     </div>
   );
@@ -548,7 +599,7 @@ function Pos({ t }) {
   const wobble = inWin(t, 37.95, 38.2) ? Math.sin((t - 37.95) * 40) * 2 : 0;
   return (
     <>
-      <div style={{ ...abs(282, 420, 130, 220), borderRadius: 22, background: C.ink, boxShadow: "0 20px 40px rgba(0,36,80,.3)" }}>
+      <div style={{ ...abs(282, 420, 130, 220), borderRadius: 22, background: `linear-gradient(150deg, #22406E, ${C.ink} 55%)`, boxShadow: `${depth(-10, 8, "#0B1A33")}, 0 26px 40px rgba(0,36,80,.35)`, transform: "perspective(800px) rotateY(-14deg) rotateX(6deg)" }}>
         <div style={{ ...abs(14, 16, 102, 64), borderRadius: 10, background: approved ? MINT : "#0B1A33", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: FONT, color: "#fff" }}>
           <div style={{ fontWeight: 800, fontSize: approved ? 13 : 15 }}>{approved ? "APROVADO" : "R$ 189,90"}</div>
           {!approved && <div style={{ fontWeight: 600, fontSize: 9, opacity: 0.7 }}>aproxime o cartão</div>}
@@ -558,11 +609,7 @@ function Pos({ t }) {
         </div>
       </div>
       {cardIn > 0 && cardOut < 1 && (
-        <div style={{ ...abs(lerp(470, 296, cardIn) + cardOut * 200, 380 + wobble, 104, 66), borderRadius: 10, background: "linear-gradient(135deg,#1E3A8A,#2FD4FF)", boxShadow: "0 12px 26px rgba(0,0,0,.3)", transform: `rotate(${lerp(18, -8, cardIn)}deg)`, zIndex: 25 }}>
-          <div style={{ ...abs(10, 12, 20, 15), borderRadius: 3, background: "#FFD86B" }} />
-          <div style={{ ...abs(10, 40, 70, 7), borderRadius: 3, background: "rgba(255,255,255,.7)" }} />
-          {inWin(t, 37.95, 38.2) && [0, 1, 2].map((k) => <div key={k} style={{ ...abs(80 - k * 4, 10 - k * 4, 14 + k * 8, 14 + k * 8), borderRadius: "50%", border: "2px solid rgba(255,255,255,.7)", borderLeftColor: "transparent", borderBottomColor: "transparent", opacity: (Math.sin(t * 30 - k) + 1) / 2 }} />)}
-        </div>
+        <img src={ICON3D.card} alt="" draggable={false} style={{ ...abs(lerp(470, 286, cardIn) + cardOut * 220, 340 + wobble, 130, 130), maxWidth: "none", transform: `perspective(600px) rotateY(${lerp(-40, 0, cardIn)}deg) rotate(${lerp(18, -10, cardIn)}deg)`, filter: "drop-shadow(0 16px 20px rgba(0,0,0,.35))", zIndex: 25 }} />
       )}
     </>
   );
@@ -578,7 +625,7 @@ function SleepScene({ t }) {
         <div style={{ ...abs(14, 12, 120, 24), borderRadius: 12, background: hexA(C.blue, 0.1), color: C.blue, fontFamily: FONT, fontWeight: 800, fontSize: 12, lineHeight: "24px", textAlign: "center" }}>Seu site, 3h da manhã</div>
         {[39.6, 40.1, 40.6, 41.0].map((at, i) => t >= at && (
           <div key={i} style={{ ...abs(14, 46 + i * 54, 382, 46), borderRadius: 14, background: "#F4F7FB", display: "flex", alignItems: "center", gap: 10, padding: "0 12px", transform: `translateX(${(1 - clamp(pop(t, at))) * 60}px)`, opacity: clamp(pop(t, at) * 2), fontFamily: FONT }}>
-            <span style={{ width: 26, height: 26, borderRadius: 8, background: GRAD, flex: "none" }} />
+            <img src={ICON3D.coin} alt="" style={{ width: 30, height: 30, maxWidth: "none", flex: "none", transform: `rotateY(${Math.max(0, 1 - (t - at) * 2) * 360}deg)` }} />
             <span style={{ fontWeight: 800, fontSize: 13, color: C.ink, flex: 1 }}>Nova venda</span>
             <span style={{ fontWeight: 800, fontSize: 13, color: MINT }}>+R$ {["89,90", "149,90", "59,90", "219,90"][i]}</span>
           </div>
@@ -586,33 +633,18 @@ function SleepScene({ t }) {
       </div>
       <div style={{ ...abs(20, 508, 410, 270), borderRadius: 24, background: "linear-gradient(180deg,#0B1530,#03060E)", overflow: "hidden", transform: `translateY(${(1 - clamp(s)) * 40}px)` }}>
         {Array.from({ length: 14 }, (_, i) => <div key={i} style={{ ...abs(rnd(i, 1) * 400, rnd(i, 2) * 150, 3, 3), borderRadius: "50%", background: "#fff", opacity: 0.3 + 0.7 * Math.abs(Math.sin(t * 2 + i)) }} />)}
-        <div style={{ ...abs(318, 28, 64, 64), borderRadius: "50%", boxShadow: "inset -16px 8px 0 0 #FFE7A6", transform: "rotate(-20deg)" }} />
+        <img src={ICON3D.moon} alt="" style={{ ...abs(300, 14, 92, 92), maxWidth: "none", transform: `rotate(${Math.sin(t) * 6}deg)`, filter: "drop-shadow(0 0 18px rgba(255,231,166,.45))" }} />
         <div style={{ ...abs(14, 12, 64, 24), borderRadius: 12, background: "rgba(255,255,255,.12)", color: "#fff", fontFamily: FONT, fontWeight: 800, fontSize: 12, lineHeight: "24px", textAlign: "center" }}>Você</div>
-        <div style={{ ...abs(90, 176, 230, 52), borderRadius: 26, background: "#E9EEF7" }} />
-        <svg viewBox="-60 -60 120 120" width="110" height="110" style={{ position: "absolute", left: 150, top: 104, transform: `rotate(${Math.sin(t * 1.6) * 3}deg)` }}>
-          <circle r="48" fill="#FFD36E" />
-          <path d="M-26 -4 Q-17 4 -8 -4 M8 -4 Q17 4 26 -4" fill="none" stroke="#1B1B1B" strokeWidth="4" strokeLinecap="round" />
-          <ellipse cx="0" cy="22" rx="7" ry={5 + Math.sin(t * 3) * 2} fill="#7A3E2E" />
-        </svg>
-        <div style={{ ...abs(60, 200, 290, 66), borderRadius: "30px 30px 16px 16px", background: C.blue }} />
-        {[0, 1, 2].map((k) => {
-          const ph = ((t - T.sleep) * 0.6 + k / 3) % 1;
-          return <div key={k} style={{ ...abs(255 + ph * 60, 110 - ph * 90, 40, 40), ...DISP, fontSize: 18 + k * 7, color: "#fff", opacity: Math.sin(ph * Math.PI) }}>Z</div>;
-        })}
+        <div style={{ ...abs(70, 170, 270, 64), borderRadius: 32, background: "radial-gradient(circle at 40% 30%, #FFFFFF, #CBD6E6)", boxShadow: "0 10px 20px rgba(0,0,0,.35)" }} />
+        <img src={EMO["08_olhos_fechados_zen"]} alt="" style={{ ...abs(118, 50, 170, 170), maxWidth: "none", transform: `rotate(${-12 + Math.sin(t * 1.6) * 3}deg)` }} />
+        <div style={{ ...abs(40, 214, 330, 70), borderRadius: "34px 34px 16px 16px", background: `linear-gradient(160deg, ${C.blue}, ${C.deep})`, boxShadow: "inset 0 6px 10px rgba(255,255,255,.15)" }} />
+        <img src={ICON3D.zzz} alt="" style={{ ...abs(270, 70 - ((t - T.sleep) * 18) % 30, 70, 70), maxWidth: "none", opacity: 0.9, transform: `scale(${1 + Math.sin(t * 2.4) * 0.08})` }} />
       </div>
     </div>
   );
 }
 
 /* ---------------- 41,4–55,2s: comparativo e CTA ---------------- */
-function Web({ x, y, s = 1, style }) {
-  return (
-    <svg viewBox="0 0 100 100" width={100 * s} height={100 * s} style={{ position: "absolute", left: x, top: y, ...style }}>
-      {[0, 22, 45, 68, 90].map((a) => <line key={a} x1="0" y1="0" x2={Math.cos((a * Math.PI) / 180) * 100} y2={Math.sin((a * Math.PI) / 180) * 100} stroke="rgba(255,255,255,.55)" strokeWidth="1.2" />)}
-      {[24, 46, 70].map((r) => <path key={r} d={`M${r} 0 Q${r * 0.85} ${r * 0.35} ${r * 0.7} ${r * 0.7} Q${r * 0.35} ${r * 0.85} 0 ${r}`} fill="none" stroke="rgba(255,255,255,.5)" strokeWidth="1.2" />)}
-    </svg>
-  );
-}
 function ProSite({ t, w, h, label, glow }) {
   return (
     <div style={{ position: "absolute", inset: 0, background: "#fff" }}>
@@ -647,8 +679,8 @@ function CompareScene({ t }) {
           <div style={{ ...abs(150, 150, 110, 28), borderRadius: 2, background: "#B85C38", color: "#fff", fontFamily: "'Comic Sans MS', cursive", fontSize: 12, lineHeight: "28px", textAlign: "center", opacity: flicker }}>CHAMA NO DIRECT</div>
           <div style={{ ...abs(16, 200, 250, 40), fontFamily: FONT, fontSize: 11, fontWeight: 600, color: "#6E6250" }}>Preço? Só no direct. Atendemos seg a sex (às vezes).</div>
         </div>
-        {t < T.prof + 0.9 && <Web x={W - 100} y={0} s={1} style={{ transform: `scaleX(-1) translateY(${easeIn(prog(t, T.prof, T.prof + 0.6)) * 300}px) rotate(${prog(t, T.prof, T.prof + 0.6) * 40}deg)` }} />}
-        <Web x={0} y={H - 70} s={0.7} style={{ transform: `scaleY(-1) translateY(${-easeIn(prog(t, T.prof, T.prof + 0.6)) * 300}px)`, opacity: t < T.prof + 0.6 ? 1 : 0 }} />
+        {t < T.prof + 0.9 && <img src={ICON3D.web} alt="" style={{ ...abs(W - 120, -14, 130, 130), maxWidth: "none", opacity: 0.9, transform: `translateY(${easeIn(prog(t, T.prof, T.prof + 0.6)) * 320}px) rotate(${prog(t, T.prof, T.prof + 0.6) * 50}deg)` }} />}
+        {t < T.prof + 0.9 && <img src={ICON3D.web} alt="" style={{ ...abs(-20, H - 96, 104, 104), maxWidth: "none", opacity: 0.8, transform: `scaleY(-1) translateY(${-easeIn(prog(t, T.prof, T.prof + 0.6)) * 320}px)` }} />}
         <div style={{ position: "absolute", inset: 0, clipPath: `inset(0 ${(1 - wipe) * 100}% 0 0)` }}>
           <ProSite t={t} w={W} h={H} label="Sua loja ✓" glow={1} />
         </div>
@@ -660,12 +692,14 @@ function CompareScene({ t }) {
         <ProSite t={t + 1.3} w={W} h={H} label={`Hoje: R$ ${sales.toLocaleString("pt-BR")}`} glow={1} />
         <div style={{ ...abs(12, 10, 118, 24), borderRadius: 12, background: C.ink, color: "#fff", fontFamily: FONT, fontWeight: 800, fontSize: 11.5, lineHeight: "24px", textAlign: "center" }}>CONCORRENTE</div>
       </div>
+      <Emo name="33_inclinado_desconfiado_original" x={290} y={402} size={160} t={t} at={43.3} out={T.prof - 0.15} z={35} />
+      <Emo name="35_estrategista_maos_piramide" x={280} y={392} size={175} t={t} at={T.prof + 0.1} out={T.bio - 0.1} z={35} />
       {/* as vendas escorrendo pro concorrente */}
       {Array.from({ length: 6 }, (_, i) => {
         const a = 42.3 + i * 0.13;
         if (t < a || t > a + 0.75) return null;
         const p = easeInOut(prog(t, a, a + 0.75));
-        return <div key={i} style={{ ...abs(lerp(120 + i * 40, 300 - i * 20, p), lerp(420, 640, p) - Math.sin(p * Math.PI) * 60, 26, 26), borderRadius: "50%", background: "#FFD25A", border: "3px solid #E8B13A", fontFamily: FONT, fontWeight: 800, fontSize: 13, color: "#9A6B12", textAlign: "center", lineHeight: "20px", zIndex: 30 }}>$</div>;
+        return <img key={i} src={ICON3D.coin} alt="" style={{ ...abs(lerp(120 + i * 40, 300 - i * 20, p), lerp(420, 640, p) - Math.sin(p * Math.PI) * 60, 40, 40), maxWidth: "none", transform: `rotateY(${p * 720}deg)`, filter: "drop-shadow(0 6px 8px rgba(0,0,0,.35))", zIndex: 30 }} />;
       })}
     </div>
   );
@@ -685,7 +719,7 @@ function BioScene({ t }) {
         {/* perfil */}
         <div style={{ position: "absolute", inset: 0, transform: `translateX(${-toPost * 100}%)` }}>
           <div style={{ ...abs(20, 24, 84, 84), borderRadius: "50%", padding: 4, background: GRAD }}>
-            <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: C.night, display: "grid", placeItems: "center" }}><CubeLogo size={44} /></div>
+            <div style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#D1D1D1", overflow: "hidden" }}><img src={EMO["01_neutro_focado"]} alt="" style={{ width: "112%", height: "112%", maxWidth: "none", marginLeft: "-6%", marginTop: "-2%" }} /></div>
           </div>
           <div style={{ ...abs(120, 34, 240, 60), display: "flex", justifyContent: "space-around", fontFamily: FONT, color: C.ink, textAlign: "center", lineHeight: 1.2 }}>
             {[["128", "posts"], ["3,4 mil", "seguidores"], ["180", "seguindo"]].map(([a, b]) => <div key={b}><div style={{ fontWeight: 800, fontSize: 16 }}>{a}</div><div style={{ fontWeight: 600, fontSize: 11, color: C.slate }}>{b}</div></div>)}
@@ -717,39 +751,49 @@ function BioScene({ t }) {
       )}
       {/* mãozinha: clica no link e depois aponta o comentário */}
       {t < T.quero ? (
-        <Hand x={lerp(380, 250, easeInOut(prog(t, 48.42, 48.72)))} y={lerp(800, 560, easeInOut(prog(t, 48.42, 48.72)))} press={press} s={1.2} />
+        <Point x={lerp(380, 232, easeInOut(prog(t, 48.42, 48.72)))} y={lerp(800, 560, easeInOut(prog(t, 48.42, 48.72)))} press={press} />
       ) : (
-        <Hand x={lerp(250, 104, easeInOut(prog(t, T.quero, T.quero + 0.35)))} y={lerp(560, 612, easeInOut(prog(t, T.quero, T.quero + 0.35))) + Math.sin(t * 9) * 8} s={1.2} />
+        <Point x={lerp(232, 90, easeInOut(prog(t, T.quero, T.quero + 0.35)))} y={lerp(560, 612, easeInOut(prog(t, T.quero, T.quero + 0.35))) + Math.sin(t * 9) * 8} />
       )}
+      <Emo name="36_impactado_segurando_coracao" x={268} y={560} size={180} t={t} at={50.0} out={T.monto - 0.05} z={42} />
       <Ripple x={262} y={570} t={t} at={48.75} />
     </div>
   );
 }
 function Brand({ t }) {
-  if (t < T.monto) return null;
+  if (t < T.monto || t > T.sai + 0.3) return null;
   const s = pop(t, 51.38, { stiffness: 200, damping: 13 });
-  const up = easeInOut(prog(t, T.sai - 0.1, T.sai + 0.3));
+  const out = easeIn(prog(t, T.sai - 0.05, T.sai + 0.25));
   return (
-    <div style={{ position: "absolute", inset: 0 }}>
-      <div style={{ ...abs(0, lerp(300, 560, up), 450, 300), display: "flex", flexDirection: "column", alignItems: "center", transform: `scale(${lerp(0.4, 1, clamp(s)) * lerp(1, 0.62, up)})`, opacity: clamp(s * 2) }}>
-        <CubeLogo size={130} glow={1.2} />
-        <div style={{ ...DISP, fontSize: 34, color: "#fff", marginTop: 16 }}>ESTOKE AO CUBO</div>
-        <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 16, color: C.ice, marginTop: 6, opacity: 1 - up }}>Sites e lojas virtuais que vendem.</div>
+    <div style={{ position: "absolute", inset: 0, opacity: 1 - out }}>
+      <EmoAnim name="03_virada_dramatica_180_sorriso" x={115} y={232} size={220} t={t} at={T.monto} />
+      <div style={{ ...abs(0, 470, 450, 260), display: "flex", flexDirection: "column", alignItems: "center", transform: `scale(${lerp(0.4, 1, clamp(s))})`, opacity: clamp(s * 2) }}>
+        <CubeLogo size={96} glow={1.2} />
+        <div style={{ ...DISP, fontSize: 32, color: "#fff", marginTop: 14 }}>ESTOKE AO CUBO</div>
+        <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 16, color: C.ice, marginTop: 6 }}>Sites e lojas virtuais que vendem.</div>
       </div>
     </div>
   );
 }
 function Sai({ t }) {
   if (t < T.sai) return null;
-  const words = [["SAI", 53.84, 96], ["DO", 54.02, 96], ["AMADORISMO.", 54.16, fitSize("AMADORISMO.", 400, 80)]];
+  const words = [["SAI", 53.84, 92], ["DO", 54.02, 92], ["AMADORISMO.", 54.16, fitSize("AMADORISMO.", 400, 80)]];
+  const ls = pop(t, 54.5, { stiffness: 220, damping: 15 });
   return (
-    <div style={{ ...abs(0, 250, 450, 300), display: "flex", flexDirection: "column", alignItems: "center", zIndex: 55 }}>
-      {words.map(([w, at, size], i) => {
-        if (t < at) return null;
-        const s = pop(t, at, { stiffness: 480, damping: 15 });
-        return <div key={i} style={{ ...DISP, fontSize: size, lineHeight: 1.02, ...(i === 2 ? gradLight : { color: "#fff" }), transform: `scale(${lerp(1.7, 1, clamp(s))})`, opacity: clamp(s * 3) }}>{w}</div>;
-      })}
-    </div>
+    <>
+      <div style={{ ...abs(0, 236, 450, 290), display: "flex", flexDirection: "column", alignItems: "center", zIndex: 55 }}>
+        {words.map(([w, at, size], i) => {
+          if (t < at) return null;
+          const s = pop(t, at, { stiffness: 480, damping: 15 });
+          return <div key={i} style={{ ...DISP, fontSize: size, lineHeight: 1.02, ...(i === 2 ? gradLight : { color: "#fff" }), transform: `scale(${lerp(1.7, 1, clamp(s))})`, opacity: clamp(s * 3) }}>{w}</div>;
+        })}
+      </div>
+      <EmoAnim name="06_piscadinha_wink_charme" x={30} y={520} size={200} t={t} at={54.3} z={55} />
+      <div style={{ ...abs(226, 580, 200, 140), display: "flex", flexDirection: "column", alignItems: "center", gap: 8, zIndex: 55, transform: `scale(${lerp(0.5, 1, clamp(ls))})`, opacity: clamp(ls * 2) }}>
+        <CubeLogo size={64} glow={1} />
+        <div style={{ ...DISP, fontSize: 17, color: "#fff", whiteSpace: "nowrap" }}>ESTOKE AO CUBO</div>
+      </div>
+    </>
   );
 }
 
@@ -772,6 +816,7 @@ function Frame({ t }) {
       )}
       <div style={{ position: "absolute", inset: 0, transform: `translate(${sx}px, ${sy}px)` }}>
         <HookPhone t={t} />
+        <HookExtras t={t} />
         <SiteScene t={t} />
         <FlowScene t={t} />
         <SleepScene t={t} />
