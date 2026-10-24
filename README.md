@@ -30,7 +30,7 @@ Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver 
 
 ## Posts do Instagram (`posts-insta/`)
 
-São 8 posts estáticos em 4:5 (1080×1350), seguindo as referências: produto em fundo claro, ciclo em azul escuro, card de dados em vidro, camadas de vidro e lançamento de site num notebook. Só aparecem os sites da Dizzy, LCS, Arteiro, K-Dust, Ruppel e Kairós. Os prints da Ruppel e da Arteiro foram tirados dos sites no ar (páginas de lançamento). Os emojis são as feições do Emoji Primordial (o rosto da Estoke ao Cubo) em **SVG com contorno vetorial**, geradas por `posts-insta/cutout_faces.py` em `posts-insta/img/face/`. O recorte de origem tem o maxilar serrilhado e pontinhos claros no contorno, então cada feição vira um traçado Bézier suave do formato do rosto (usado como máscara) sobre a imagem 3D com a faixa da borda limpa. A borda fica nítida em qualquer tamanho e não deixa fio nem ponto branco. O script precisa de `scikit-image`. Entram só as feições de frente; as de ângulo, as de olhos fechados ou piscando (06, 07 e 08) e a 36 (lista "Não usar") ficam de fora.
+São 16 posts estáticos em 4:5 (1080×1350), seguindo as referências: produto em fundo claro, ciclo em azul escuro, card de dados em vidro, camadas de vidro e lançamento de site num notebook. Só aparecem os sites da Dizzy, LCS, Arteiro, K-Dust, Ruppel e Kairós. Os prints da Ruppel e da Arteiro foram tirados dos sites no ar (páginas de lançamento). Os emojis são as feições do Emoji Primordial (o rosto da Estoke ao Cubo) em **SVG com contorno vetorial**, geradas por `posts-insta/cutout_faces.py` em `posts-insta/img/face/`. O recorte de origem tem o maxilar serrilhado e pontinhos claros no contorno, então cada feição vira um traçado Bézier suave do formato do rosto (usado como máscara) sobre a imagem 3D com a faixa da borda limpa. A borda fica nítida em qualquer tamanho e não deixa fio nem ponto branco. O script precisa de `scikit-image`. Entram só as feições de frente; as de ângulo, as de olhos fechados ou piscando (06, 07 e 08) e a 36 (lista "Não usar") ficam de fora.
 
 1. `01-site-de-cara-nova`: "Seu negócio merece um site de cara nova!", com a LCS no notebook.
 2. `02-combo-que-vende`: "O combo que vende!", com a loja da Dizzy, o selo de vidro "24h" e o rosto em "estrategista".
@@ -40,6 +40,17 @@ São 8 posts estáticos em 4:5 (1080×1350), seguindo as referências: produto e
 6. `06-feitos-pela-estoke`: o portfólio com Dizzy, LCS, Arteiro, K-Dust, Ruppel e Kairós.
 7. `07-ruppel-rompa-o-padrao`: "O site da Ruppel tá na contagem regressiva!".
 8. `08-arteiro-em-breve`: "Algo especial vem aí", a loja online da Arteiro.
+
+**Leva 2 (09 a 16),** a partir das referências em `posts refeerncias/`:
+
+9. `09-saia-do-template`: "Saia do template. Faça sua marca.", com uma fila de sites genéricos e a Ruppel saindo da fila (ref. "Break the Pattern").
+10. `10-marca-na-luz`: "Seja a marca que está na luz", com o holofote azul sobre a loja da Dizzy (ref. "Be the brand in the light").
+11. `11-vende`: "ven/de." gigante em laranja sobre azul, com "menos template. mais venda." e a Kairós (ref. "future").
+12. `12-site-trabalhando`: "Seu site trabalhando por você", com a LCS no notebook e cards de vidro flutuando (ref. "Get Your Professional Website").
+13. `13-qual-o-proximo`: os adesivos "e aí, qual o próximo site? vai ser o seu?" e uma polaroid com o rosto surpreso (ref. "post apa ya?").
+14. `14-seja-ousado`: "Seja ousado." em amarelo e azul, com o estrategista e a K-Dust no celular (ref. "Be Bold").
+15. `15-kairos-case`: o case "kairós." com a linha de dados cliente / segmento / entrega / por (ref. "afternoon").
+16. `16-sites-que-impressionam`: o card branco "Sites que impressionam, atraem e convertem", com o leque dos 6 sites (refs. "We deliver websites" e "A place to display your masterpiece").
 
 Os posts ficam em `posts-insta/posts.html` e são gerados com `NODE_PATH=/opt/node22/lib/node_modules node posts-insta/render.cjs`, que grava os PNGs em `posts-insta/out/`.
 
