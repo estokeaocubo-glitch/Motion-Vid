@@ -53,6 +53,21 @@ Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver 
   - **Recorte:** cada quadro passa pelo recorte limpo dos posts, então não aparece borda branca.
   - **Sincronia:** o motion toca esse vídeo sincronizado com a linha do tempo.
 
+## Posts do sistema Estoke ao Cubo (`posts-saas/`)
+
+São 3 conceitos para vender o sistema (estoque + PDV + financeiro), em 4:5 (1080×1350). A interface é desenhada em HTML/CSS e os valores são ilustrativos.
+
+1. `01-bento-do-controle`: pôster dark em bento grid, com cards de vidro para PDV, estoque, reposição e fluxo de caixa, e a CTA "Teste o sistema →".
+2. `02-1` a `02-5`: carrossel brutalista "Caderninho vs. Cubo".
+   - Slide 1: estoque mentindo, com o caderninho rasurado e o carimbo "NÃO CONFERE".
+   - Slide 2: a planilha com `#REF!`.
+   - Slide 3: a gaveta do caixa com o post-it "falta R$ 230".
+   - Slide 4: "vendeu → baixou → somou".
+   - Slide 5: "Sai do caderninho" e "Chama no direct: CONTROLE".
+3. `03-quanto-voce-lucrou`: pôster claro estilo Apple, com a pergunta gigante, o card de vidro "Lucro líquido · outubro" e o caderninho desfocado ficando para trás.
+
+Para gerar: `NODE_PATH=/opt/node22/lib/node_modules node posts-saas/render.cjs` grava em `posts-saas/out/`. As fontes Archivo Black, Space Mono e Caveat têm licença OFL.
+
 ## Posts do Instagram (`posts-insta/`)
 
 São 16 posts estáticos em 4:5 (1080×1350), seguindo as referências: produto em fundo claro, ciclo em azul escuro, card de dados em vidro, camadas de vidro e lançamento de site num notebook. Só aparecem os sites da Dizzy, LCS, Arteiro, K-Dust, Ruppel e Kairós. Os prints da Ruppel e da Arteiro foram tirados dos sites no ar (páginas de lançamento). Os emojis são as feições do Emoji Primordial (o rosto da Estoke ao Cubo) em **SVG com contorno vetorial**, geradas por `posts-insta/cutout_faces.py` em `posts-insta/img/face/`. O recorte de origem tem o maxilar serrilhado e pontinhos claros no contorno, então cada feição vira um traçado Bézier suave do formato do rosto (usado como máscara) sobre a imagem 3D com a faixa da borda limpa. A borda fica nítida em qualquer tamanho e não deixa fio nem ponto branco. O script precisa de `scikit-image`. Entram só as feições de frente; as de ângulo, as de olhos fechados ou piscando (06, 07 e 08) e a 36 (lista "Não usar") ficam de fora.

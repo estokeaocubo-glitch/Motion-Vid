@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Estoke ao Cubo · Posts SaaS</title>
+<!--
+  Três conceitos de post para o sistema Estoke ao Cubo (estoque + PDV + financeiro), 4:5 (1080×1350):
+    01  "Bento do Controle"     pôster dark, bento grid de cards de vidro (ref. B2B SaaS bento grid)
+    02  "Caderninho vs. Cubo"   carrossel brutalista de 5 slides (ref. brutalist tech poster)
+    03  "Quanto você lucrou?"   pôster minimalista claro estilo fintech/Apple (ref. minimalist fintech ad)
+  A interface do sistema é desenhada aqui mesmo (HTML/CSS/SVG). Os valores são ilustrativos.
+  Fontes: Open Sauce Sans e EAC Display (marca), Archivo Black, Space Mono e Caveat (OFL, Google Fonts).
+  Gerar os PNGs: NODE_PATH=/opt/node22/lib/node_modules node posts-saas/render.cjs  →  posts-saas/out/
+-->
+<style>
+  @font-face { font-family: "Open Sauce Sans"; font-weight: 600; src: url(fonts/open-sauce-sans-latin-600-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Open Sauce Sans"; font-weight: 700; src: url(fonts/open-sauce-sans-latin-700-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Open Sauce Sans"; font-weight: 800; src: url(fonts/open-sauce-sans-latin-800-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Archivo Black"; src: url(fonts/archivo-black-400.woff2) format("woff2"); }
+  @font-face { font-family: "Space Mono"; font-weight: 400; src: url(fonts/space-mono-400.woff2) format("woff2"); }
+  @font-face { font-family: "Space Mono"; font-weight: 700; src: url(fonts/space-mono-700.woff2) format("woff2"); }
+  @font-face { font-family: "Caveat"; font-weight: 600; src: url(fonts/caveat-600.woff2) format("woff2"); }
+  :root {
+    --night: #000A1E; --navy: #002450; --blue: #008ACC; --cyan: #2FD4FF; --green: #22C55E; --amber: #F5B544;
+    --paper: #F2F0EA; --red: #FF3B30; --lime: #C6FF3D; --ink: #0B0F18;
+    --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #777; font-family: "Open Sauce Sans", Inter, system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; gap: 40px; padding: 40px 0; }
+  .post { width: 1080px; height: 1350px; position: relative; overflow: hidden; flex: none; }
+  .abs { position: absolute; }
+  .grain::after { content: ""; position: absolute; inset: 0; background-image: var(--grain); mix-blend-mode: overlay; opacity: var(--g, .06); pointer-events: none; }
+  .mono { font-family: "Space Mono", "DejaVu Sans Mono", monospace; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* ---------- 01 bento ---------- */
+  .bento { position: absolute; left: 56px; top: 56px; width: 968px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  .card { position: relative; border-radius: 28px; padding: 30px; overflow: hidden; color: #fff;
+          background: linear-gradient(160deg, rgba(255,255,255,.085), rgba(255,255,255,.035)); border: 1px solid rgba(255,255,255,.13);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 30px 60px rgba(0,0,0,.35); }
+  .card .lbl { font-size: 17px; font-weight: 700; letter-spacing: .02em; color: #8FA6C6; display: flex; align-items: center; gap: 10px; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 30px; font-size: 16px; font-weight: 800; }
+  .dot { width: 9px; height: 9px; border-radius: 5px; display: inline-block; }
+
+  /* ---------- 02 brutalista ---------- */
+  .brut { font-family: "Archivo Black", "Inter Display", sans-serif; text-transform: uppercase; line-height: .9; letter-spacing: -0.02em; }
+  .frame { position: absolute; inset: 28px; border: 6px solid #000; pointer-events: none; z-index: 40; }
+  .tag { font-family: "Space Mono", monospace; font-weight: 700; font-size: 22px; padding: 6px 12px; border: 4px solid #000; background: #fff; display: inline-block; }
+  .hard { border: 6px solid #000; box-shadow: 12px 12px 0 #000; }
+  .hand { font-family: "Caveat", cursive; font-weight: 600; }
+  .stamp { position: absolute; font-family: "Space Mono", monospace; font-weight: 700; color: var(--red); border: 7px solid var(--red); padding: 10px 26px; font-size: 52px; letter-spacing: .04em; opacity: .9; mix-blend-mode: multiply; }
+
+  /* ---------- 03 minimalista ---------- */
+  .glasscard { position: absolute; border-radius: 40px; background: linear-gradient(150deg, rgba(255,255,255,.82), rgba(255,255,255,.55)); border: 1.5px solid rgba(255,255,255,.95);
+               backdrop-filter: blur(22px); box-shadow: 0 60px 90px rgba(20,35,70,.18), 0 12px 24px rgba(20,35,70,.08), inset 0 1px 0 #fff; }
+  .row { display: flex; align-items: center; gap: 14px; font-size: 26px; font-weight: 700; color: #2A3240; }
+  .ok { width: 34px; height: 34px; border-radius: 17px; background: #16A34A; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; }
+</style>
+</head>
+<body>
+
+<!-- ===================================================================== -->
+<!-- 01 · Bento do Controle (pôster único, dark) -->
+<section class="post grain" id="01-bento-do-controle" style="--g: .07; background: radial-gradient(60% 45% at 8% 6%, rgba(47,212,255,.20), transparent 70%), radial-gradient(55% 45% at 100% 100%, rgba(0,138,204,.30), transparent 70%), #000A1E;">
+  <div class="bento" style="grid-template-rows: 420px 300px 380px;">
+    <!-- A: headline -->
+    <div class="card" style="grid-column: span 2; padding: 40px;">
+      <div class="mono" style="font-size: 16px; font-weight: 700; letter-spacing: .14em; color: var(--cyan);">ESTOKE AO CUBO · SISTEMA DE GESTÃO</div>
+      <div style="margin-top: 30px; font-weight: 800; font-size: 64px; line-height: 1; letter-spacing: -0.045em;">Seu negócio inteiro.<br><span style="background: linear-gradient(90deg, #2FD4FF, #4FB3E8); -webkit-background-clip: text; background-clip: text; color: transparent;">Num lugar só.</span></div>
+      <div style="margin-top: 24px; font-size: 22px; line-height: 1.4; color: #A9BBD4; font-weight: 600; max-width: 560px;">Estoque, frente de caixa e financeiro conectados. Vendeu no PDV, baixou do estoque e caiu no caixa, automaticamente.</div>
+    </div>
+    <!-- B: cubo -->
+    <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: radial-gradient(70% 60% at 50% 45%, rgba(47,212,255,.22), rgba(255,255,255,.03) 70%);">
+      <img src="cube-logo.webp" style="width: 170px; filter: drop-shadow(0 0 30px rgba(47,212,255,.55)) drop-shadow(0 24px 40px rgba(0,138,204,.6));">
+      <div style="font-weight: 800; font-size: 24px; letter-spacing: -0.01em;">estoke ao cubo</div>
+      <div class="mono" style="font-size: 14px; color: #8FA6C6; letter-spacing: .08em;">ESTOQUE · PDV · FINANCEIRO</div>
+    </div>
+    <!-- C1: PDV -->
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background: var(--cyan);"></span>PDV · agora</div>
+      <div style="margin-top: 20px; font-size: 22px; font-weight: 700; color: #DCE6F3;">Venda registrada</div>
+      <div class="num" style="margin-top: 6px; font-size: 54px; font-weight: 800; letter-spacing: -0.03em;">R$ 89,90</div>
+      <div class="mono" style="position: absolute; left: 30px; right: 30px; bottom: 26px; padding: 14px 16px; border-radius: 14px; background: rgba(255,255,255,.06); font-size: 14px; color: #B9C7DA; line-height: 1.6;">
+        <div style="display: flex; justify-content: space-between;"><span>1× Camiseta P</span><span>59,90</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>1× Boné preto</span><span>30,00</span></div>
+      </div>
+    </div>
+    <!-- C2: estoque -->
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background: var(--green);"></span>Estoque</div>
+      <div class="num" style="margin-top: 20px; font-size: 54px; font-weight: 800; letter-spacing: -0.03em;">248 <span style="font-size: 24px; color: #A9BBD4;">itens</span></div>
+      <div style="margin-top: 22px; height: 12px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: hidden;"><div style="width: 92%; height: 100%; background: linear-gradient(90deg, #16A34A, #4ADE80);"></div></div>
+      <div class="chip" style="position: absolute; left: 30px; bottom: 28px; background: rgba(34,197,94,.16); color: #4ADE80; border: 1px solid rgba(74,222,128,.35);">✓ em dia</div>
+    </div>
+    <!-- C3: reposição -->
+    <div class="card">
+      <div class="lbl"><span class="dot" style="background: var(--amber);"></span>Reposição</div>
+      <div style="margin-top: 20px; font-size: 30px; font-weight: 800; letter-spacing: -0.02em;">Camiseta P</div>
+      <div class="num" style="margin-top: 6px; font-size: 22px; font-weight: 700; color: #F5C26B;">restam 3 un.</div>
+      <div class="chip" style="position: absolute; left: 30px; bottom: 28px; background: rgba(245,181,68,.16); color: #F5C26B; border: 1px solid rgba(245,181,68,.4);">⚠ repor agora</div>
+    </div>
+    <!-- D: fluxo de caixa -->
+    <div class="card" style="grid-column: span 2; padding: 34px 36px;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="lbl" style="font-size: 19px;"><span class="dot" style="background: var(--cyan);"></span>Fluxo de caixa · outubro</div>
+        <div class="chip" style="background: rgba(255,255,255,.08); color: #C9D6EA; font-weight: 700;">mês ⌄</div>
+      </div>
+      <svg width="572" height="250" viewBox="0 0 572 250" style="position: absolute; left: 36px; bottom: 26px;">
+        <defs><linearGradient id="fa" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2FD4FF" stop-opacity=".45"/><stop offset="1" stop-color="#2FD4FF" stop-opacity="0"/></linearGradient></defs>
+        <g stroke="rgba(255,255,255,.07)" stroke-width="1"><line x1="0" y1="60" x2="572" y2="60"/><line x1="0" y1="130" x2="572" y2="130"/><line x1="0" y1="200" x2="572" y2="200"/></g>
+        <path d="M0 210 C40 200 70 214 110 196 S170 160 210 170 S280 150 320 128 S390 120 430 92 S500 70 572 40 L572 250 L0 250 Z" fill="url(#fa)"/>
+        <path d="M0 210 C40 200 70 214 110 196 S170 160 210 170 S280 150 320 128 S390 120 430 92 S500 70 572 40" fill="none" stroke="#2FD4FF" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="430" cy="92" r="11" fill="#000A1E" stroke="#4ADE80" stroke-width="5"/>
+      </svg>
+      <div style="position: absolute; left: 330px; top: 92px; padding: 14px 18px; border-radius: 16px; background: rgba(10,25,45,.85); border: 1px solid rgba(74,222,128,.45); box-shadow: 0 14px 30px rgba(0,0,0,.4);">
+        <div style="font-size: 15px; font-weight: 700; color: #8FA6C6;">Lucro líquido</div>
+        <div class="num" style="font-size: 32px; font-weight: 800; color: #4ADE80; letter-spacing: -0.02em;">R$ 18.430</div>
+      </div>
+    </div>
+    <!-- E: CTA -->
+    <div class="card" style="background: linear-gradient(150deg, #0A9BE0, #005C99); border-color: rgba(255,255,255,.25); display: flex; flex-direction: column; justify-content: space-between;">
+      <div class="mono" style="font-size: 15px; font-weight: 700; letter-spacing: .1em; color: #CDEBFF;">PRÓXIMO PASSO</div>
+      <div style="font-weight: 800; font-size: 46px; line-height: 1; letter-spacing: -0.04em;">Teste o<br>sistema →</div>
+      <div style="font-size: 17px; font-weight: 600; color: #DDF1FF; line-height: 1.35;">Estoke ao Cubo · gestão de estoque e PDV</div>
+    </div>
+  </div>
+  <div class="abs mono" style="left: 56px; right: 56px; bottom: 54px; display: flex; justify-content: space-between; font-size: 15px; color: #5F7596; letter-spacing: .06em;"><span>@estokeaocubo</span><span>valores ilustrativos</span></div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- 02 · Caderninho vs. Cubo (carrossel brutalista, 5 slides) -->
+
+<!-- slide 1 -->
+<section class="post grain" id="02-1-estoque-mentindo" style="--g: .16; background: var(--paper);">
+  <div class="frame"></div>
+  <div class="abs mono" style="left: 64px; top: 62px; font-size: 24px; font-weight: 700;">[01/05]</div>
+  <div class="abs" style="right: 64px; top: 56px;"><span class="tag" style="font-size: 18px;">ESTOKE AO CUBO</span></div>
+  <div class="abs brut" style="left: 64px; top: 140px; width: 960px; font-size: 100px;">Seu estoque está <span style="background: #000; color: var(--paper); padding: 0 12px;">mentindo</span> pra você.</div>
+  <!-- caderninho -->
+  <div class="abs" style="left: 160px; top: 560px; width: 640px; height: 640px; transform: rotate(-6deg); background: #FBFAF4; box-shadow: 18px 22px 0 rgba(0,0,0,.18), 0 2px 0 #ddd; border: 2px solid #d8d4c8;
+       background-image: repeating-linear-gradient(180deg, transparent 0 51px, #B9D3EA 51px 53px), linear-gradient(90deg, transparent 88px, #F2A0A0 88px 91px, transparent 91px);">
+    <div style="position: absolute; left: 22px; top: 30px; bottom: 30px; width: 26px; background: radial-gradient(circle, #2b2b2b 7px, transparent 8px) 0 0 / 26px 52px repeat-y;"></div>
+    <div class="hand" style="position: absolute; left: 112px; top: 46px; right: 30px; font-size: 40px; line-height: 52px; color: #1E2A6A;">
+      <div>Camiseta P — <s style="text-decoration-thickness: 4px;">12</s> <s style="text-decoration-thickness: 4px;">10</s> 8?</div>
+      <div>Bermuda M — ??</div>
+      <div>Boné preto — <span style="color: #C0392B;">acabou</span></div>
+      <div>fiado D. Maria R$ 45</div>
+      <div><s style="text-decoration-thickness: 4px;">caixa: R$ 1.230</s></div>
+      <div>caixa: R$ 1.0?? ⟵ conferir</div>
+      <div style="color: #888;">Tênis 39 — tem 2?</div>
+    </div>
+    <div style="position: absolute; right: 70px; bottom: 90px; width: 150px; height: 150px; border-radius: 50%; border: 12px solid rgba(120,70,30,.22); filter: blur(1px);"></div>
+  </div>
+  <div class="stamp" style="left: 480px; top: 900px; transform: rotate(-14deg);">NÃO CONFERE</div>
+  <div class="abs mono" style="right: 64px; bottom: 60px; font-size: 26px; font-weight: 700; background: #000; color: var(--paper); padding: 8px 16px;">arrasta →</div>
+</section>
+
+<!-- slide 2 -->
+<section class="post grain" id="02-2-planilha-esquece" style="--g: .16; background: var(--paper);">
+  <div class="frame"></div>
+  <div class="abs mono" style="left: 64px; top: 62px; font-size: 24px; font-weight: 700;">[02/05]</div>
+  <div class="abs" style="right: 64px; top: 56px;"><span class="tag" style="font-size: 18px;">ESTOKE AO CUBO</span></div>
+  <div class="abs brut" style="left: 64px; top: 140px; width: 960px; font-size: 118px;">Planilha não vende. <span style="color: var(--red);">Planilha esquece.</span></div>
+  <div class="abs hard" style="left: 80px; top: 640px; width: 920px; background: #fff; transform: rotate(1.5deg);">
+    <div class="mono" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 4px solid #000; font-size: 22px; font-weight: 700;"><span style="background: #000; color: #fff; padding: 2px 10px;">fx</span><span style="background: #FFE94D; padding: 2px 8px;">=SOMA(C2:C9)-D4/0</span></div>
+    <table class="mono" style="width: 100%; border-collapse: collapse; font-size: 22px;">
+      <tr style="background: #E9E6DC; font-weight: 700;"><td style="border: 2px solid #000; padding: 10px; width: 50px;"></td><td style="border: 2px solid #000; padding: 10px;">PRODUTO</td><td style="border: 2px solid #000; padding: 10px;">QTD</td><td style="border: 2px solid #000; padding: 10px;">VENDIDO</td><td style="border: 2px solid #000; padding: 10px;">SALDO</td></tr>
+      <tr><td style="border: 2px solid #000; padding: 10px;">2</td><td style="border: 2px solid #000; padding: 10px;">Camiseta P</td><td style="border: 2px solid #000; padding: 10px;">12</td><td style="border: 2px solid #000; padding: 10px;">4</td><td style="border: 2px solid #000; padding: 10px;">8</td></tr>
+      <tr><td style="border: 2px solid #000; padding: 10px;">3</td><td style="border: 2px solid #000; padding: 10px;">Bermuda M</td><td style="border: 2px solid #000; padding: 10px;">6</td><td style="border: 2px solid #000; padding: 10px;">?</td><td style="border: 2px solid #000; padding: 10px; background: var(--red); color: #fff; font-weight: 700;">#REF!</td></tr>
+      <tr><td style="border: 2px solid #000; padding: 10px;">4</td><td style="border: 2px solid #000; padding: 10px; text-decoration: line-through;">Boné preto</td><td style="border: 2px solid #000; padding: 10px;">0</td><td style="border: 2px solid #000; padding: 10px;">3</td><td style="border: 2px solid #000; padding: 10px; background: var(--red); color: #fff; font-weight: 700;">-3</td></tr>
+      <tr><td style="border: 2px solid #000; padding: 10px;">5</td><td style="border: 2px solid #000; padding: 10px; color: #999;">(linha apagada)</td><td style="border: 2px solid #000; padding: 10px;"></td><td style="border: 2px solid #000; padding: 10px;"></td><td style="border: 2px solid #000; padding: 10px; background: var(--red); color: #fff; font-weight: 700;">#DIV/0!</td></tr>
+      <tr><td style="border: 2px solid #000; padding: 10px;">6</td><td style="border: 2px solid #000; padding: 10px;">Tênis 39</td><td style="border: 2px solid #000; padding: 10px;">2</td><td style="border: 2px solid #000; padding: 10px;">2</td><td style="border: 2px solid #000; padding: 10px;">0 ?</td></tr>
+    </table>
+  </div>
+  <div class="abs brut" style="left: 64px; bottom: 76px; font-family: 'Open Sauce Sans', sans-serif; text-transform: none; font-weight: 800; font-size: 40px; letter-spacing: -0.02em; background: #000; color: var(--paper); padding: 10px 18px;">Uma linha apagada e o seu estoque some.</div>
+</section>
+
+<!-- slide 3 -->
+<section class="post grain" id="02-3-caixa-nao-bate" style="--g: .16; background: var(--paper);">
+  <div class="frame"></div>
+  <div class="abs mono" style="left: 64px; top: 62px; font-size: 24px; font-weight: 700;">[03/05]</div>
+  <div class="abs" style="right: 64px; top: 56px;"><span class="tag" style="font-size: 18px;">ESTOKE AO CUBO</span></div>
+  <div class="abs brut" style="left: 64px; top: 140px; width: 960px; font-size: 140px;">O caixa não bate. <span style="background: var(--red); color: #fff; padding: 0 12px;">De novo.</span></div>
+  <!-- gaveta do caixa -->
+  <div class="abs hard" style="left: 110px; top: 690px; width: 860px; height: 380px; background: #2B2F36; padding: 26px; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 0.8fr; gap: 16px;">
+    <div style="background: #1B1E23; border: 3px solid #000; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px;"><div style="width: 150px; height: 70px; background: #6FB18A; border: 3px solid #234; transform: rotate(-3deg);"></div></div>
+    <div style="background: #1B1E23; border: 3px solid #000; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px;"><div style="width: 150px; height: 70px; background: #C9A35B; border: 3px solid #234; transform: rotate(2deg);"></div></div>
+    <div style="background: #1B1E23; border: 3px solid #000; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px;"><div style="width: 150px; height: 70px; background: #8FA9D6; border: 3px solid #234; transform: rotate(-1deg);"></div></div>
+    <div style="background: #1B1E23; border: 3px solid #000;"></div>
+    <div style="grid-column: span 4; display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px;">
+      <div style="background: #1B1E23; border: 3px solid #000; display: flex; gap: 6px; align-items: center; justify-content: center;"><i style="width: 36px; height: 36px; border-radius: 50%; background: #D8B86A; border: 3px solid #6b5520;"></i><i style="width: 36px; height: 36px; border-radius: 50%; background: #D8B86A; border: 3px solid #6b5520;"></i></div>
+      <div style="background: #1B1E23; border: 3px solid #000; display: flex; align-items: center; justify-content: center;"><i style="width: 32px; height: 32px; border-radius: 50%; background: #C0C4CB; border: 3px solid #555;"></i></div>
+      <div style="background: #1B1E23; border: 3px solid #000;"></div>
+      <div style="background: #1B1E23; border: 3px solid #000; display: flex; align-items: center; justify-content: center;"><i style="width: 40px; height: 40px; border-radius: 50%; background: #D8B86A; border: 3px solid #6b5520;"></i></div>
+      <div style="background: #1B1E23; border: 3px solid #000;"></div>
+      <div style="background: #1B1E23; border: 3px solid #000; display: flex; align-items: center; justify-content: center;"><i style="width: 30px; height: 30px; border-radius: 50%; background: #C0C4CB; border: 3px solid #555;"></i></div>
+    </div>
+  </div>
+  <div class="abs hand" style="left: 640px; top: 600px; width: 300px; height: 230px; background: #FFE94D; transform: rotate(7deg); box-shadow: 8px 10px 0 rgba(0,0,0,.25); padding: 26px; font-size: 54px; line-height: 1; color: #222;">falta<br>R$ 230 ??</div>
+  <div class="abs" style="left: 64px; bottom: 76px; width: 950px; font-weight: 800; font-size: 38px; letter-spacing: -0.02em; line-height: 1.15; color: #000;">Fim do mês: você trabalhou, vendeu… <span style="background: #000; color: var(--paper); padding: 0 8px;">e não sabe quanto lucrou.</span></div>
+</section>
+
+<!-- slide 4 -->
+<section class="post grain" id="02-4-vendeu-baixou-somou" style="--g: .12; background: #008ACC; background-image: radial-gradient(rgba(0,0,0,.18) 2px, transparent 2px); background-size: 36px 36px;">
+  <div class="frame"></div>
+  <div class="abs mono" style="left: 64px; top: 62px; font-size: 24px; font-weight: 700; color: #000;">[04/05]</div>
+  <div class="abs" style="right: 64px; top: 56px;"><span class="tag" style="font-size: 18px; background: var(--lime);">ESTOKE AO CUBO</span></div>
+  <div class="abs brut" style="left: 64px; top: 140px; width: 960px; font-size: 132px; color: #000;">Vendeu →<br>baixou →<br><span style="color: #fff; -webkit-text-stroke: 0;">somou.</span></div>
+  <!-- 3 blocos ligados -->
+  <div class="abs hard" style="left: 70px; top: 600px; width: 290px; height: 330px; background: #fff; padding: 24px;">
+    <div class="mono" style="font-size: 18px; font-weight: 700;">01 · PDV</div>
+    <div style="margin-top: 18px; font-weight: 800; font-size: 26px;">Venda registrada</div>
+    <div class="num" style="font-weight: 800; font-size: 50px; letter-spacing: -0.03em;">R$ 89,90</div>
+    <div class="mono" style="margin-top: 14px; font-size: 16px; line-height: 1.6; border-top: 3px dashed #000; padding-top: 10px;">1× Camiseta P<br>1× Boné preto</div>
+  </div>
+  <div class="abs hard" style="left: 395px; top: 640px; width: 290px; height: 330px; background: #fff; padding: 24px;">
+    <div class="mono" style="font-size: 18px; font-weight: 700;">02 · ESTOQUE</div>
+    <div style="margin-top: 18px; font-weight: 800; font-size: 26px;">Camiseta P</div>
+    <div class="num" style="font-weight: 800; font-size: 50px; letter-spacing: -0.03em;">8 <span style="font-size: 26px;">→</span> 7</div>
+    <div style="margin-top: 14px; height: 18px; border: 3px solid #000;"><div style="width: 70%; height: 100%; background: #22C55E;"></div></div>
+  </div>
+  <div class="abs hard" style="left: 720px; top: 600px; width: 290px; height: 330px; background: #fff; padding: 24px;">
+    <div class="mono" style="font-size: 18px; font-weight: 700;">03 · CAIXA</div>
+    <div style="margin-top: 18px; font-weight: 800; font-size: 26px;">Entrou no caixa</div>
+    <div class="num" style="font-weight: 800; font-size: 50px; letter-spacing: -0.03em; color: #16A34A;">+ 89,90</div>
+    <div class="mono" style="margin-top: 14px; font-size: 16px; line-height: 1.6; border-top: 3px dashed #000; padding-top: 10px;">saldo do dia<br>atualizado</div>
+  </div>
+  <svg class="abs" width="1080" height="1350" style="left: 0; top: 0; z-index: 5; pointer-events: none;">
+    <path d="M358 760 L392 760" stroke="#000" stroke-width="10"/><path d="M380 744 L398 760 L380 776" fill="none" stroke="#000" stroke-width="10"/>
+    <path d="M683 790 L716 790" stroke="#000" stroke-width="10"/><path d="M704 774 L722 790 L704 806" fill="none" stroke="#000" stroke-width="10"/>
+  </svg>
+  <div class="abs" style="left: 70px; top: 1010px; display: flex; gap: 18px;"><span class="tag" style="background: var(--lime); font-size: 26px;">[ESTOQUE: OK]</span><span class="tag" style="background: var(--lime); font-size: 26px;">[CAIXA: FECHADO]</span></div>
+  <div class="abs" style="left: 70px; bottom: 76px; font-weight: 800; font-size: 38px; letter-spacing: -0.02em; color: #000;">PDV, estoque e financeiro conversando sozinhos.</div>
+</section>
+
+<!-- slide 5 -->
+<section class="post grain" id="02-5-sai-do-caderninho" style="--g: .12; background: #008ACC;">
+  <div class="frame"></div>
+  <div class="abs mono" style="left: 64px; top: 62px; font-size: 24px; font-weight: 700; color: #000;">[05/05]</div>
+  <img class="abs" src="cube-logo.webp" style="left: 640px; top: 120px; width: 380px; transform: rotate(8deg); filter: drop-shadow(16px 16px 0 #000);">
+  <div class="abs brut" style="left: 64px; top: 540px; width: 960px; font-size: 116px; color: #000;">Sai do<br><span style="color: #fff;">caderninho.</span></div>
+  <div class="abs" style="left: 64px; top: 900px; width: 900px; font-weight: 800; font-size: 40px; line-height: 1.2; letter-spacing: -0.02em; color: #000;">Estoke ao Cubo: estoque, frente de caixa e financeiro num sistema só.</div>
+  <div class="abs hard brut" style="left: 64px; top: 1100px; background: var(--lime); padding: 26px 34px; font-size: 52px; line-height: 1; color: #000;">Chama no direct: CONTROLE</div>
+</section>
+
+<!-- ===================================================================== -->
+<!-- 03 · Quanto você lucrou? (pôster único, claro estilo Apple) -->
+<section class="post grain" id="03-quanto-voce-lucrou" style="--g: .05; background: radial-gradient(90% 60% at 50% 0%, #FFFFFF, #EEF2F6 55%, #E2E8EF 100%);">
+  <div class="abs" style="top: 104px; width: 100%; text-align: center; color: var(--ink); font-weight: 800; font-size: 104px; line-height: .98; letter-spacing: -0.05em;">Quanto você<br>lucrou esse mês?</div>
+  <div class="abs" style="top: 336px; width: 100%; text-align: center; color: #5B6577; font-size: 32px; font-weight: 600; letter-spacing: -0.01em;">Não é quanto vendeu. É quanto sobrou.</div>
+  <!-- caderninho ficando para trás, desfocado -->
+  <div class="abs" style="left: 120px; top: 470px; width: 520px; height: 460px; transform: rotate(-12deg); background: #FBFAF4; filter: blur(7px); opacity: .55; background-image: repeating-linear-gradient(180deg, transparent 0 44px, #B9D3EA 44px 46px);">
+    <div class="hand" style="position: absolute; left: 70px; top: 40px; font-size: 38px; line-height: 46px; color: #1E2A6A;">caixa R$ 1.0??<br>fiado 45<br>conferir…</div>
+  </div>
+  <!-- card de vidro com a resposta -->
+  <div class="glasscard" style="left: 230px; top: 500px; width: 640px; height: 470px; transform: rotate(-6deg); padding: 46px 50px;">
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="font-size: 24px; font-weight: 700; color: #5B6577;">Lucro líquido · outubro</div>
+      <img src="cube-logo.webp" style="width: 40px;">
+    </div>
+    <div class="num" style="margin-top: 14px; font-weight: 800; font-size: 84px; letter-spacing: -0.045em; color: var(--ink);">R$ 18.430<span style="font-size: 50px;">,00</span></div>
+    <div style="margin-top: 4px; display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 20px; background: rgba(22,163,74,.12); color: #15803D; font-weight: 800; font-size: 20px;">▲ no positivo</div>
+    <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 16px;">
+      <div class="row"><span class="ok">✓</span>Vendas no PDV</div>
+      <div class="row"><span class="ok">✓</span>Estoque conferido</div>
+      <div class="row"><span class="ok">✓</span>Contas pagas</div>
+    </div>
+  </div>
+  <div class="abs" style="top: 1050px; width: 100%; text-align: center; padding: 0 140px; color: #3E4757; font-size: 28px; line-height: 1.4; font-weight: 600;">A Estoke ao Cubo liga o seu PDV ao estoque e ao financeiro, e mostra o lucro real do mês em um clique.</div>
+  <div class="abs" style="top: 1178px; width: 100%; display: flex; justify-content: center;"><span style="background: var(--ink); color: #fff; font-weight: 700; font-size: 26px; padding: 16px 32px; border-radius: 40px;">Descubra o seu → link na bio</span></div>
+  <div class="abs" style="bottom: 46px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; font-weight: 800; font-size: 24px; color: var(--navy);"><img src="cube-logo.webp" style="width: 30px;">estoke ao cubo</div>
+  <div class="abs" style="right: 40px; bottom: 50px; font-size: 14px; color: #8A93A3; font-weight: 600;">valores ilustrativos</div>
+</section>
+
+</body>
+</html>
