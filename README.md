@@ -9,6 +9,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
 | Roda Cultural do CDC: navegação no site com zoom e efeitos | 22,5s | 16:9 e 9:16 | `roda-cultural/edit.py` (captura no zip da raiz) | `dist/roda-cultural-site-16x9.mp4`, `dist/roda-cultural-site-9x16.mp4` |
+| "Site no navegador" (LCS, refeito da referência do navegador) | 17,2s | 16:9 e 9:16 | `src/ChromeSiteAd.jsx` + `dist/media/chrome/` | `dist/site-no-navegador-16x9.mp4`, `dist/site-no-navegador-9x16.mp4` |
 | "Quanto você lucrou?" (sistema de estoque/PDV, UI motion) | 22s | 9:16 | `src/LucroAd.jsx` + `src/lucro/` | `dist/quanto-voce-lucrou-9x16.mp4` |
 | "Tem site?" (historinha com o Emoji Primordial 3D) | 21,5s | 9:16 | `src/EmojiStoryAd.jsx` + `src/emojiStory/` | `dist/tem-site-emoji-9x16.mp4` |
 | "WhatsApp no automático" (UI motion, 3 opções de texto) | 9,2s | 16:9 e 9:16 | `src/AutoPilotAd.jsx` + `src/autopilot/` | `dist/whatsapp-automatico-opcao{1,2,3}-16x9.mp4`, `dist/whatsapp-automatico-opcao{1,2,3}-9x16.mp4` |
@@ -29,6 +30,22 @@ Biblioteca do **Emoji Primordial 3D** (36 feições, 12 animações, documentaç
 Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver [`trailer-temporada1/`](trailer-temporada1/).
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## "Site no navegador" (ChromeSiteAd)
+
+Refaz a referência do navegador com um site nosso, o da LCS Transporte e Turismo. Os tempos e o áudio são os originais da referência.
+
+| Tempo | Cena |
+|---|---|
+| 0–2s | O cursor chega no dock de apps e clica no navegador |
+| 2,07s | Um círculo verde se abre e o ícone do navegador cresce e gira |
+| 3,4s | Fundo azul: uma linha branca desenha um círculo que vira a barra de endereço e digita "lcs transporte e turismo" |
+| 5,3–12,3s | A linha amarela leva até a janela, que mostra a gravação real do site rolando, com saltos nas batidas |
+| 12,3s | Fundo amarelo com o zigue-zague verde e uma colagem de prints do site |
+| 15s | "LCS Transporte & Turismo · site no ar · feito pela Estoke ao Cubo" |
+| 16,3s | Fundo preto com a logo da LCS e "site por estoke ao cubo" |
+
+O ícone do navegador é genérico (um globo), não a marca de um navegador específico. A gravação, os prints e a logo ficam em `dist/media/chrome/`.
 
 ## "Quanto você lucrou?" (LucroAd)
 
