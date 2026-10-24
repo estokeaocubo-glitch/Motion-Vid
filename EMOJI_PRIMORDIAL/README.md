@@ -11,6 +11,18 @@ Esta pasta centraliza **todos os ativos oficiais, feições estáticas, animaç�
 >   versões transparentes, com a mesma composição sobre `#D1D1D1` da engine (`save_both_formats`).
 > - **`01_FEICOES_PNG_TRANSPARENTE`:** só 6 de 36 (02, 26, 33, 34, 35 e 36). **Falta reenviar as outras 30** (01, 03–25, 27–32).
 
+## Feições vetoriais 2D (`06_FEICOES_VETORIAIS_2D/`)
+
+São 20 feições novas, 100% em SVG, do mesmo personagem num traço ilustrado de emoji de meme: contorno grosso, cor chapada, sombra simples, blush hachurado e gotas de suor. Continua sendo ele: pele marrom com as cores amostradas do 3D, cabelo curto com degradê, óculos sem aro com ponte azul-marinho, AirPods e olhos castanhos.
+
+![Feições vetoriais 2D](06_FEICOES_VETORIAIS_2D/catalogo.png)
+
+- **Sérias (refinadas):** 01 confiante, 02 sorriso aberto, 03 focado, 04 pensativo (mão no queixo), 05 satisfeito, 06 piscadinha, 07 bravo e 08 desconfiado.
+- **Cômicas:** 09 convencido, 10 implorando (mãos juntas), 11 estressado, 12 cansado, 13 sem reação, 14 chocado, 15 chorando de rir, 16 nervoso, 17 apaixonado, 18 dinheiro, 19 confuso e 20 dormindo.
+- **Como gerar:** `python3 EMOJI_PRIMORDIAL/06_FEICOES_VETORIAIS_2D/gerar_feicoes.py` grava `svg/*.svg` e `catalogo.html`.
+- **Como criar uma feição nova:** cada uma é montada de peças (olhos, sobrancelhas, boca, extras e inclinação). Basta acrescentar uma linha na lista `FEICOES` do script.
+- **Escala:** por serem vetor, ficam nítidas em qualquer tamanho e sem borda branca em fundo nenhum.
+
 ## Não usar
 
 Feições e animações que ficam fora dos motions da Estoke ao Cubo:
