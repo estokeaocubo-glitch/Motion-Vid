@@ -9,6 +9,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
 | Roda Cultural do CDC: navegação no site com zoom e efeitos | 22,5s | 16:9 e 9:16 | `roda-cultural/edit.py` (captura no zip da raiz) | `dist/roda-cultural-site-16x9.mp4`, `dist/roda-cultural-site-9x16.mp4` |
+| "Em 5 segundos" (gancho de retenção na tela do notebook) | 33s | 9:16 | `src/CincoSegundosAd.jsx` | `dist/em-5-segundos-9x16.mp4` |
 | "Carrossel de sites" (cover flow 3D, loop) | 14s | 4:5 e 9:16 | `src/CoverflowAd.jsx` + `dist/media/coverflow/` | `dist/carrossel-sites-4x5.mp4`, `dist/carrossel-sites-9x16.mp4` |
 | "Site no navegador" (LCS, refeito da referência do navegador) | 18,8s | 16:9 e 9:16 | `src/ChromeSiteAd.jsx` + `dist/media/chrome/` | `dist/site-no-navegador-16x9.mp4`, `dist/site-no-navegador-9x16.mp4` |
 | "Quanto você lucrou?" (sistema de estoque/PDV, UI motion) | 22s | 9:16 | `src/LucroAd.jsx` + `src/lucro/` | `dist/quanto-voce-lucrou-9x16.mp4` |
@@ -31,6 +32,26 @@ Biblioteca do **Emoji Primordial 3D** (36 feições, 12 animações, documentaç
 Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver [`trailer-temporada1/`](trailer-temporada1/).
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## "Em 5 segundos" (CincoSegundosAd)
+
+Segue o formato da referência de retenção: a tela de um notebook filmada no escuro, com câmera na mão, vinheta, grão e brilho no texto. No centro, um player com cronômetro no topo, e a legenda fixa "Em 5 segundos alguém compra no seu site sem você sequer cansar". Os valores são ilustrativos.
+
+| Tempo | Cena |
+|---|---|
+| 0–6s | Contagem 5 → 0 com tique de relógio. O cursor fica parado em "Finalizar compra" num card da camiseta Ruppel |
+| 6s | Clique: "PIX APROVADO", "VENDEU." e a notificação de venda, no drop da "Miami" |
+| 7,4s | "você ficou 5 segundos esperando a venda" |
+| 10,4s | "e ainda está 00:11 AQUI ↓" (o cronômetro é o tempo real do vídeo) |
+| 13,2s | "isso é ATENÇÃO." |
+| 15,4s | "atenção VENDE." com o gráfico subindo |
+| 17,6s | "mas você… sem site / vende só no direct / perde a venda das 3h" |
+| 21,4s | Card laranja "AGORA você pode ter um site que vende 24h", que vai de 85% a 100% e mostra "site no ar" |
+| 26s | "assim como esses aqui": Ruppel, Dizzy e Kairós |
+| 28,2s | "0 cansaço." |
+| 30,2s | "o próximo passo" e o botão "orçamento no direct" |
+
+A partir de 15,5s, a legenda muda para "Orçamento no direct 👇".
 
 ## "Carrossel de sites" (CoverflowAd)
 

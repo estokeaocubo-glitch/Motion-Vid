@@ -23,6 +23,7 @@ const ENTRIES = [
   { src: "src/AutoPilotAd.jsx", name: "AutoPilotAd", slug: "whatsapp-automatico-opcao1", title: "WhatsApp no Automático · Opção 1", alias: { "./autopilot/variant": "src/autopilot/v1.js" } },
   { src: "src/AutoPilotAd.jsx", name: "AutoPilotAd", slug: "whatsapp-automatico-opcao2", title: "WhatsApp no Automático · Opção 2", alias: { "./autopilot/variant": "src/autopilot/v2.js" } },
   { src: "src/AutoPilotAd.jsx", name: "AutoPilotAd", slug: "whatsapp-automatico-opcao3", title: "WhatsApp no Automático · Opção 3", alias: { "./autopilot/variant": "src/autopilot/v3.js" } },
+  { src: "src/CincoSegundosAd.jsx", name: "CincoSegundosAd", slug: "em-5-segundos", title: "Em 5 segundos" },
   { src: "src/CoverflowAd.jsx", name: "CoverflowAd", slug: "carrossel-sites", title: "Carrossel de sites" },
   { src: "src/ChromeSiteAd.jsx", name: "ChromeSiteAd", slug: "site-no-navegador", title: "Site no navegador (LCS)" },
   { src: "src/LucroAd.jsx", name: "LucroAd", slug: "quanto-voce-lucrou", title: "Quanto você lucrou?" },
