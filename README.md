@@ -8,6 +8,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
+| "Site é oxigênio" (Reels narrado) | 55,2s | 9:16 | `src/OxigenioAd.jsx` + `src/oxi/` | `dist/site-oxigenio-9x16.mp4` |
 | "dev / tools / site" (três faixas) | 11,4s | Story 9:16 e 3:4 | `src/ToolsReveal.jsx` | `dist/dev-tools-site-9x16.mp4`, `dist/dev-tools-site-3x4.mp4` |
 | "Amplie seu alcance" (anúncio de sites) | 31s | 16:9 e 9:16 | `src/ReachAd.jsx` | `dist/anuncio-alcance-16x9.mp4`, `dist/anuncio-alcance-9x16.mp4` |
 | Anúncio de sites (tipografia cinética) | 32s | 16:9 e 9:16 | `src/SiteAd.jsx` | `dist/anuncio-sites-16x9.mp4`, `dist/anuncio-sites-9x16.mp4` |
@@ -23,6 +24,28 @@ Biblioteca do **Emoji Primordial 3D** (36 feições, 12 animações, documentaç
 Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver [`trailer-temporada1/`](trailer-temporada1/).
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## "Site é oxigênio" (OxigenioAd)
+
+Reels narrado (voz ElevenLabs, `VO - Voce gasta horas gravando Reels (ElevenLabs).mp3`), com tudo sincronizado com a fala.
+Os tempos de cada palavra saem da transcrição com faster-whisper, revisada à mão, em `src/oxi/captions.js`.
+
+- **Legendas cinéticas:** cada palavra entra na hora em que é falada, com os destaques em ciano (fundo escuro) ou azul (fundo claro). "NADA.", "EM PLENO 2026" e "SAI DO AMADORISMO." viram tipografia gigante com impacto.
+- **0–10,7s, o gancho:** celular gravando Reels, com o cronômetro em horas. Depois o feed com fotos subindo, o story com filtro de cachorrinho balançando a orelha e a busca "minha loja petrópolis", que termina em "Nenhum resultado encontrado", com grilos.
+- **10,7–22,9s, a ironia:** o direct com "Qual o valor?" e "Mandei no direct", e "EM PLENO 2026" com tremor. Em seguida o cliente digitando, "visto há 3 h", "Deixa, comprei em outra loja." e "cliente saiu da conversa".
+- **23–41,4s, a solução (visual claro):**
+  - O site surgindo e as bolhas de O₂.
+  - O robô vendedor carimbando pedidos "PAGO", o relógio 24H acelerado e a lista riscada "sem CLT / folga / vácuo".
+  - A jornada de compra: entra, catálogo, dúvida no chat, cartão na maquininha "APROVADO", "Comprar agora", confete e "Nova venda!".
+  - Metade da tela com o site vendendo de madrugada, metade com você dormindo (lua e "Zzz").
+- **41,4–55,2s, o CTA:**
+  - "Loja do Zé!!!" amadora, com teia e preço só no direct, contra o concorrente bonito, com as vendas indo para ele.
+  - A virada para "Sua loja ✓", com o carimbo PRO.
+  - O perfil com "LINK NA BIO", a mãozinha no comentário com "EU QUERO" pulsando, a logo e "SAI DO AMADORISMO.".
+- **Som:** narração por cima de tudo e a trilha "DISTANCE" baixa por baixo.
+  - A trilha some no "Nada." (só os grilos) e baixa no "Em pleno 2026".
+  - Efeitos em cada ação: obturador, digitação, cliques, pops do direct, impactos, carimbos, tique-taque, moedas da venda, corneta do confete, ronco e sininhos de venda.
+  - Os efeitos novos vêm da Mixkit e ficam num módulo separado: `src/audio/sfxVo.js`.
 
 ## "dev / tools / site" (ToolsReveal)
 
@@ -242,6 +265,7 @@ node scripts/export-video.cjs dist/reel-editorial.html dist/reel-editorial-9x16.
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-4x5.mp4 60 4x5
 node scripts/export-video.cjs dist/dev-tools-site.html dist/dev-tools-site-9x16.mp4 60 9x16
+node scripts/export-video.cjs dist/site-oxigenio.html dist/site-oxigenio-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/dev-tools-site.html dist/dev-tools-site-3x4.mp4 60 3x4
 node scripts/export-video.cjs dist/anuncio-alcance.html dist/anuncio-alcance-16x9.mp4 60 16x9
 node scripts/export-video.cjs dist/anuncio-alcance.html dist/anuncio-alcance-9x16.mp4 60 9x16

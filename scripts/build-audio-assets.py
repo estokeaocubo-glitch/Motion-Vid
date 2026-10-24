@@ -6,6 +6,8 @@
   src/audio/bailarAd.js   trecho da "BAILAR" para o anúncio de sites (MUSIC_AD)
   src/audio/alexaReach.js trecho da "Alexa 2" para o anúncio "Amplie seu alcance" (MUSIC_REACH)
   src/audio/toolsRef.js   música do vídeo de referência "artist / tools / art" para o "dev / tools / site" (MUSIC_TOOLS)
+  src/audio/voSite.js     narração (ElevenLabs) e trilha de fundo do anúncio "Site é oxigênio" (VO_SITE, MUSIC_OXI)
+  src/audio/sfxVo.js      efeitos extras do anúncio "Site é oxigênio" (SFXV, SFXV_PEAK)
   src/audio/tape.js       efeitos analógicos do repositório (TAPE, TAPE_PEAK)
   src/audio/sfx.js        efeitos gravados da Mixkit (SFX, SFX_PEAK)
 
@@ -23,6 +25,8 @@ MIAMI = os.path.join(ROOT, "[FREE] Nemzzz x Sample x Hoodtrap Type Beat - _Miami
 ALEXA = os.path.join(ROOT, "Lh Chucro x Derek x Neckklace type beat _Alexa 2_ _ Prod. EMANVEL.m4a")
 BAILAR = os.path.join(ROOT, "[FREE] Latin Trap x Mexican Type Beat - ''BAILAR'' 🇲🇽 _ Cuban Trap Type Beat 2025 [mdU25uOFZRg].mp3")
 TOOLS_REF = os.path.join(ROOT, "dev-tools-site (audio original).m4a")
+VO_SITE = os.path.join(ROOT, "VO - Voce gasta horas gravando Reels (ElevenLabs).mp3")
+DISTANCE = os.path.join(ROOT, "TRAP TYPE BEAT - _DISTANCE_ _ FREESTYLE BEAT _ HARD TYPE BEAT _ FREE RAP INSTRUMENTAL 2026 [zuHucgfzkoA].mp3")
 TAPE_DIR = os.path.join(ROOT, "Efeitos Analógicos (15)")
 
 # Música: id → (arquivo, constante exportada, início na faixa, duração)
@@ -31,7 +35,9 @@ MUSIC = {
     "miamiFlow": (MIAMI, "MUSIC_FLOW", 23.0, 20.5),  # golpe de 39,38s da faixa em 16,38s do trecho
     "bailarAd": (BAILAR, "MUSIC_AD", 30.0, 33.0),     # drop da "BAILAR" (32,02s) em 2,02s do trecho
     "alexaReach": (ALEXA, "MUSIC_REACH", 1.3, 32.0),   # drop da "Alexa 2" (17,47s) em 16,17s do trecho
-    "toolsRef": (TOOLS_REF, "MUSIC_TOOLS", 0.0, None),  # inteira (11,39s): beat volta em 3,78s, 137,6 BPM
+    "toolsRef": (TOOLS_REF, "MUSIC_TOOLS", 0.0, None),
+    "voSite": (VO_SITE, "VO_SITE", 0.0, None),               # narração inteira (55,07s)
+    "oxiMusic": (DISTANCE, "MUSIC_OXI", 67.29, 56.0),         # "DISTANCE" a partir da volta do beat, por baixo da voz  # inteira (11,39s): beat volta em 3,78s, 137,6 BPM
 }
 # Efeitos analógicos do repositório: id → (arquivo, início, duração)
 TAPE = {
@@ -73,6 +79,19 @@ SFX = {
     "crumple": (2996, 0, None),          # Quick paper crumple sound — "template" amassado
     "paperTrash": (2381, 0, None),       # Pile of paper trash — cai na lixeira
     "marker": (2998, 0, None),           # Pen marker line — marca-texto
+}
+
+# Efeitos extras só do anúncio "Site é oxigênio" (módulo separado para não pesar nos outros motions)
+SFX_VO = {
+    "crickets": (1789, 0, 2.6),          # Summer night crickets loop — "Nada."
+    "shutter": (1432, 0, None),          # Camera digital shutter — fotos postadas
+    "tick": (1063, 0, 2.2),              # Fast wall clock ticking — 24 horas
+    "coinWin": (1992, 0, None),          # Coin win notification — a venda (cha-ching)
+    "coins": (1993, 0, 1.4),             # Clinking coins — reforço da venda
+    "snore": (1911, 0, 2.4),             # Sleep soft snore — "tá dormindo"
+    "boing": (2894, 0, None),            # Boing hit sound — orelha do filtro
+    "partyHorn": (530, 0, None),         # Happy party horn sound — confete
+    "bell": (933, 0, None),              # Bell notification — notificações de venda
 }
 
 
@@ -145,6 +164,14 @@ def main():
             peaks[k] = encode(src, s, d, p, "128k", normalize=True)
             files[k] = p
         module(os.path.join(out, "sfx.js"), "SFX", files, peaks)
+        files, peaks = {}, {}
+        for k, (num, s, d) in SFX_VO.items():
+            src = os.path.join(tmp, f"mixkit-{num}.wav")
+            urllib.request.urlretrieve(f"https://assets.mixkit.co/active_storage/sfx/{num}/{num}.wav", src)
+            p = os.path.join(tmp, k + ".mp3")
+            peaks[k] = encode(src, s, d, p, "128k", normalize=True)
+            files[k] = p
+        module(os.path.join(out, "sfxVo.js"), "SFXV", files, peaks)
 
 
 if __name__ == "__main__":

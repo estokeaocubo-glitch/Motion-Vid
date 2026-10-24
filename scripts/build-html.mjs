@@ -16,6 +16,7 @@ const ENTRIES = [
   { src: "src/SiteAd.jsx", name: "SiteAd", slug: "anuncio-sites", title: "Anúncio Sites" },
   { src: "src/ReachAd.jsx", name: "ReachAd", slug: "anuncio-alcance", title: "Amplie seu Alcance" },
   { src: "src/ToolsReveal.jsx", name: "ToolsReveal", slug: "dev-tools-site", title: "dev / tools / site" },
+  { src: "src/OxigenioAd.jsx", name: "OxigenioAd", slug: "site-oxigenio", title: "Site é Oxigênio" },
   { src: "src/FlowReveal.jsx", name: "FlowReveal", slug: "fluxo-automatico", title: "Venda no Automático" },
   { src: "src/FlowReveal.jsx", name: "FlowReveal", slug: "fluxo-automatico-story", title: "Venda no Automático (Story)", alias: { "./flow/variant": "src/flow/story.js" } },
   { src: "src/InventorySaaS.jsx", name: "InventorySaaS", slug: "saas-estoque", title: "SaaS Gestão de Estoque" },
