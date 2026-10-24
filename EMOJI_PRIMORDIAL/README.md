@@ -13,7 +13,7 @@ Esta pasta centraliza **todos os ativos oficiais, feições estáticas, animaç�
 
 ## Não usar
 
-Feições e animações que ficam fora dos motions da Estoke ao Cubo (o `scripts/build-oxi-assets.py` recusa as que estão aqui):
+Feições e animações que ficam fora dos motions da Estoke ao Cubo:
 
 | Arquivo | Motivo |
 | --- | --- |
