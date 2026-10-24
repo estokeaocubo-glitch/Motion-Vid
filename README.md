@@ -40,7 +40,7 @@ Refaz a referência do navegador com um site nosso, o da LCS Transporte e Turism
 | 0–2s | O cursor chega no dock de apps (grande, como na referência) e clica no navegador |
 | 2,07s | Um círculo verde com anéis concêntricos se abre e o ícone cresce girando, com motion blur |
 | 3,4s | Fundo azul: o anel branco grande se desenha rápido e vira a barra de endereço grossa, que digita "lcs transporte e turismo" |
-| 5,3–12,3s | A linha amarela leva até a janela com moldura grossa, que mostra a gravação real do site já rolando. Os saltos têm motion blur |
+| 5,3–12,3s | A linha amarela leva até a janela com moldura grossa, que fica parada no centro mostrando a gravação real do site já rolando |
 | 12,3s | A janela vira uma tira estreita e atravessa a tela; o fundo amarelo e o zigue-zague entram |
 | 13,2s | Colagem de prints grandes e sobrepostos, em perspectiva, com a câmera andando |
 | 15s | "LCS Transporte & Turismo" grande, à direita, numa área limpa (o zigue-zague fica embaixo e à esquerda) |

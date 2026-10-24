@@ -956,12 +956,8 @@ function Browser({ t, W, H, u }) {
   if (t < T.win - 0.05 || t >= T.yellow + 0.85) return null;
   const vertical = H > W;
   const ww = vertical ? W * 0.92 : W * 0.78, wh = vertical ? ww * 0.74 : ww * 0.58;
-  const jumps = [[5.35, 0, 0], [7.5, -0.05, 0.02], [8.9, 0.05, -0.02], [9.9, -0.03, 0.02], [10.9, 0.05, 0.0], [11.6, -0.02, -0.01]];
-  let j = jumps[0], jp = jumps[0];
-  jumps.forEach((x, i) => { if (t >= x[0]) { j = x; jp = jumps[Math.max(0, i - 1)]; } });
-  const jt = easeOut(clamp((t - j[0]) / 0.18));
-  const jx = lerp(jp[1], j[1], jt), jy = lerp(jp[2], j[2], jt);
-  const jumpBlur = t - j[0] < 0.18 && j !== jumps[0] ? (1 - jt) * 6 * u : 0;
+  // a janela fica parada no centro enquanto o site é apresentado (sem saltos)
+  const jx = 0, jy = 0, jumpBlur = 0;
   const p = pop(t, T.win, 240, 16);
   // saída: vira uma tira estreita (tipo celular) e atravessa a tela para a esquerda
   const o1 = easeInOut(prog(t, T.yellow - 0.1, T.yellow + 0.35));
@@ -983,7 +979,8 @@ function Browser({ t, W, H, u }) {
         filter: jumpBlur + o2 * 8 * u > 0.3 ? `blur(${jumpBlur + o2 * 8 * u}px)` : "none",
       }}>
         <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: 14 * u, overflow: "hidden", background: "#eee" }}>
-          <SyncedVideo t={t - T.win} duration={SITE.dur} webm={SITE.webm} mp4={SITE.mp4} style={{ objectFit: "cover", objectPosition: vertical ? "45% top" : "top" }} />
+          {/* a primeira linha decodificada do vídeo pode vir com uma faixa rosa/verde no navegador: o vídeo começa 8px acima da borda */}
+          <SyncedVideo t={t - T.win} duration={SITE.dur} webm={SITE.webm} mp4={SITE.mp4} style={{ inset: "auto", left: 0, top: -8 * u, width: "100%", height: `calc(100% + ${8 * u}px)`, objectFit: "cover", objectPosition: vertical ? "45% top" : "top" }} />
         </div>
       </div>
     </>
@@ -1107,7 +1104,6 @@ function buildEvents() {
   fx(T.type, "typing", 0.12, { dur: T.up - T.type - 0.1 });
   fx(T.up, "confirm", 0.08);
   fx(T.win, "airSweep", 0.12); fx(T.win + 0.1, "hardPop", 0.1);
-  [7.5, 8.9, 9.9, 10.9, 11.6].forEach((at, i) => fx(at, "dryPop", 0.07, { rate: 1 + (i % 3) * 0.06 }));
   fx(T.yellow, "windSwoosh", 0.12);
   [0, 1, 2, 3, 4, 5].forEach((i) => fx(T.collage + i * 0.14, "shutter", 0.06, { rate: 1 + (i % 3) * 0.05 }));
   fx(T.name, "airWhoosh", 0.1); fx(T.name + 0.15, "sparkleTouch", 0.1);
