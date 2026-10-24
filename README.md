@@ -30,15 +30,16 @@ Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver 
 
 ## Posts do Instagram (`posts-insta/`)
 
-São 7 posts estáticos em 4:5 (1080×1350), seguindo as referências: produto em fundo claro, ciclo em azul escuro, card de dados em vidro, camadas de vidro e lançamento de site num notebook. Os prints vêm dos sites já feitos pela Estoke ao Cubo, e os emojis são 3D (Fluent Emoji da Microsoft, licença MIT).
+São 8 posts estáticos em 4:5 (1080×1350), seguindo as referências: produto em fundo claro, ciclo em azul escuro, card de dados em vidro, camadas de vidro e lançamento de site num notebook. Só aparecem os sites da Dizzy, LCS, Arteiro, K-Dust, Ruppel e Kairós. Os prints da Ruppel e da Arteiro foram tirados dos sites no ar (páginas de lançamento). Os emojis são 3D (Fluent Emoji da Microsoft, licença MIT).
 
-1. `01-site-de-cara-nova`: "Seu negócio merece um site de cara nova!", com o Misú no notebook.
+1. `01-site-de-cara-nova`: "Seu negócio merece um site de cara nova!", com a LCS no notebook.
 2. `02-combo-que-vende`: "O combo que vende!", com a loja da Dizzy, o selo de vidro "24h", carrinho e saco de dinheiro.
 3. `03-acontece-com-todo-mundo`: o ciclo "Sem site → Cliente não te acha → Venda perdida", e a Estoke ao Cubo resolve.
 4. `04-vendendo-24-7`: o card "Seu site vendendo 24/7", com o pedido às 03:15, a lua e a carinha dormindo.
-5. `05-sites-que-vendem`: "Sites que vendem de verdade", com Noka, Misú e LCS em camadas de vidro.
-6. `06-feitos-pela-estoke`: o portfólio com Misú, Noka, LCS, Dizzy, Roda Cultural e Kairós.
-7. `07-roda-cultural-no-ar`: o lançamento "O site da Roda Cultural do CDC tá no ar!".
+5. `05-sites-que-vendem`: "Sites que vendem de verdade", com Kairós, Dizzy e K-Dust em camadas de vidro.
+6. `06-feitos-pela-estoke`: o portfólio com Dizzy, LCS, Arteiro, K-Dust, Ruppel e Kairós.
+7. `07-ruppel-rompa-o-padrao`: "O site da Ruppel tá na contagem regressiva!".
+8. `08-arteiro-em-breve`: "Algo especial vem aí", a loja online da Arteiro.
 
 Os posts ficam em `posts-insta/posts.html` e são gerados com `NODE_PATH=/opt/node22/lib/node_modules node posts-insta/render.cjs`, que grava os PNGs em `posts-insta/out/`.
 
