@@ -254,16 +254,32 @@ function StoryScreen({ t }) {
           </div>
         ))}
       </div>
-      <div style={{ ...abs(8, 100, 200, 200) }}>
-        {/* orelhas 3D do filtro, balançando */}
-        {[-1, 1].map((sd) => (
-          <div key={sd} style={{ ...abs(sd < 0 ? 6 : 132, 0, 62, 112), borderRadius: "50% 50% 46% 46% / 40% 40% 60% 60%", background: "radial-gradient(circle at 40% 30%, #B07A55, #7A4A2C 70%)", boxShadow: "inset -6px -10px 14px rgba(0,0,0,.35)", transformOrigin: "50% 8%", transform: `rotate(${sd * (24 + flap)}deg)`, zIndex: 1 }}>
-            <div style={{ ...abs(14, 18, 34, 72), borderRadius: "50%", background: "radial-gradient(circle at 40% 30%, #E7A98A, #C27E5E)" }} />
-          </div>
-        ))}
-        <img src={EMO["02_sorriso_gentil"]} alt="" draggable={false} style={{ ...abs(0, 6, 200, 200), maxWidth: "none", zIndex: 2, transform: breathe(t) }} />
-        <div style={{ ...abs(84, 116 + tongue * 2, 32, 34 * clamp(tongue, 0, 1.2)), borderRadius: "0 0 16px 16px", background: "linear-gradient(#FF6B8B,#E0466A)", zIndex: 3 }} />
-        <div style={{ ...abs(80, 100, 40, 26), borderRadius: "50%", background: "radial-gradient(circle at 35% 30%, #6B4A3A, #1B0F0A 65%)", boxShadow: "0 3px 6px rgba(0,0,0,.4)", zIndex: 4 }} />
+      <div style={{ ...abs(8, 96, 200, 216), transform: breathe(t) }}>
+        <img src={EMO["02_sorriso_gentil"]} alt="" draggable={false} style={{ ...abs(0, 6, 200, 200), maxWidth: "none" }} />
+        {/* filtro de cachorrinho: medidas da feição a 200 px — topo da cabeça y≈21, nariz (100,128), boca (100,145) */}
+        <svg viewBox="0 0 200 216" width="200" height="216" style={{ position: "absolute", left: 0, top: 0, overflow: "visible" }}>
+          <defs>
+            <radialGradient id="dogEar" cx="40%" cy="25%" r="80%"><stop offset="0" stopColor="#C08A5E" /><stop offset=".55" stopColor="#8E5B37" /><stop offset="1" stopColor="#5E3A21" /></radialGradient>
+            <radialGradient id="dogEarIn" cx="45%" cy="30%" r="75%"><stop offset="0" stopColor="#F2B9A0" /><stop offset="1" stopColor="#C98468" /></radialGradient>
+            <radialGradient id="dogNose" cx="38%" cy="30%" r="75%"><stop offset="0" stopColor="#6A4B40" /><stop offset=".45" stopColor="#2A1A14" /><stop offset="1" stopColor="#0E0806" /></radialGradient>
+            <linearGradient id="dogTongue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FF8FA6" /><stop offset="1" stopColor="#E0466A" /></linearGradient>
+            <filter id="dogShadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#000" floodOpacity=".35" /></filter>
+          </defs>
+          {[-1, 1].map((sd) => (
+            <g key={sd} transform={`translate(${100 + sd * 52} 28) rotate(${-sd * (24 + flap * 0.7)})`} filter="url(#dogShadow)">
+              <path d="M0 0 C 26 4, 34 46, 26 84 C 20 108, -20 108, -26 84 C -34 46, -26 4, 0 0 Z" fill="url(#dogEar)" />
+              <path d="M0 12 C 15 16, 19 46, 15 74 C 11 90, -11 90, -15 74 C -19 46, -15 16, 0 12 Z" fill="url(#dogEarIn)" opacity=".9" />
+            </g>
+          ))}
+          {tongue > 0.01 && <g transform={`translate(100 ${148 + tongue * 2}) rotate(${Math.sin(t * 11) * 6 * clamp(tongue)}) scale(${clamp(tongue * 1.5)})`}>
+            <path d={`M-12 0 H12 V${18 * clamp(tongue, 0, 1.15)} a12 12 0 0 1 -24 0 Z`} fill="url(#dogTongue)" />
+            <line x1="0" y1="2" x2="0" y2={14 * clamp(tongue, 0, 1.15)} stroke="#C93A5C" strokeWidth="2" strokeLinecap="round" />
+          </g>}
+          <g transform="translate(100 127)" filter="url(#dogShadow)">
+            <path d="M-17 -8 C -17 -14, 17 -14, 17 -8 C 17 2, 6 11, 0 11 C -6 11, -17 2, -17 -8 Z" fill="url(#dogNose)" />
+            <ellipse cx="-6" cy="-7" rx="6" ry="3" fill="#fff" opacity=".45" />
+          </g>
+        </svg>
       </div>
       <div style={{ ...abs(12, 400, SW - 24, 36), borderRadius: 18, border: "2px solid rgba(255,255,255,.7)", fontFamily: FONT, fontWeight: 600, fontSize: 12, color: "#fff", lineHeight: "32px", paddingLeft: 14 }}>Enviar mensagem</div>
     </div>
@@ -755,7 +771,7 @@ function BioScene({ t }) {
       ) : (
         <Point x={lerp(232, 90, easeInOut(prog(t, T.quero, T.quero + 0.35)))} y={lerp(560, 612, easeInOut(prog(t, T.quero, T.quero + 0.35))) + Math.sin(t * 9) * 8} />
       )}
-      <Emo name="36_impactado_segurando_coracao" x={268} y={560} size={180} t={t} at={50.0} out={T.monto - 0.05} z={42} />
+      <EmoAnim name="07_aceno_SIM_aprovando" x={262} y={556} size={190} t={t} at={50.0} out={T.monto - 0.05} z={42} />
       <Ripple x={262} y={570} t={t} at={48.75} />
     </div>
   );

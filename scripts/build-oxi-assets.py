@@ -22,7 +22,10 @@ SIZE = 420
 
 # feições estáticas usadas no motion (01_ = transparente original quando existe; senão recorte da versão de estúdio)
 STILLS = ["02_sorriso_gentil", "08_olhos_fechados_zen", "14_triste_desapontado", "15_revirando_olhos_tedio",
-          "33_inclinado_desconfiado_original", "35_estrategista_maos_piramide", "36_impactado_segurando_coracao", "01_neutro_focado"]
+          "33_inclinado_desconfiado_original", "35_estrategista_maos_piramide", "01_neutro_focado"]
+# feições que não vamos usar nos motions (ver "Não usar" em EMOJI_PRIMORDIAL/README.md)
+NAO_USAR = {"36_impactado_segurando_coracao"}
+assert not NAO_USAR & set(STILLS), "feição na lista de não usar"
 ANIMS = ["11_falando_locucao_loop", "02_dizendo_NAO_cabeca_3d", "10_revirando_olhos_eye_roll", "08_desconfiado_side_eye_rock",
          "07_aceno_SIM_aprovando", "03_virada_dramatica_180_sorriso", "06_piscadinha_wink_charme"]
 FLUENT = "https://cdn.jsdelivr.net/gh/microsoft/fluentui-emoji@main/assets"

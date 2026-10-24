@@ -45,7 +45,7 @@ Os tempos de cada palavra saem da transcrição com faster-whisper, revisada à 
 - **Protagonista:** o Emoji Primordial (`EMOJI_PRIMORDIAL/`) reage à narração com as feições e animações 3D da biblioteca.
   - Grava o Reels dentro do celular, usa o filtro de cachorrinho e balança a cabeça dizendo "não" no "NADA.".
   - Revira os olhos no direct, olha desconfiado no "2026" e acena "sim" no "oxigênio".
-  - Dorme no travesseiro, faz as mãos de estrategista no "profissionalizar" e segura o coração no "EU QUERO".
+  - Dorme no travesseiro, faz as mãos de estrategista no "profissionalizar" e acena "sim" no "EU QUERO".
   - Vira para sorrir na logo e pisca no final.
   - Os recortes saem de `python3 scripts/build-oxi-assets.py`, com o mesmo método de recorte da engine da biblioteca e a borda descontaminada do cinza.
 - **Objetos 3D:** vêm do Fluent Emoji da Microsoft (licença MIT): robô, relógio, moedas, cartão, saco de dinheiro, estourador de festa, sino, lua, Zzz, grilo, teia, lupa, ampulheta, câmera, X e a mãozinha.

@@ -11,6 +11,14 @@ Esta pasta centraliza **todos os ativos oficiais, feições estáticas, animaç�
 >   versões transparentes, com a mesma composição sobre `#D1D1D1` da engine (`save_both_formats`).
 > - **`01_FEICOES_PNG_TRANSPARENTE`:** só 6 de 36 (02, 26, 33, 34, 35 e 36). **Falta reenviar as outras 30** (01, 03–25, 27–32).
 
+## Não usar
+
+Feições e animações que ficam fora dos motions da Estoke ao Cubo (o `scripts/build-oxi-assets.py` recusa as que estão aqui):
+
+| Arquivo | Motivo |
+| --- | --- |
+| `36_impactado_segurando_coracao` | Reprovada na revisão do motion "Site é oxigênio" |
+
 ---
 
 ## Estrutura Completa da Pasta `EMOJI_PRIMORDIAL`
