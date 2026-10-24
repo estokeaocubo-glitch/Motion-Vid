@@ -23,7 +23,7 @@ São 20 feições novas, 100% em SVG, do mesmo personagem num traço ilustrado d
 - **Como criar uma feição nova:** cada uma é montada de peças (olhos, sobrancelhas, boca, extras e inclinação). Basta acrescentar uma linha na lista `FEICOES` do script.
 - **Escala:** por serem vetor, ficam nítidas em qualquer tamanho e sem borda branca em fundo nenhum.
 
-## Variações 3D novas (`06_VARIACOES_3D/`, 37 a 52)
+## Variações 3D novas (`06_VARIACOES_3D/`, 37 a 64)
 
 São 16 expressões novas do mesmo emoji 3D padrão, esculpidas pela própria engine (`PrimordialFaceSculptor`) sobre o vídeo padrão-ouro, exatamente como as 36 originais. Os parâmetros ficam no limite das faixas seguras do guia técnico, combinados com inclinação, aceno e giro de cabeça.
 
@@ -31,8 +31,12 @@ São 16 expressões novas do mesmo emoji 3D padrão, esculpidas pela própria en
 
 - **Cômicas** (inspiradas em emojis de meme): 37 convencido olhando de lado, 38 implorando com olhos grandes, 39 estressado com olhar vidrado, 40 cansado com pálpebra caída, 41 sem reação, 42 rindo alto, 43 nervoso com sorriso amarelo, 44 desconfiado de olhos cerrados, 45 chocado de queixo caído e 46 irônico com meio sorriso.
 - **Sérias:** 47 confiante de olhar firme, 48 determinado, 49 aprovando satisfeito, 50 atento olhando de lado, 51 preocupado e 52 teve ideia.
+- **Caricatas (53 a 64),** um pouco além das faixas seguras, no estilo do emoji "tédio" de meme: pálpebra pesada com a pupila pendurada, olho menor, boca sumindo, cabeça mais inclinada e blush 3D nas bochechas. São elas: 53 tédio total, 54 julgando de lado, 55 envergonhado, 56 derretido apaixonado, 57 choque extremo, 58 sorriso malandro, 59 revirando de saco cheio, 60 suspeita extrema, 61 quase chorando, 62 sorriso forçado, 63 sonolento e 64 nariz empinado. O catálogo é `06_VARIACOES_3D/CATALOGO_CARICATAS_3D.jpg`.
+
+![Caricatas 3D](06_VARIACOES_3D/CATALOGO_CARICATAS_3D.jpg)
+
 - **Formatos:** `01_PNG_TRANSPARENTE/` (800×800 RGBA) e `02_FUNDO_PADRAO_STUDIO/` (800×800 sobre #D1D1D1).
-- **Como gerar:** `python3 EMOJI_PRIMORDIAL/05_ENGINE_E_FONTES_MESTRES/gerar_variacoes_3d.py`, que precisa de `opencv-python-headless`. Para criar uma nova, basta acrescentar uma linha com a receita de parâmetros na lista `VARIACOES`.
+- **Como gerar:** `python3 EMOJI_PRIMORDIAL/05_ENGINE_E_FONTES_MESTRES/gerar_variacoes_3d.py`, que precisa de `opencv-python-headless`. Para criar uma nova, basta acrescentar uma linha com a receita de parâmetros na lista `VARIACOES` ou `CARICATAS`. Nas caricatas, `blush` (0 a 1) liga o rubor nas bochechas.
 
 ## Não usar
 
