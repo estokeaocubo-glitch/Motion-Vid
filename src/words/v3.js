@@ -2,15 +2,9 @@
 export const SCRIPT = {
   name: "Opção 3 · contraste",
   steps: [
-    [0.0, "w", "das 8h"],
-    [0.5, "w", "às 18h", "das 8h"],
-    [1.25, "b", "você trabalha."],
-    [2.0, "b", "às 8h", "das 18h", "xl"],
-    [2.75, "w", "seu site"],
-    [3.25, "b", "vende."],
-    [3.75, "w", "tenha sua"],
-    [4.25, "b", "vitrine", null, "xl"],
-    [4.75, "w", "24h."],
+    ["das 8h"], ["às 18h", "das 8h"], ["você trabalha."], ["às 8h", "das 18h", "xl"],
+    ["seu site", null, "l"], ["vende."], ["enquanto"], ["você"], ["janta."], ["dorme."], ["viaja."],
+    ["descansa."], ["seu site"], ["vende."], ["vende."], ["vende."], ["tenha sua"], ["vitrine 24h.", null, "l"],
   ],
-  typed: { at: 5.5, text: "estoke ao cubo." },
+  typed: "estoke ao cubo.",
 };
