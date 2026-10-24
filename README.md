@@ -8,6 +8,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Carrossel Padrão Portfólio | 9s, loop perfeito | 9:16 e 4:5 | `src/PortfolioCarousel.jsx` | `dist/portfolio-carrossel-9x16.mp4`, `dist/portfolio-carrossel-4x5.mp4` |
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
+| "Venda 24h" (só tipografia, 3 opções de texto) | ~8,5s | 9:16 | `src/WordsAd.jsx` + `src/words/` | `dist/venda-24h-opcao1-9x16.mp4`, `dist/venda-24h-opcao2-9x16.mp4`, `dist/venda-24h-opcao3-9x16.mp4` |
 | "Site é oxigênio" (Reels narrado) | 55,2s | 9:16 | `src/OxigenioAd.jsx` + `src/oxi/` | `dist/site-oxigenio-9x16.mp4` |
 | "dev / tools / site" (três faixas) | 11,4s | Story 9:16 e 3:4 | `src/ToolsReveal.jsx` | `dist/dev-tools-site-9x16.mp4`, `dist/dev-tools-site-3x4.mp4` |
 | "Amplie seu alcance" (anúncio de sites) | 31s | 16:9 e 9:16 | `src/ReachAd.jsx` | `dist/anuncio-alcance-16x9.mp4`, `dist/anuncio-alcance-9x16.mp4` |
@@ -24,6 +25,19 @@ Biblioteca do **Emoji Primordial 3D** (36 feições, 12 animações, documentaç
 Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver [`trailer-temporada1/`](trailer-temporada1/).
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## "Venda 24h" (WordsAd)
+
+Feito a partir do vídeo "we don't just edit": só tipografia, de 1 a 3 palavras por tela.
+
+- **Ritmo e corte:** corte seco na batida e fundo invertendo entre branco e preto. A palavra anterior fica pequena, alinhada à esquerda, em cima da nova.
+- **Virada:** aos 2,0s, gigante no preto, com glitch.
+- **Fim:** "estoke ao cubo." digitado letra a letra, alternando o fundo, e fecha com a logo e "sites e lojas virtuais que vendem 24h".
+- **Três roteiros, mesmo componente:**
+  - `src/words/v1.js`, fiel à ideia: "difícil / vender / das 8h às 18h? → seu site / vende / 24 horas / por dia. / até / enquanto / você / dorme."
+  - `src/words/v2.js`, manifesto: "sua loja / fecha / às 18h. → seu cliente não. / catálogo. / pagamentos. / automação. / venda 24/7 / com um site."
+  - `src/words/v3.js`, contraste: "das 8h às 18h / você trabalha. → das 18h às 8h / seu site / vende. / tenha sua / vitrine / 24h."
+- **Música:** "BAILAR" a partir de 30s da faixa (o mesmo trecho do anúncio de sites). A grade é de 0,25s e o drop (32,01s da faixa) cai exatamente na virada. Efeitos: glitch no drop, teclas na digitação e impacto na logo.
 
 ## "Site é oxigênio" (OxigenioAd)
 
@@ -273,6 +287,9 @@ node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-9x16.
 node scripts/export-video.cjs dist/pasta-clientes.html dist/pasta-clientes-4x5.mp4 60 4x5
 node scripts/export-video.cjs dist/dev-tools-site.html dist/dev-tools-site-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/site-oxigenio.html dist/site-oxigenio-9x16.mp4 60 9x16
+node scripts/export-video.cjs dist/venda-24h-opcao1.html dist/venda-24h-opcao1-9x16.mp4 60 9x16
+node scripts/export-video.cjs dist/venda-24h-opcao2.html dist/venda-24h-opcao2-9x16.mp4 60 9x16
+node scripts/export-video.cjs dist/venda-24h-opcao3.html dist/venda-24h-opcao3-9x16.mp4 60 9x16
 node scripts/export-video.cjs dist/dev-tools-site.html dist/dev-tools-site-3x4.mp4 60 3x4
 node scripts/export-video.cjs dist/anuncio-alcance.html dist/anuncio-alcance-16x9.mp4 60 16x9
 node scripts/export-video.cjs dist/anuncio-alcance.html dist/anuncio-alcance-9x16.mp4 60 9x16
