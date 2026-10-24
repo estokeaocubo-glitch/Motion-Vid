@@ -16,9 +16,9 @@ const T = { color: 4.7, flow: 5.0, back: 12.8 };
 const SITES = [
   { img: "media/coverflow/dizzy-shop.webp", name: "Dizzy House", seg: "loja virtual" },
   { img: "media/coverflow/lcs-hero.webp", name: "LCS Turismo", seg: "transporte executivo" },
-  { img: "media/coverflow/arteiro.webp", name: "Arteiro", seg: "arte popular" },
+  { img: "media/coverflow/arteiro.webp", name: "Arteiro", seg: "arte popular e mobiliário", pos: "2% 40%" },
   { img: "media/coverflow/kdust.webp", name: "K-Dust", seg: "streetwear" },
-  { img: "media/coverflow/ruppel.webp", name: "Ruppel", seg: "drop 01" },
+  { img: "media/coverflow/ruppel.webp", name: "Ruppel", seg: "streetwear · drop 02", pos: "79% 0%" },
   { img: "media/coverflow/kairos.webp", name: "Kairós", seg: "streetwear" },
 ];
 // itens do carrossel: o card do título (índice 0) e os sites
@@ -52,7 +52,7 @@ function TitleCard({ w, h, colored }) {
 function SiteCard({ site, w, h }) {
   return (
     <div style={{ position: "absolute", inset: 0, borderRadius: 30, overflow: "hidden", background: "#111" }}>
-      <img src={site.img} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "30% 20%" }} />
+      <img src={site.img} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: site.pos || "30% 20%" }} />
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,.72) 100%)" }} />
       <div style={{ position: "absolute", left: "50%", top: 12, width: 8, height: 8, marginLeft: -4, borderRadius: 4, background: "rgba(255,255,255,.75)" }} />
       <div style={{ position: "absolute", left: w * 0.08, bottom: h * 0.07, color: "#fff" }}>
