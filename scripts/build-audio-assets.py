@@ -9,6 +9,8 @@
   src/audio/voSite.js     narração (ElevenLabs) e trilha de fundo do anúncio "Site é oxigênio" (VO_SITE, MUSIC_OXI)
   src/audio/wordsRef.js   música do vídeo de referência "we don't just edit" para o "Venda 24h" (MUSIC_WORDS)
   src/audio/autoPilotRef.js música do vídeo de referência "Auto Pilot" para o "WhatsApp no automático" (MUSIC_AUTOPILOT)
+  src/audio/voDez.js      narração "foco dezembro" do vídeo "Preparar agora para vender mais" (VO_DEZ)
+  src/audio/sfxDez.js     efeitos do vídeo "Preparar agora para vender mais" (SFXD, SFXD_PEAK)
   src/audio/sfxVo.js      efeitos extras do anúncio "Site é oxigênio" (SFXV, SFXV_PEAK)
   src/audio/tape.js       efeitos analógicos do repositório (TAPE, TAPE_PEAK)
   src/audio/sfx.js        efeitos gravados da Mixkit (SFX, SFX_PEAK)
@@ -28,6 +30,7 @@ ALEXA = os.path.join(ROOT, "Lh Chucro x Derek x Neckklace type beat _Alexa 2_ _ 
 BAILAR = os.path.join(ROOT, "[FREE] Latin Trap x Mexican Type Beat - ''BAILAR'' 🇲🇽 _ Cuban Trap Type Beat 2025 [mdU25uOFZRg].mp3")
 TOOLS_REF = os.path.join(ROOT, "dev-tools-site (audio original).m4a")
 VO_SITE = os.path.join(ROOT, "VO - Voce gasta horas gravando Reels (ElevenLabs).mp3")
+VO_DEZ = os.path.join(ROOT, "VO - Narracao foco dezembro (ElevenLabs).mp3")
 DISTANCE = os.path.join(ROOT, "TRAP TYPE BEAT - _DISTANCE_ _ FREESTYLE BEAT _ HARD TYPE BEAT _ FREE RAP INSTRUMENTAL 2026 [zuHucgfzkoA].mp3")
 WORDS_REF = os.path.join(ROOT, "venda-24h (audio original).m4a")
 AUTOPILOT_REF = os.path.join(ROOT, "auto-pilot (audio original).m4a")
@@ -41,6 +44,7 @@ MUSIC = {
     "alexaReach": (ALEXA, "MUSIC_REACH", 1.3, 32.0),   # drop da "Alexa 2" (17,47s) em 16,17s do trecho
     "toolsRef": (TOOLS_REF, "MUSIC_TOOLS", 0.0, None),
     "voSite": (VO_SITE, "VO_SITE", 0.0, None),               # narração inteira (55,07s)
+    "voDez": (VO_DEZ, "VO_DEZ", 0.0, None),                   # narração "foco dezembro" inteira (27,64s)
     "oxiMusic": (DISTANCE, "MUSIC_OXI", 67.29, 56.0),        # "DISTANCE" a partir da volta do beat, por baixo da voz
     "wordsRef": (WORDS_REF, "MUSIC_WORDS", 0.0, None),       # inteira (9,52s), com os cortes da referência
     "autoPilotRef": (AUTOPILOT_REF, "MUSIC_AUTOPILOT", 0.0, None),  # inteira (9,22s), com os cortes da referência
@@ -88,6 +92,12 @@ SFX = {
 }
 
 # Efeitos extras só do anúncio "Site é oxigênio" (módulo separado para não pesar nos outros motions)
+# Efeitos do vídeo "Preparar agora para vender mais" (campanha de dezembro): id → (Mixkit, início, duração)
+SFX_DEZ = {
+    "glassBreak": (2826, 0.9, 3.6),      # Glass break — a bomboniere explodindo
+    "glassImpact": (2836, 0, None),      # Glass impact — estalo seco do vidro / tampa
+    "fireWhoosh": (1345, 0, None),       # Fire whoosh — brasa caindo / transições quentes
+}
 SFX_VO = {
     "crickets": (1789, 0, 2.6),          # Summer night crickets loop — "Nada."
     "shutter": (1432, 0, None),          # Camera digital shutter — fotos postadas
@@ -178,6 +188,14 @@ def main():
             peaks[k] = encode(src, s, d, p, "128k", normalize=True)
             files[k] = p
         module(os.path.join(out, "sfxVo.js"), "SFXV", files, peaks)
+        files, peaks = {}, {}
+        for k, (num, st, d) in SFX_DEZ.items():
+            src = os.path.join(tmp, f"mixkit-{num}.wav")
+            urllib.request.urlretrieve(f"https://assets.mixkit.co/active_storage/sfx/{num}/{num}.wav", src)
+            p = os.path.join(tmp, k + ".mp3")
+            peaks[k] = encode(src, st, d, p, "128k", normalize=True)
+            files[k] = p
+        module(os.path.join(out, "sfxDez.js"), "SFXD", files, peaks)
 
 
 if __name__ == "__main__":

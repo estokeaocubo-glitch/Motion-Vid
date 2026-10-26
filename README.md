@@ -9,6 +9,7 @@ Motions em React para a Estoke ao Cubo, com timeline determinística, som sintet
 | Reel de portfólio no monitor | 8s, loop | 9:16 e 4:5 | `src/MonitorReel.jsx` | `dist/reel-portfolio-9x16.mp4`, `dist/reel-portfolio-4x5.mp4` |
 | Reel editorial "Sites que transformam visitas em vendas." | 14s, loop | 3:4 e 9:16 | `src/EditorialReel.jsx` | `dist/reel-editorial-3x4.mp4`, `dist/reel-editorial-9x16.mp4` |
 | Roda Cultural do CDC: navegação no site com zoom e efeitos | 22,5s | 16:9 e 9:16 | `roda-cultural/edit.py` (captura no zip da raiz) | `dist/roda-cultural-site-16x9.mp4`, `dist/roda-cultural-site-9x16.mp4` |
+| "Preparar agora para vender mais" (campanha novembro → dezembro, narrado) | 28,4s | 9:16 | `src/DezembroAd.jsx` + `src/dezembro/` + `dist/media/dezembro/` | `dist/preparar-dezembro-9x16.mp4` |
 | "Em 5 segundos" (gancho de retenção na tela do notebook) | 33s | 9:16 | `src/CincoSegundosAd.jsx` | `dist/em-5-segundos-9x16.mp4` |
 | "Carrossel de sites" (cover flow 3D, loop) | 14s | 4:5 e 9:16 | `src/CoverflowAd.jsx` + `dist/media/coverflow/` | `dist/carrossel-sites-4x5.mp4`, `dist/carrossel-sites-9x16.mp4` |
 | "Site no navegador" (LCS, refeito da referência do navegador) | 18,8s | 16:9 e 9:16 | `src/ChromeSiteAd.jsx` + `dist/media/chrome/` | `dist/site-no-navegador-16x9.mp4`, `dist/site-no-navegador-9x16.mp4` |
@@ -32,6 +33,67 @@ Biblioteca do **Emoji Primordial 3D** (36 feições, 12 animações, documentaç
 Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver [`trailer-temporada1/`](trailer-temporada1/).
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
+
+## "Preparar agora para vender mais" (DezembroAd)
+
+Campanha de novembro (estruturar) para dezembro (lucrar), sobre a narração `VO - Narracao foco dezembro (ElevenLabs).mp3`. As legendas entram palavra por palavra, a partir da transcrição com tempo por palavra (`src/dezembro/captions.js`).
+
+**Gancho (`gancho.mp4` → `dist/media/dezembro/hook.mp4`).** O vídeo foi recortado em 9:16 (faixa central de 405×720) e editado com rampa de velocidade:
+
+| Trecho do original | Velocidade | No vídeo |
+|---|---|---|
+| 0,15–1,70s: a brasa cai no vidro | 1× | 0–1,55s |
+| 3,70–4,80s: a tampa fecha | 2× | 1,55–2,10s |
+| 4,80–14,05s: os 9s parados | 12× (speed ramp, com o contador "1 → 30 NOV") | 2,10–2,87s |
+| 14,05–14,70s: o vidro explode | 0,35× (câmera lenta interpolada) | 2,87–4,73s, com a explosão em 3,42s, sincronizada ao "NÃO dá conta" |
+| cacos parados | frame congelado | até 6,12s |
+
+**Ganchos de retenção usados:**
+
+| Tempo | Gancho | Fala |
+|---|---|---|
+| 0s | Pergunta-desafio, com o letreiro no quadro 0 | "Você vai mesmo esperar dezembro…" |
+| 3,42s | Choque visual: a explosão em câmera lenta e "QUEBRA." | — |
+| 6,12s | Quebra de padrão: corte seco para o calendário e entrada do beat | "No pico de vendas…" |
+| 12,4s | Loop aberto: o cadeado e "O SEGREDO" | "O segredo para faturar…" |
+| 17,74s | Prova: sites reais que entregamos, com o relógio 24h e as notificações de Pix | — |
+| 21,6s | Payoff | "PREPARE AGORA. VENDA MAIS." |
+| 24,02s | CTA com seta apontando para o botão | "Clique no botão aqui embaixo" |
+
+**Design de som (o tempo é o do golpe; o pico de cada efeito cai exatamente nele):**
+
+| Tempo | Efeito | Função |
+|---|---|---|
+| 0,05s | fire whoosh | brasa caindo |
+| 0,10s | dry pop | letreiro "sua loja em dezembro" |
+| 1,98s | glass impact | tampa fechando |
+| 2,10s | relógio acelerado | speed ramp |
+| 3,20–3,45s | silêncio na música | respiro antes do impacto |
+| 3,42s | glass break + deep hit + zoom impact | explosão |
+| 4,60s | fita desacelerando | congelamento |
+| 4,78s | hard pop | "não quebre no pico" |
+| 6,12s | wind swoosh + drop da música | virada |
+| 8,06s | air sweep | celular sobe |
+| 8,25–10,0s | bubble pops com tom subindo + alerta | mensagens chegando |
+| 10,58s | glitch + hard pop | "perde cliente" |
+| 12,4s | tunnel whoosh | virada "o segredo" |
+| 12,9s | trava | cadeado abre |
+| 13,6s | sparkle sweep | revelação |
+| 14,1–15,15s | 4 light pops com tom subindo | checklist |
+| 15,86s | zoom impact | carimbo "AGORA." |
+| 16,84s | confirm | novembro acende |
+| 17,74s | air whoosh | celular com os sites |
+| 18,75 / 19,6 / 20,45s | small sweeps | troca de site |
+| 19,2s | coin win | Pix recebido |
+| 20,0s | bell | novo pedido |
+| 21,6s | deep hit + wind swoosh | "PREPARE AGORA." |
+| 22,92s | zoom impact | "VENDA MAIS." |
+| 24,02s | light pop | seta |
+| 24,4s | mouse click | botão |
+| 26,4s | logo impact | marca |
+| 27,1s | sparkle | fecho |
+
+A narração fica por cima de tudo. A trilha ("Miami") toca baixa, com o drop na virada de 6,12s e um reforço no payoff. Os efeitos de vidro e fogo vêm da Mixkit e são gerados por `scripts/build-audio-assets.py` em `src/audio/sfxDez.js`.
 
 ## "Em 5 segundos" (CincoSegundosAd)
 
