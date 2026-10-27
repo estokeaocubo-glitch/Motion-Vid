@@ -4,6 +4,7 @@ import { VO_DIRECT } from "./audio/voDirect";
 import { MUSIC_DIRECT } from "./audio/deepUrban";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 import { SFXV, SFXV_PEAK } from "./audio/sfxVo";
+import { TEE_PINK_HALO, TEE_BULLET, TEE_CHICANO_FRENTE, TEE_CHICANO_COSTAS } from "./direct/tees";
 
 /* =============================================================================
    Estoke ao Cubo — "Me manda um Direct" (9:16, 22s)
@@ -156,6 +157,36 @@ function Impact({ t, at, out, y, size = 34, children, slideOut = 0, slideIn = 0,
 }
 const G = ({ c = NEON, children }) => <span style={{ color: c, textShadow: `0 0 18px ${c}66` }}>{children}</span>;
 
+/* ---------- Cena 1: título que rola de uma pergunta para a outra ---------- */
+// Cada linha é uma máscara: a pergunta antiga sobe e sai, a nova sobe por baixo (linha 2 com 0,08s de atraso),
+// com um leve blur de movimento no meio do trajeto. O "ONDE" fica no mesmo lugar nas duas.
+const HOOK = [
+  [<>Onde estão</>, <>Onde é mais</>],
+  [<>Seus <G c={C.cyan}>clientes?</G></>, <><G>Fácil</G> comprar?</>],
+];
+function HookTitle({ t }) {
+  if (t < 0.3 || t > T.chat + 0.1) return null;
+  const size = 34, lh = size * 1.18;
+  const out = eout(t, T.chat - 0.3, 0.3);
+  return (
+    <div style={{ position: "absolute", left: 0, right: 0, top: 322, opacity: 1 - out, filter: out > 0.02 ? `blur(${out * 8}px)` : "none", transform: `scale(${lerp(1, 1.06, out)})` }}>
+      {HOOK.map(([a, b], i) => {
+        const pin = punch(t, 0.35 + i * 0.1);
+        const roll = EASE(prog(t, T.q2 + i * 0.08, T.q2 + i * 0.08 + 0.55));
+        const mb = Math.sin(Math.PI * roll) * 3.5;
+        const line = { position: "absolute", left: 0, right: 0, top: 0, height: lh, display: "flex", alignItems: "center", justifyContent: "center", whiteSpace: "nowrap", filter: mb > 0.05 ? `blur(${mb}px)` : "none" };
+        return (
+          <div key={i} style={{ position: "relative", height: lh, overflow: "hidden", ...DISP, fontSize: size, lineHeight: 1, color: "#fff",
+            opacity: clamp(pin * 2), transform: `scale(${lerp(1.3, 1, Math.min(pin, 1)) * (pin > 1 ? 1 + (pin - 1) * 0.3 : 1)})`, filter: pin < 1 ? `blur(${(1 - Math.min(pin, 1)) * 8}px)` : "none" }}>
+            <div style={{ ...line, transform: `translateY(${-roll * lh}px)`, opacity: 1 - roll * 0.6 }}><span>{a}</span></div>
+            <div style={{ ...line, transform: `translateY(${(1 - roll) * lh}px)`, opacity: 0.4 + roll * 0.6 }}><span>{b}</span></div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ---------- Cena 1: ícones convergem ---------- */
 const FLY = Array.from({ length: 12 }, (_, i) => {
   const a = (i / 12) * Math.PI * 2 + 0.3;
@@ -168,7 +199,7 @@ function Converge({ t, W, H }) {
     const p = ein(t, f.delay, 2.6);
     // convergem e param num anel em volta do título (mais aberto na vertical, para não cobrir o texto)
     const d = lerp(f.d, 175 + (i % 3) * 18, p);
-    const a = f.a + p * 0.6;
+    const a = f.a + p * 0.6 + EASE(prog(t, T.q2, T.q2 + 0.8)) * 0.35;
     const x = W / 2 + Math.cos(a) * d * 1.1, y = 370 + Math.sin(a) * d * 1.35;
     const op = clamp(prog(t, f.delay, f.delay + 0.4)) * (1 - out) * (0.55 + 0.45 * ((i % 3) / 2));
     return (
@@ -242,11 +273,16 @@ function ChatScene({ t, W }) {
 
 /* ---------- Cena 2B: o site do concorrente ---------- */
 const PRODUCTS = [
-  { c1: "#F472B6", c2: "#FB7185", name: "Camiseta Oversized", price: "R$ 189,90" },
-  { c1: "#60A5FA", c2: "#2FD4FF", name: "Moletom Basic", price: "R$ 229,90" },
-  { c1: "#FBBF24", c2: "#F59E0B", name: "Boné Logo", price: "R$ 89,90" },
-  { c1: "#34D399", c2: "#10B981", name: "Calça Cargo", price: "R$ 249,90" },
+  { img: TEE_PINK_HALO, name: "Baby Tee Pink Halo Boxy", price: "R$ 65,00" },
+  { img: TEE_BULLET, name: "Baby Tee Dizzy Bullet", price: "R$ 65,00" },
+  { img: TEE_CHICANO_FRENTE, name: "Cropped Gold Chicano", price: "R$ 80,00" },
+  { img: TEE_CHICANO_COSTAS, name: "Cropped Chicano Costas", price: "R$ 80,00" },
 ];
+const Photo = ({ p, h, r = 14 }) => (
+  <div style={{ height: h, borderRadius: r, overflow: "hidden", background: "#000" }}>
+    <img src={p.img} alt="" decoding="sync" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+  </div>
+);
 const Tee = ({ c = "#fff", s = 60 }) => (
   <svg width={s} height={s} viewBox="0 0 64 64"><path d="M22 8 L12 12 L4 24 L13 29 L16 25 L16 56 L48 56 L48 25 L51 29 L60 24 L52 12 L42 8 C40 13 36 15 32 15 C28 15 24 13 22 8Z" fill={c} /></svg>
 );
@@ -260,10 +296,25 @@ function SiteScene({ t, W }) {
   const pw = 250, ph = 500, x0 = (W - pw) / 2, y0 = 170;
   const pressP = t >= T.tapProd - 0.05 && t < T.tapProd + 0.1;
   const pressX = t >= T.tapPix - 0.05 && t < T.tapPix + 0.1;
+  // celular 3D: entra girando e fica balançando de leve
+  const turn = EASE(prog(t, T.site, T.site + 0.9));
+  const ry = lerp(48, -16, turn) + Math.sin((t - T.site) * 1.3) * 6;
+  const rx = lerp(16, 7, turn) + Math.sin((t - T.site) * 0.9 + 1) * 2;
+  const rz = lerp(-6, 1.5, turn);
+  const float = Math.sin((t - T.site) * 1.6) * 5;
+  const glare = prog(t, T.site + 0.2, T.site + 1.4);
   return (
     <div style={{ position: "absolute", inset: 0, transform: `translateX(${(1 - enter) * 520}px) scale(${lerp(1, 0.55, exit)})`, opacity: 1 - exit, filter: exit > 0.02 ? `blur(${exit * 8}px)` : "none" }}>
       <Impact t={t} at={T.site + 0.1} y={92} size={20}>No site do <G>concorrente</G></Impact>
-      <div style={{ position: "absolute", left: x0, top: y0, width: pw, height: ph, borderRadius: 40, background: "#05070D", padding: 8, boxSizing: "border-box", boxShadow: "0 40px 80px rgba(0,0,0,.55), 0 0 0 1.5px rgba(255,255,255,.14), 0 0 60px rgba(16,185,129,.18)" }}>
+      {/* sombra no "chão" */}
+      <div style={{ position: "absolute", left: x0 + 20 + ry * 1.5, top: y0 + ph + 10, width: pw - 40, height: 30, borderRadius: "50%", background: "radial-gradient(closest-side, rgba(0,0,0,.6), rgba(0,0,0,0))", filter: "blur(6px)" }} />
+      <div style={{ position: "absolute", left: x0, top: y0, width: pw, height: ph, perspective: 950 }}>
+      <div style={{ position: "absolute", inset: 0, transformStyle: "preserve-3d", transform: `translateY(${float}px) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)` }}>
+        {/* espessura: camadas de metal atrás da frente */}
+        {Array.from({ length: 14 }, (_, i) => (
+          <div key={i} style={{ position: "absolute", inset: 0, borderRadius: 40, transform: `translateZ(${-(i + 1) * 1.1}px)`, background: i === 13 ? "#0B0E16" : `linear-gradient(${90 + ry * 2}deg, #3A4152, #9AA3B5 ${45 + ry}%, #2A303D)` }} />
+        ))}
+        <div style={{ position: "absolute", inset: 0, borderRadius: 40, background: "#05070D", padding: 8, boxSizing: "border-box", transform: "translateZ(0.6px)", boxShadow: "inset 0 0 0 1.5px rgba(255,255,255,.22), 0 0 60px rgba(16,185,129,.18)" }}>
         <div style={{ position: "relative", width: "100%", height: "100%", borderRadius: 33, overflow: "hidden", background: "#FFFFFF", color: "#0B1222", fontFamily: FONT }}>
           <div style={{ position: "absolute", left: "50%", top: 8, width: 74, height: 21, marginLeft: -37, borderRadius: 11, background: "#05070D", zIndex: 5 }} />
           {/* cronômetro */}
@@ -275,7 +326,7 @@ function SiteScene({ t, W }) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, padding: "0 14px", opacity: 1 - det, transform: `translateX(${-det * 60}px)` }}>
             {PRODUCTS.map((p, i) => (
               <div key={i} style={{ transform: i === 0 && pressP ? "scale(.95)" : "none" }}>
-                <div style={{ height: 112, borderRadius: 14, background: `linear-gradient(135deg, ${p.c1}, ${p.c2})`, display: "flex", alignItems: "center", justifyContent: "center" }}><Tee c="rgba(255,255,255,.92)" s={58} /></div>
+                <Photo p={p} h={112} />
                 <div style={{ fontSize: 10.5, fontWeight: 700, marginTop: 5 }}>{p.name}</div>
                 <div style={{ fontSize: 11, fontWeight: 800 }}>{p.price}</div>
               </div>
@@ -284,10 +335,10 @@ function SiteScene({ t, W }) {
           {/* página do produto */}
           {det > 0.01 && (
             <div style={{ position: "absolute", left: 0, right: 0, top: 70, bottom: 0, background: "#fff", transform: `translateX(${(1 - det) * 240}px)` }}>
-              <div style={{ margin: "0 14px", height: 200, borderRadius: 18, background: `linear-gradient(135deg, ${PRODUCTS[0].c1}, ${PRODUCTS[0].c2})`, display: "flex", alignItems: "center", justifyContent: "center" }}><Tee c="rgba(255,255,255,.95)" s={120} /></div>
+              <div style={{ margin: "0 14px" }}><Photo p={PRODUCTS[0]} h={200} r={18} /></div>
               <div style={{ padding: "12px 16px 0" }}>
-                <div style={{ fontSize: 14, fontWeight: 800 }}>Camiseta Oversized</div>
-                <div style={{ fontSize: 19, fontWeight: 800, marginTop: 2 }}>R$ 189,90</div>
+                <div style={{ fontSize: 14, fontWeight: 800 }}>{PRODUCTS[0].name}</div>
+                <div style={{ fontSize: 19, fontWeight: 800, marginTop: 2 }}>{PRODUCTS[0].price}</div>
                 <div style={{ fontSize: 10.5, fontWeight: 700, color: "#10B981", marginTop: 4 }}>Frete calculado: grátis · chega amanhã</div>
               </div>
               <div style={{ position: "absolute", left: 14, right: 14, top: 318, height: 44, borderRadius: 14, background: pressX ? "#0E9F6E" : "#10B981", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontSize: 14, fontWeight: 800, transform: `scale(${pressX ? 0.96 : 1})`, boxShadow: "0 10px 22px rgba(16,185,129,.35)" }}>
@@ -307,7 +358,11 @@ function SiteScene({ t, W }) {
               <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 6, fontSize: 17, fontWeight: 800, opacity: done }}>em 30s <Bolt s={18} /></div>
             </div>
           )}
+          {/* reflexo de vidro passando pela tela */}
+          {glare > 0 && glare < 1 && <div style={{ position: "absolute", top: -60, bottom: -60, width: 90, left: lerp(-140, 300, glare), background: "linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.45), rgba(255,255,255,0))", transform: "rotate(18deg)", zIndex: 40, pointerEvents: "none" }} />}
         </div>
+        </div>
+      </div>
       </div>
     </div>
   );
@@ -348,7 +403,7 @@ function TurnScene({ t, W }) {
               <div style={{ marginTop: 6, display: "inline-block", padding: "5px 10px", borderRadius: 8, background: "#fff", color: "#064E3B", fontSize: 10.5, fontWeight: 800 }}>Comprar agora</div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginTop: 10 }}>
-              {PRODUCTS.slice(0, 3).map((p, i) => <div key={i} style={{ height: 70, borderRadius: 10, background: `linear-gradient(135deg, ${p.c1}, ${p.c2})`, display: "flex", alignItems: "center", justifyContent: "center", opacity: 0.85 }}><Tee c="rgba(255,255,255,.9)" s={36} /></div>)}
+              {PRODUCTS.slice(1, 4).map((p, i) => <Photo key={i} p={p} h={70} r={10} />)}
             </div>
           </div>
           <Notif t={t} at={T.pix} y={150} icon={<Cart s={17} />}>Pix recebido • R$ 189,90</Notif>
@@ -454,8 +509,7 @@ function Frame({ t, format = "9x16" }) {
       <Background t={t} W={W} H={H} />
       <Converge t={t} W={W} H={H} />
       {/* Cena 1: o gancho */}
-      <Impact t={t} at={0.35} out={T.q2 - 0.05} slideOut={480} y={318} size={38}>Onde estão<br />seus <G c={C.cyan}>clientes?</G></Impact>
-      <Impact t={t} at={T.q2} out={T.chat - 0.2} slideIn={480} y={318} size={38}>Onde é mais<br /><G>fácil</G> comprar?</Impact>
+      <HookTitle t={t} />
       <ChatScene t={t} W={W} />
       <SiteScene t={t} W={W} />
       <TurnScene t={t} W={W} />

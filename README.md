@@ -125,9 +125,9 @@ Promo vertical (9:16, 1080×1920, 60 fps, 22s) em UI/UX escuro (`#0A0F1D`). A na
 
 | Tempo | Cena |
 |---|---|
-| 0–5,3s | Pins de localização e celulares convergem para o centro. "ONDE ESTÃO SEUS CLIENTES?" entra com impacto, e um slide rápido leva a "ONDE É MAIS FÁCIL COMPRAR?" (3,55s, no "mas") |
+| 0–5,3s | Pins de localização e celulares convergem para o centro. "ONDE ESTÃO SEUS CLIENTES?" entra com impacto e rola, linha a linha e com blur de movimento, para "ONDE É MAIS FÁCIL COMPRAR?" (3,55s, no "mas"). Os ícones giram junto |
 | 5,3–9,35s | Card do Direct com "Oi! Tem disponível? Qual o valor?" e "E o frete pra minha cidade?". Relógio girando com "Visto há 2 horas...", a barra de paciência esvazia até ficar vermelha e o carimbo "DIFÍCIL E LENTO" entra em 8,75s |
-| 9,35–13s | Whoosh empurra o chat para fora, e entra o site do concorrente com cronômetro. Toque no produto, toque em "Comprar com Pix" (no "pagar no PIX") e o check gigante "Compra fechada em 30s" |
+| 9,35–13s | Whoosh empurra o chat para fora, e entra o site do concorrente num celular 3D (com espessura, balanço e reflexo de vidro) e cronômetro. A loja usa camisetas reais da Dizzy House Shop (`src/direct/tees.js`), e a comprada é a "Baby Tee Pink Halo Boxy". Toque no produto, toque em "Comprar com Pix" (no "pagar no PIX") e o check gigante "Compra fechada em 30s" |
 | 13–16,2s | Zoom-out. "O CLIENTE COMPRA DE QUEM FACILITA." e o site do lojista recebendo "Pix recebido • R$ 189,90" e "Venda no automático" |
 | 16,2–18,45s | "SIMPLIFIQUE O CAMINHO ATÉ O SEU CAIXA.": a linha acende Produto → Pix → Caixa |
 | 18,45–22s | Logo no topo e card do Direct com o avião de papel brilhando. A frase "Quero meu site!" é digitada e o cursor clica em "Enviar". No "AGORA!", "MUDE ISSO AGORA." entra com scale-up, glow verde neon e tremida, junto do botão pulsante "ME MANDA UM DIRECT" |
