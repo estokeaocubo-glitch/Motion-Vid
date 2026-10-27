@@ -2,10 +2,10 @@
 
 Este pacote cobre o feed em 4:5 e os stories em 9:16. A direção de arte segue a pasta `novas referencias/`, com a identidade da Estoke ao Cubo.
 
-- **Peças:** as artes estão em `posts-pacote/posts.src.html`. Cada post e cada story é uma `<section>` com um `id`.
+- **Peças:** as artes do lote 1 estão em `posts-pacote/posts.html`. Cada post e cada story é uma `<section>` com um `id`.
 - **PNGs prontos:** ficam em `posts-pacote/out/`.
 - **Versão guia dos stories:** fica em `posts-pacote/out/guia/` e mostra as zonas de sticker e as áreas seguras.
-- **Para gerar:** `python3 posts-pacote/build.py && NODE_PATH=/opt/node22/lib/node_modules node posts-pacote/render.cjs`.
+- **Para gerar:** `python3 posts-pacote/build.py && NODE_PATH=/opt/node22/lib/node_modules node posts-pacote/render.cjs`. O design system compartilhado pelos lotes fica em `base.src.css` + `icons.js`.
 
 ---
 
@@ -113,3 +113,101 @@ As áreas seguras do Instagram são o topo (250px) e o rodapé (300px), por caus
 2. O story 2 mostra a saída lado a lado.
 3. O story 3 prova com o painel.
 4. O story 4 fecha com duas portas de entrada para o Direct: o link e a palavra-gatilho "SITE".
+
+---
+
+# Lote 2: 5 arquétipos de venda + 4 stories
+
+As artes estão em `posts-pacote/lote2.html`, e os PNGs em `posts-pacote/out/lote2/`. A versão guia dos stories fica em `out/lote2/guia/`.
+
+O lote usa o mesmo design system do lote 1 (`base.src.css` + `icons.js`): mesmas fontes e pesos, tracking negativo nos títulos e caps a 0,2em, paleta (papel `#F3F2EE`, royal `#1F5BFF`, tinta `#0B1222`), raios de 26–30px nos cards e 999px nas pílulas, a mesma sombra longa e macia e o grão do papel. O que muda de post para post é só a composição, sempre emprestada de uma referência diferente da pasta.
+
+As interfaces mostram coisas reais: o print da loja da Dizzy, o site da Kairós e a camiseta Baby Tee Pink Halo da Dizzy. Os valores de pedido e de caixa são ilustrativos.
+
+**Travas respeitadas:**
+- Nenhuma foto de banco de imagem.
+- Nenhum ícone infantil: os ícones são de traço próprio, sem emoji.
+- O logotipo é sempre o vetor oficial.
+- Todo post ancora a atenção num elemento concreto: planilha, painel, notificação, card de sistema, chat ou comprovante.
+
+## Feed (4:5)
+
+### Post 1: Contraste A vs. B · `l2-feed1-planilha-vs-painel.png`
+- **Base estrutural:** `2b8f0004b809ea4248a2258ab0f42aee.jpg` (a planilha do Excel em tela cheia).
+- **Arte:** a metade esquerda é a planilha real, com faixa de menu, barra de fórmula, `#REF!`, `#VALOR!`, "??", estoque −1 circulado e a nota manuscrita "vendeu mais do que tinha??". A metade direita é o painel escuro do sistema, com vendas do dia, pedidos, estoque por produto e o gráfico subindo. Um botão → liga um lado ao outro, com os selos ANTES ✕ / DEPOIS ✓.
+- **Copy:** **4 planilhas. 1 painel.** / Pedido, estoque e caixa se atualizando sozinhos.
+- **Legenda:**
+> Planilha de estoque, planilha de vendas, planilha do caixa… e nenhuma conversa com a outra.
+>
+> Resultado: produto vendido que não existia, Pix que ninguém conferiu e aquela célula com #REF! que todo mundo finge que não viu.
+>
+> Com um sistema sob medida, cada venda baixa o estoque, soma no caixa e aparece no painel na hora. Uma tela, a verdade da sua operação.
+>
+> → Manda **PAINEL** no Direct que a gente te mostra como fica com os seus produtos.
+
+### Post 2: UI / Notificação de impacto · `l2-feed2-pedido-0312.png`
+- **Base estrutural:** `c38023ae0d4846fbfa178bb00a1dd917.jpg` (pilha de buscas recuando em perspectiva + texto no canto inferior esquerdo).
+- **Arte:** uma pilha de notificações da madrugada recua em perspectiva (Pix recebido 23:58, pedido enviado 00:21, estoque atualizado 01:15…). A da frente é a pílula preta grande **PEDIDO APROVADO · 03:12 · Pix · R$ 189,90**, com o selo "sem ninguém online".
+- **Copy:** **Você dormindo. O site vendendo.** / Venda que entra de madrugada não espera você acordar.
+- **Legenda:**
+> 03:12. Pix aprovado. Pedido separado. Estoque atualizado. E você dormindo.
+>
+> Quem compra de madrugada não manda mensagem esperando resposta: compra de quem deixa comprar. Seu site pode ser o vendedor que nunca fecha, nunca esquece de responder e nunca erra o estoque.
+>
+> → Manda **SITE** no Direct e descubra quanto você está deixando de vender enquanto dorme.
+
+### Post 3: Carrossel de fluxo (5 slides) · `l2-feed3-1` a `l2-feed3-5`
+- **Base estrutural:** `3f0f0128841999d55f5cd50eedeff9e1.jpg` (linha tracejada com pontos sobre papel quadriculado + placa pendurada).
+- **Arte:** os 5 slides são um panorama de 5400px. A mesma linha tracejada atravessa todos, no mesmo papel quadriculado e no mesmo grid: rótulo da etapa no topo à esquerda, título em dois tons, um card de UI no centro e a frase de apoio embaixo. A cada slide, um ponto da linha acende em azul.
+
+| Slide | Copy da arte | Card de UI |
+|---|---|---|
+| 01 · Matéria-prima | **Tudo começa no insumo.** / Registrou a entrada, o sistema já sabe. | Entrada de insumos: Algodão cru +250 kg, estoque de insumos 1.490 kg |
+| 02 · Produção | **A produção avisa quando fecha.** / Sem grupo de WhatsApp perguntando "ficou pronto?" | OP #402 · Baby Tee, concluída, barra 100% (Corte → Pronto) |
+| 03 · Estoque | **O estoque se conta sozinho.** / Acabou o "deixa eu conferir e te falo". | Matéria-prima −15 un. · Produto final +15 un. |
+| 04 · Vitrine | **O site mostra o que tem de verdade.** / Estoque e site falando a mesma língua. | Card da Baby Tee Pink Halo Boxy, R$ 65,00, em estoque: 15 |
+| 05 · Cliente | **…até o clique do cliente.** / Manda CONTROLE no Direct. | PIX APROVADO · pedido #1044, estoque −1, expedição avisada; placa pendurada "Bora montar o seu?" |
+
+- **Legenda:**
+> Do algodão que chegou de manhã ao Pix que caiu à noite: quantas vezes a informação passa pela sua mão no meio do caminho?
+>
+> Num sistema sob medida, cada etapa avisa a próxima: entrada de insumo → produção → estoque → site → cliente. Ninguém precisa perguntar, conferir ou atualizar planilha.
+>
+> Arrasta pra ver a jornada completa.
+>
+> → Manda **CONTROLE** no Direct e conta como é a sua operação hoje.
+
+### Post 4: Tipografia de impacto + dor · `l2-feed4-demorou-perdeu.png`
+- **Base estrutural:** `e91d2c3c2794cbcd1af8c41a0340499c.jpg` ("MASTER YOUR CRAFT": letras gigantes no azul, com o objeto atravessando).
+- **Arte:** fundo royal cheio. **DEMOROU,** em branco e **PERDEU.** em ciano, em display gigante, com a notificação do Direct atravessando entre as duas palavras, inclinada: "Oi! Ainda tem?" · visto há 11 h · não respondida. Há textos curtos nos cantos (como na referência) e a pílula branca de CTA.
+- **Copy:** **DEMOROU, PERDEU.** / No Direct, a resposta é o produto. / Um site responde preço, estoque e frete na hora, até de madrugada. / Manda SITE no Direct.
+- **Legenda:**
+> "Oi! Ainda tem?" e a mensagem ficou lá, vista, sem resposta.
+>
+> Não é falta de cliente. É cliente que chegou pronto pra comprar e foi embora porque ninguém respondeu a tempo. No Direct, cada hora de silêncio vira venda do concorrente.
+>
+> Um site responde sozinho: preço, tamanho, estoque, frete e pagamento, na hora.
+>
+> → Manda **SITE** no Direct. A gente responde rápido (prometido).
+
+### Post 5: Prova / portfólio · `l2-feed5-sites-que-vendem.png`
+- **Base estrutural:** `c2a15974147e10fa2f428e483496da97.jpg` ("Solution that Works": título em degradê no topo + aparelho central + rodapé de contato).
+- **Arte:** título em degradê royal → ciano. No centro, o notebook com a loja da Dizzy House Shop (print real) e o celular com o site da Kairós (print real). Selos de vidro: Pix em 1 clique · Rápido no celular · Pedido direto no painel. No rodapé, as marcas atendidas: Dizzy · LCS · Arteiro · K-Dust · Ruppel · Kairós.
+- **Copy:** **Sites que vendem.** / Entregues pra marcas reais. Rodando agora.
+- **Legenda:**
+> Não é mockup de template. São sites no ar, vendendo agora: Dizzy House, LCS, Arteiro, K-Dust, Ruppel e Kairós.
+>
+> Cada um feito do zero pro jeito que a marca vende: Pix em 1 clique, carregamento rápido no celular e pedido caindo direto no painel.
+>
+> O próximo pode ser o seu.
+>
+> → Manda **PORTFÓLIO** no Direct que a gente te mostra os bastidores de cada projeto.
+
+## Stories (9:16): sequência de 4 telas
+
+| # | Arquivo | Função | Base estrutural | Texto na tela | Sticker (onde) |
+|---|---|---|---|---|---|
+| 1 | `l2-story1-so-pelo-direct.png` | Gancho | `5e0aa731f7e0a78bcffa87d1e20edbdf.jpg` ("Still Stuck in the Offline Era?") | Ícones pixelados (balão "…" e ampulheta) sobre a linha do chão. **Ainda vendendo só pelo Direct?** (com marca-texto) / Seu cliente já está online. Sua venda também deveria estar. | **Enquete** abaixo do subtítulo (y ≈ 1260–1480): "Hoje sua venda depende de você responder?" → Sim / Não |
+| 2 | `l2-story2-manual-x-auto.png` | Contraste | `92187a102e5087ca721a5cb1a499d80a.jpg` ("HR CLINIC": duas poltronas frente a frente + display gigante) | Mesma loja. Mesmo produto. **Resultados diferentes.** Dois celulares frente a frente: Direct com "Tem no M? Quanto?", "E o frete?", "??" e visto há 2 h; loja com Comprar com Pix e pago em 12 s. Selo "vs". Display: **MANUAL × AUTO** | **Quiz** (opcional) logo abaixo do display (y ≈ 1510–1620): "Qual vende às 3h?" → Manual / Auto |
+| 3 | `l2-story3-madrugada.png` | Prova | `e1ccda26c79c74c487dab33281821f73.jpg` (rolo de papel em perspectiva no verde + título à direita) | Comprovante desenrolando: vendas da madrugada 23:58 → 05:40, total R$ 399,90, PIX aprovado, respostas 0. **[ Madrugada ] 4 vendas. 0 respostas.** / Enquanto você dormia, o site respondeu, cobrou e vendeu. | **Caixa de perguntas** (y ≈ 1420–1600): "Que horas você mais perde venda?" |
+| 4 | `l2-story4-cta.png` | CTA | `8e97ec0438889ff978a22a41962f6739.jpg` (plateia azul desfocada + um único objeto em destaque + chips de data e hora) | sua vez · **Manda SITE no Direct.** O botão "enviar" em 3D sob o holofote, com os chips Hoje (resposta no mesmo dia) e Site + sistema (sob medida). A gente te mostra como fica o seu. | **Link** (y ≈ 1370–1520): `ig.me/m/<seu perfil>`, com o texto "Quero meu site". **Gatilho no Direct:** responder o story com "SITE" dispara a resposta automática. |

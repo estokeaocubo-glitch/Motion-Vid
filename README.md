@@ -258,9 +258,18 @@ São 3 posts de feed em 4:5 e 4 stories em 9:16, na direção de arte da pasta `
 - **Feed 3:** "Estoque certo. Venda rápida." (seta 3D, controle da operação).
 - **Stories:** gancho → manual vs. site → prova no painel → CTA para o Direct. Em `out/guia/` está a versão com as zonas de sticker (enquete, caixa de perguntas, link) e as áreas seguras marcadas.
 
+**Lote 2** (`posts-pacote/lote2.html` → `out/lote2/`) tem 5 posts, um por arquétipo de venda, e 4 stories, todos no mesmo design system:
+- **Contraste A vs. B:** "4 planilhas. 1 painel."
+- **Notificação de impacto:** "Você dormindo. O site vendendo.", com o pedido das 03:12.
+- **Carrossel de fluxo:** da matéria-prima ao clique do cliente, com uma linha tracejada contínua pelos 5 slides.
+- **Tipografia de impacto:** "DEMOROU, PERDEU."
+- **Prova de portfólio:** "Sites que vendem.", com os prints da Dizzy e da Kairós.
+
+O design system compartilhado pelos dois lotes fica em `base.src.css` + `icons.js`.
+
 O mapeamento com as referências, a copy de cada arte, as legendas e onde colar os stickers estão em `posts-pacote/PACOTE.md`.
 
-Para gerar: `python3 posts-pacote/build.py && NODE_PATH=/opt/node22/lib/node_modules node posts-pacote/render.cjs` (grava em `posts-pacote/out/`).
+Para gerar: `python3 posts-pacote/build.py && NODE_PATH=/opt/node22/lib/node_modules node posts-pacote/render.cjs` (grava os dois lotes em `posts-pacote/out/`).
 
 ## Posts do sistema Estoke ao Cubo (`posts-saas/`)
 

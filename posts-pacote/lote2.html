@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Pacote Instagram · Lote 2 · Estoke ao Cubo</title>
+<!--
+  Lote 2: 5 posts de feed (4:5) em 5 arquétipos de venda + 4 stories (9:16), no mesmo design system do lote 1
+  (base.src.css + icons.js) e na direção de arte da pasta "novas referencias". Cada <section> indica a referência
+  que serviu de base estrutural. Interfaces reais: prints dos sites entregues (posts-insta/img/sites) e camisetas
+  da Dizzy House Shop (img/). Valores de pedidos e caixa são ilustrativos.
+  Gerar: python3 posts-pacote/build.py && NODE_PATH=/opt/node22/lib/node_modules node posts-pacote/render.cjs → out/lote2/
+-->
+<link rel="stylesheet" href="base.css">
+<style>
+  /* papel quadriculado (ref 3f0f0128): grade fina que continua de um slide para o outro */
+  .gridpaper { background-color: #F1F2F4; background-image: linear-gradient(rgba(11,18,34,.055) 1px, transparent 1px), linear-gradient(90deg, rgba(11,18,34,.055) 1px, transparent 1px); background-size: 54px 54px; }
+  .step { font-weight: 800; font-size: 24px; letter-spacing: .18em; text-transform: uppercase; color: var(--royal); }
+  .ui { background: #fff; border-radius: 30px; box-shadow: 0 40px 80px rgba(11,18,34,.12), 0 8px 20px rgba(11,18,34,.06); padding: 34px 36px; }
+  .ui .lbl { font-size: 20px; font-weight: 700; color: var(--mute); letter-spacing: .1em; text-transform: uppercase; }
+  .ui .ttl { font-size: 34px; font-weight: 800; letter-spacing: -0.02em; }
+  .bar { height: 14px; border-radius: 8px; background: #EEF0F4; overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--royal), var(--cyan)); }
+  .tag { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 14px; font-weight: 800; font-size: 24px; }
+  .ok { background: #DDF7EA; color: #0E9F6E; }
+  .bad { background: #FFE5E3; color: #E5372C; }
+  .xl { font-size: 22px; }
+  /* planilha (ref 2b8f0004) */
+  .xls { position: absolute; background: #fff; font-family: "Open Sauce Sans", sans-serif; overflow: hidden; }
+  .xls .ribbon { height: 150px; background: #F3F3F3; border-bottom: 1px solid #D4D4D4; }
+  .xls .tabs { display: flex; gap: 22px; padding: 14px 18px 0; font-size: 15px; color: #444; }
+  .xls .tabs b { color: #fff; background: #217346; padding: 3px 10px; border-radius: 4px; font-weight: 700; }
+  .xls table { border-collapse: collapse; font-size: 17px; color: #222; }
+  .xls td { border: 1px solid #DADADA; height: 44px; padding: 0 10px; white-space: nowrap; }
+  .xls td.hd { background: #F3F3F3; color: #666; text-align: center; font-size: 14px; }
+</style>
+</head>
+<body>
+<script src="icons.js"></script>
+
+<!-- =====================================================================
+     POST 1 · CONTRASTE A vs. B · base: 2b8f0004 (planilha do Excel em tela cheia)
+====================================================================== -->
+<section class="post" id="l2-feed1-planilha-vs-painel" style="background: #fff;">
+  <!-- ANTES: a planilha -->
+  <div class="xls" style="left: 0; top: 0; width: 540px; height: 1030px;">
+    <div class="ribbon">
+      <div class="tabs"><span>Arquivo</span><b>Página Inicial</b><span>Inserir</span><span>Fórmulas</span></div>
+      <div style="display: flex; gap: 12px; padding: 24px 18px;">
+        <span style="width: 120px; height: 66px; border-radius: 6px; background: #E6E6E6;"></span><span style="width: 160px; height: 66px; border-radius: 6px; background: #E6E6E6;"></span><span style="width: 120px; height: 66px; border-radius: 6px; background: #E6E6E6;"></span>
+      </div>
+    </div>
+    <div style="height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border-bottom: 1px solid #D4D4D4; font-size: 16px; color: #666;"><span style="border: 1px solid #ccc; padding: 2px 10px;">F7</span><i style="font-style: normal; color: #217346;">fx</i>=SOMA(VENDAS!B2:B99)-ESTOQ…</div>
+    <table>
+      <tr><td class="hd" style="width: 40px;"></td><td class="hd" style="width: 150px;">A</td><td class="hd" style="width: 110px;">B</td><td class="hd" style="width: 110px;">C</td><td class="hd" style="width: 130px;">D</td></tr>
+      <tr><td class="hd">1</td><td><b>Produto</b></td><td><b>Estoque</b></td><td><b>Vendido</b></td><td><b>Pago?</b></td></tr>
+      <tr><td class="hd">2</td><td>Baby Tee M</td><td>12</td><td>14</td><td style="color: #E5372C;">ver Pix</td></tr>
+      <tr><td class="hd">3</td><td>Cropped G</td><td style="background: #FFF2CC;">??</td><td>3</td><td>sim</td></tr>
+      <tr><td class="hd">4</td><td>Boné preto</td><td style="color: #E5372C;">#REF!</td><td>2</td><td style="color: #E5372C;">cobrar</td></tr>
+      <tr><td class="hd">5</td><td>Baby Tee P</td><td>-1</td><td>6</td><td>?</td></tr>
+      <tr><td class="hd">6</td><td style="background: #FFE5E3;">pedido da Ju</td><td></td><td></td><td>Direct</td></tr>
+      <tr><td class="hd">7</td><td>Cropped M</td><td>4</td><td style="color: #E5372C;">#VALOR!</td><td></td></tr>
+      <tr><td class="hd">8</td><td style="color: #999;">conferir dps</td><td></td><td></td><td></td></tr>
+      <tr><td class="hd">9</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="hd">10</td><td>frete SP?</td><td></td><td></td><td style="color: #E5372C;">R$ ???</td></tr>
+      <tr><td class="hd">11</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="hd">12</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="hd">13</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="hd">14</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="hd">15</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="hd">16</td><td></td><td></td><td></td><td></td></tr>
+    </table>
+    <div class="hand abs" style="left: 70px; top: 700px; font-size: 50px; color: #E5372C; transform: rotate(-6deg);">vendeu mais do que tinha??</div>
+    <svg class="abs" style="left: 135px; top: 399px;" width="150" height="70"><ellipse cx="75" cy="35" rx="70" ry="28" fill="none" stroke="#E5372C" stroke-width="4" transform="rotate(-6 75 35)" /></svg>
+    <div class="abs" style="left: 22px; bottom: 26px;"><span class="tag bad"><svg width="24" height="24"><use href="#x" /></svg>Antes</span></div>
+  </div>
+  <!-- DEPOIS: o painel -->
+  <div class="abs" style="left: 540px; top: 0; width: 540px; height: 1030px; background: linear-gradient(180deg, #0F1626, #0A1020); padding: 54px 46px; color: #fff;">
+    <div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: 800; font-size: 28px;">Painel</span><span class="tag ok" style="background: rgba(34,197,94,.15); color: #4ADE80; font-size: 20px;">● ao vivo</span></div>
+    <div style="margin-top: 34px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div style="background: rgba(255,255,255,.06); border-radius: 20px; padding: 20px 22px;"><div style="font-size: 18px; color: #8D93A0; font-weight: 700;">Vendas hoje</div><div style="font-size: 34px; font-weight: 800; margin-top: 4px;">R$ 2.480</div></div>
+      <div style="background: rgba(255,255,255,.06); border-radius: 20px; padding: 20px 22px;"><div style="font-size: 18px; color: #8D93A0; font-weight: 700;">Pedidos</div><div style="font-size: 40px; font-weight: 800; margin-top: 4px;">23</div></div>
+    </div>
+    <div style="margin-top: 22px; background: rgba(255,255,255,.06); border-radius: 20px; padding: 10px 22px;">
+      <div style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.07); font-size: 22px; font-weight: 700;"><span>Baby Tee M</span><span style="color: #4ADE80;">12 un.</span></div>
+      <div style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.07); font-size: 22px; font-weight: 700;"><span>Cropped G</span><span style="color: #4ADE80;">8 un.</span></div>
+      <div style="display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.07); font-size: 22px; font-weight: 700;"><span>Boné preto</span><span style="color: #FACC15;">2 un. · repor</span></div>
+      <div style="display: flex; justify-content: space-between; padding: 14px 0; font-size: 22px; font-weight: 700;"><span>Baby Tee P</span><span style="color: #4ADE80;">5 un.</span></div>
+    </div>
+    <svg width="448" height="190" viewBox="0 0 448 190" style="margin-top: 26px; display: block;">
+      <defs><linearGradient id="p1a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2FD4FF" stop-opacity=".35" /><stop offset="1" stop-color="#2FD4FF" stop-opacity="0" /></linearGradient></defs>
+      <path d="M0 160 L56 150 L112 156 L168 120 L224 128 L280 90 L336 96 L392 52 L448 30 L448 190 L0 190 Z" fill="url(#p1a)" />
+      <path d="M0 160 L56 150 L112 156 L168 120 L224 128 L280 90 L336 96 L392 52 L448 30" fill="none" stroke="#2FD4FF" stroke-width="5" stroke-linejoin="round" />
+    </svg>
+    <div class="abs" style="left: 46px; bottom: 26px;"><span class="tag ok"><svg width="24" height="24"><use href="#check" /></svg>Depois</span></div>
+  </div>
+  <!-- faixa da headline -->
+  <div class="abs paper" style="left: 0; right: 0; bottom: 0; height: 320px; background: var(--paper); border-top: 1px solid #E2E2DE;">
+    <div class="abs h" style="left: 70px; top: 64px; font-size: 92px;">4 planilhas. <span class="r">1 painel.</span></div>
+    <div class="abs sub" style="left: 72px; top: 178px; font-size: 32px;">Pedido, estoque e caixa <b>se atualizando sozinhos.</b></div>
+    <div class="abs" style="right: 70px; top: 190px;"><span class="wm" style="font-size: 24px; color: var(--navy);"></span></div>
+  </div>
+  <div class="abs" style="left: 492px; top: 455px; width: 96px; height: 96px; border-radius: 50%; background: var(--royal); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 30px; box-shadow: 0 16px 34px rgba(31,91,255,.4); border: 6px solid #fff;">→</div>
+</section>
+
+<!-- =====================================================================
+     POST 2 · UI / NOTIFICAÇÃO DE IMPACTO · base: c38023ae (pilha de buscas em perspectiva + texto no canto)
+====================================================================== -->
+<section class="post paper" id="l2-feed2-pedido-0312">
+  <div class="abs" style="left: 0; right: 0; top: 120px; height: 760px; perspective: 1200px;">
+    <div id="stack" style="position: absolute; left: 150px; right: 150px; top: 0; bottom: 0; transform-style: preserve-3d;"></div>
+  </div>
+  <!-- notificação da frente -->
+  <div class="abs notif" style="left: 90px; right: 90px; top: 690px; height: 200px; z-index: 5;">
+    <span class="ico" style="width: 110px; height: 110px; background: #10B981; color: #fff;"><svg width="54" height="54"><use href="#pix" /></svg></span>
+    <span style="flex: 1;"><span style="display: flex; justify-content: space-between; align-items: baseline;"><b style="font-size: 32px; letter-spacing: .03em;">PEDIDO APROVADO</b><span style="font-size: 24px; color: #8D93A0; font-weight: 700;">03:12</span></span><span style="display: block; margin-top: 6px; font-size: 28px; color: #C9CDD6; font-weight: 600;">Pix · R$ 189,90 · pedido #1043</span></span>
+  </div>
+  <div class="abs" style="left: 760px; top: 640px; z-index: 6;"><span class="pill" style="padding: 12px 22px; background: var(--royal); color: #fff; font-size: 22px; box-shadow: 0 10px 24px rgba(31,91,255,.35);"><svg width="22" height="22"><use href="#clock" /></svg>sem ninguém online</span></div>
+  <div class="abs h" style="left: 70px; top: 990px; font-size: 82px;">Você dormindo.<br><span class="r">O site vendendo.</span></div>
+  <div class="abs" style="left: 72px; bottom: 70px; font-size: 22px; font-weight: 700; color: var(--slate);">Venda que entra de madrugada não espera você acordar.</div>
+  <div class="abs" style="right: 70px; bottom: 60px;"><span class="wm" style="font-size: 24px; color: var(--navy);"></span></div>
+</section>
+
+<!-- =====================================================================
+     POST 3 · CARROSSEL DE FLUXO (5 slides) · base: 3f0f0128 (linha tracejada sobre papel quadriculado + placa)
+     A mesma linha atravessa os 5 slides (panorama de 5400px), sempre no mesmo fundo e grid.
+====================================================================== -->
+<section class="post gridpaper" id="l2-feed3-1-materia-prima">
+  <svg class="flow abs" data-i="0" style="left: 0; top: 0;" width="1080" height="1350"></svg>
+  <div class="pager">1/5</div>
+  <div class="abs step" style="left: 70px; top: 90px;">01 · Matéria-prima</div>
+  <div class="abs h" style="left: 70px; top: 150px; font-size: 84px;">Tudo começa<br><span class="r">no insumo.</span></div>
+  <div class="abs ui" style="left: 170px; top: 470px; width: 740px;">
+    <div class="lbl">Entrada de insumos</div>
+    <div style="display: flex; align-items: center; gap: 22px; margin-top: 22px;">
+      <span class="ico" style="width: 84px; height: 84px; border-radius: 22px; background: #E5ECFF; color: var(--royal);"><svg width="44" height="44"><use href="#box" /></svg></span>
+      <div style="flex: 1;"><div class="ttl">Algodão cru</div><div style="font-size: 22px; font-weight: 600; color: var(--slate); margin-top: 4px;">Fornecedor · lote 118</div></div>
+      <span class="tag ok" style="font-size: 30px;">+250 kg</span>
+    </div>
+    <div style="margin-top: 26px; display: flex; justify-content: space-between; font-size: 22px; font-weight: 700; color: var(--slate);"><span>Estoque de insumos</span><span style="color: var(--ink);">1.490 kg</span></div>
+    <div class="bar" style="margin-top: 10px;"><i style="width: 74%;"></i></div>
+  </div>
+  <div class="abs sub" style="left: 70px; bottom: 120px; font-size: 30px;">Registrou a entrada, <b>o sistema já sabe.</b></div>
+  <div class="pill swipe">arrasta <span class="r">→</span></div>
+</section>
+
+<section class="post gridpaper" id="l2-feed3-2-producao">
+  <svg class="flow abs" data-i="1" style="left: 0; top: 0;" width="1080" height="1350"></svg>
+  <div class="pager">2/5</div>
+  <div class="abs step" style="left: 70px; top: 90px;">02 · Produção</div>
+  <div class="abs h" style="left: 70px; top: 150px; font-size: 84px;">A produção<br><span class="r">avisa quando fecha.</span></div>
+  <div class="abs ui" style="left: 170px; top: 470px; width: 740px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;"><div><div class="lbl">Ordem de produção</div><div class="ttl" style="margin-top: 8px;">#402 · Baby Tee</div></div><span class="tag ok"><svg width="24" height="24"><use href="#check" /></svg>Concluída</span></div>
+    <div class="bar" style="margin-top: 28px; height: 18px;"><i style="width: 100%; background: var(--green);"></i></div>
+    <div style="margin-top: 14px; display: flex; justify-content: space-between; font-size: 22px; font-weight: 700; color: var(--slate);"><span>Corte</span><span>Costura</span><span>Acabamento</span><span style="color: #0E9F6E;">Pronto</span></div>
+    <div style="margin-top: 26px; display: flex; gap: 14px;"><span class="tag" style="background: #F1F3F7; color: var(--slate);">15 un.</span><span class="tag" style="background: #F1F3F7; color: var(--slate);">−15 un. de insumo</span></div>
+  </div>
+  <div class="abs sub" style="left: 70px; bottom: 120px; font-size: 30px;">Sem grupo de WhatsApp <b>perguntando “ficou pronto?”</b></div>
+  <div class="pill swipe">arrasta <span class="r">→</span></div>
+</section>
+
+<section class="post gridpaper" id="l2-feed3-3-estoque">
+  <svg class="flow abs" data-i="2" style="left: 0; top: 0;" width="1080" height="1350"></svg>
+  <div class="pager">3/5</div>
+  <div class="abs step" style="left: 70px; top: 90px;">03 · Estoque</div>
+  <div class="abs h" style="left: 70px; top: 150px; font-size: 84px;">O estoque<br><span class="r">se conta sozinho.</span></div>
+  <div class="abs ui" style="left: 170px; top: 470px; width: 740px; padding-bottom: 20px;">
+    <div class="lbl">Movimentação automática</div>
+    <div style="display: flex; align-items: center; gap: 20px; padding: 22px 0; border-bottom: 1px solid #EEF0F3; margin-top: 8px;"><span class="ico" style="width: 64px; height: 64px; border-radius: 18px; background: #F1F3F7; color: var(--slate);"><svg width="34" height="34"><use href="#box" /></svg></span><div style="flex: 1;"><div style="font-size: 28px; font-weight: 800;">Matéria-prima</div><div style="font-size: 20px; color: var(--slate); font-weight: 600;">algodão cru</div></div><span class="tag bad">−15 un.</span></div>
+    <div style="display: flex; align-items: center; gap: 20px; padding: 22px 0;"><span class="ico" style="width: 64px; height: 64px; border-radius: 18px; background: #E5ECFF; color: var(--royal);"><svg width="34" height="34"><use href="#check" /></svg></span><div style="flex: 1;"><div style="font-size: 28px; font-weight: 800;">Produto final</div><div style="font-size: 20px; color: var(--slate); font-weight: 600;">Baby Tee · disponível no site</div></div><span class="tag ok">+15 un.</span></div>
+  </div>
+  <div class="abs sub" style="left: 70px; bottom: 120px; font-size: 30px;">Acabou o <b>“deixa eu conferir e te falo”.</b></div>
+  <div class="pill swipe">arrasta <span class="r">→</span></div>
+</section>
+
+<section class="post gridpaper" id="l2-feed3-4-vitrine">
+  <svg class="flow abs" data-i="3" style="left: 0; top: 0;" width="1080" height="1350"></svg>
+  <div class="pager">4/5</div>
+  <div class="abs step" style="left: 70px; top: 90px;">04 · Vitrine</div>
+  <div class="abs h" style="left: 70px; top: 150px; font-size: 84px;">O site mostra<br><span class="r">o que tem de verdade.</span></div>
+  <div class="abs ui" style="left: 250px; top: 440px; width: 580px; padding: 22px;">
+    <div style="height: 330px; border-radius: 22px; overflow: hidden; background: #000;"><img src="img/tee-pink-halo.webp" alt="" style="width: 100%; height: 100%; object-fit: cover;"></div>
+    <div style="padding: 20px 10px 8px;">
+      <div style="font-size: 30px; font-weight: 800;">Baby Tee Pink Halo Boxy</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;"><span style="font-size: 36px; font-weight: 800;">R$ 65,00</span><span class="tag ok" style="font-size: 20px;">em estoque: 15</span></div>
+    </div>
+  </div>
+  <div class="abs sub" style="left: 70px; bottom: 120px; font-size: 30px;">Estoque e site <b>falando a mesma língua.</b></div>
+  <div class="pill swipe">arrasta <span class="r">→</span></div>
+</section>
+
+<section class="post gridpaper" id="l2-feed3-5-clique-do-cliente">
+  <svg class="flow abs" data-i="4" style="left: 0; top: 0;" width="1080" height="1350"></svg>
+  <div class="pager">5/5</div>
+  <div class="abs step" style="left: 70px; top: 90px;">05 · Cliente</div>
+  <div class="abs h" style="left: 70px; top: 150px; font-size: 84px;">…até o clique<br><span class="r">do cliente.</span></div>
+  <div class="abs notif" style="left: 110px; right: 110px; top: 470px; height: 180px;">
+    <span class="ico" style="width: 100px; height: 100px; background: #10B981; color: #fff;"><svg width="50" height="50"><use href="#pix" /></svg></span>
+    <span style="flex: 1;"><span style="display: flex; justify-content: space-between; align-items: baseline;"><b style="font-size: 30px; letter-spacing: .03em;">PIX APROVADO</b><span style="font-size: 22px; color: #8D93A0; font-weight: 700;">agora</span></span><span style="display: block; margin-top: 6px; font-size: 26px; color: #C9CDD6; font-weight: 600;">Baby Tee · R$ 65,00 · pedido #1044</span></span>
+  </div>
+  <div class="abs" style="left: 110px; top: 690px; display: flex; gap: 14px;"><span class="tag ok"><svg width="24" height="24"><use href="#check" /></svg>estoque −1</span><span class="tag ok"><svg width="24" height="24"><use href="#truck" /></svg>expedição avisada</span></div>
+  <!-- placa pendurada, como na referência -->
+  <svg class="abs" style="left: 600px; top: 790px;" width="320" height="150"><path d="M40 0 L150 140 M290 0 L180 140" stroke="#0B1222" stroke-width="3" /></svg>
+  <div class="abs" style="left: 560px; top: 900px; transform: rotate(-10deg);"><span class="pill" style="padding: 26px 44px; background: var(--royal); color: #fff; font-size: 40px; box-shadow: 0 18px 36px rgba(31,91,255,.35); border: 5px solid #fff;">Bora montar o seu?</span></div>
+  <div class="abs sub" style="left: 70px; bottom: 120px; font-size: 30px;">Manda <b>CONTROLE</b> no Direct.</div>
+  <div class="abs" style="right: 70px; bottom: 60px;"><span class="wm" style="font-size: 24px; color: var(--navy);"></span></div>
+</section>
+
+<!-- =====================================================================
+     POST 4 · TIPOGRAFIA DE IMPACTO + DOR · base: e91d2c3c ("MASTER YOUR CRAFT": letras gigantes no azul com o objeto atravessando)
+====================================================================== -->
+<section class="post" id="l2-feed4-demorou-perdeu" style="background: radial-gradient(90% 70% at 50% 40%, #2C66FF 0%, #1F5BFF 45%, #1546D6 100%);">
+  <div class="abs" style="left: 70px; top: 80px; width: 470px; font-size: 22px; font-weight: 600; color: rgba(255,255,255,.85); line-height: 1.45;">No Direct, a resposta é o produto. Cliente que espera é cliente que compra em outro lugar.</div>
+  <div class="abs" style="right: 70px; top: 82px; color: #fff;"><span class="wm" style="font-size: 26px;"></span></div>
+  <div class="abs disp" style="left: 50px; top: 320px; font-size: 158px; line-height: .9; color: #fff; letter-spacing: -0.02em;">Demorou,</div>
+  <div class="abs disp" style="left: 50px; top: 760px; font-size: 196px; line-height: .9; color: var(--cyan); letter-spacing: -0.02em;">perdeu.</div>
+  <!-- a notificação atravessa as letras -->
+  <div class="abs notif" style="left: 120px; right: 80px; top: 540px; height: 180px; transform: rotate(-5deg); box-shadow: 0 60px 100px rgba(0,10,60,.55);">
+    <span class="ico igrad" style="width: 100px; height: 100px; color: #fff;"><svg width="50" height="50"><use href="#plane" /></svg></span>
+    <span style="flex: 1;"><span style="display: flex; justify-content: space-between; align-items: baseline;"><b style="font-size: 30px;">“Oi! Ainda tem?”</b><span style="font-size: 22px; color: #FF6B60; font-weight: 800;">visto há 11 h</span></span><span style="display: block; margin-top: 6px; font-size: 24px; color: #8D93A0; font-weight: 600;">cliente · 21:47 · não respondida</span></span>
+  </div>
+  <div class="abs" style="right: 70px; bottom: 80px; width: 420px; text-align: right; font-size: 22px; font-weight: 600; color: rgba(255,255,255,.85); line-height: 1.45;">Um site responde preço, estoque e frete <b style="color: #fff;">na hora</b>, até de madrugada.</div>
+  <div class="abs" style="left: 70px; bottom: 76px;"><span class="pill" style="padding: 18px 30px; background: #fff; color: var(--royal); font-size: 26px;"><svg width="26" height="26"><use href="#plane" /></svg>Manda SITE no Direct</span></div>
+</section>
+
+<!-- =====================================================================
+     POST 5 · PROVA / PORTFÓLIO · base: c2a15974 ("Solution that Works": título em degradê + aparelho central + rodapé)
+====================================================================== -->
+<section class="post paper" id="l2-feed5-sites-que-vendem" style="background: linear-gradient(180deg, #F3F2EE 0%, #ECEFF8 100%);">
+  <div class="abs c h" style="top: 110px; font-size: 100px; line-height: 1;"><span style="background: linear-gradient(95deg, #1F5BFF, #4F7BFF 50%, #2FD4FF); -webkit-background-clip: text; background-clip: text; color: transparent;">Sites que<br>vendem.</span></div>
+  <div class="abs c sub" style="top: 345px; font-size: 30px;">Entregues pra marcas reais. <b>Rodando agora.</b></div>
+  <!-- notebook com a loja da Dizzy -->
+  <div class="abs" style="left: 120px; top: 470px; width: 840px;">
+    <div style="height: 500px; border-radius: 28px 28px 0 0; background: #0B0E16; padding: 16px; box-shadow: 0 50px 90px rgba(11,18,34,.28);">
+      <img src="../posts-insta/img/sites/dizzy-shop.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; border-radius: 12px; display: block;">
+    </div>
+    <div style="height: 34px; margin: 0 -60px; border-radius: 0 0 30px 30px; background: linear-gradient(180deg, #D9DDE5, #9DA4B3);"></div>
+  </div>
+  <!-- celular com a Kairós -->
+  <div class="abs" style="left: 730px; top: 640px; width: 230px; height: 460px; border-radius: 40px; background: #0B0E16; padding: 9px; box-shadow: 0 40px 70px rgba(11,18,34,.35);">
+    <div style="width: 100%; height: 100%; border-radius: 32px; overflow: hidden; position: relative; background: #000;">
+      <img src="../posts-insta/img/sites/kairos.jpg" alt="" style="height: 100%; width: auto; position: absolute; left: -40px; top: 0;">
+      <div style="position: absolute; left: 50%; top: 8px; width: 70px; height: 20px; margin-left: -35px; border-radius: 10px; background: #0B0E16;"></div>
+    </div>
+  </div>
+  <!-- selos -->
+  <div class="abs glass chip" style="left: 70px; top: 600px;"><span class="ico" style="width: 46px; height: 46px; background: #DDF7EA; color: #0E9F6E;"><svg width="26" height="26"><use href="#pix" /></svg></span>Pix em 1 clique</div>
+  <div class="abs glass chip" style="left: 90px; top: 830px;"><span class="ico" style="width: 46px; height: 46px; background: #E5ECFF; color: var(--royal);"><svg width="26" height="26"><use href="#clock" /></svg></span>Rápido no celular</div>
+  <div class="abs glass chip" style="left: 470px; top: 1000px;"><span class="ico" style="width: 46px; height: 46px; background: #ECE6FF; color: #6D4AFF;"><svg width="26" height="26"><use href="#chart" /></svg></span>Pedido direto no painel</div>
+  <div class="foot" style="font-size: 20px;"><span>Dizzy · LCS · Arteiro · K-Dust · Ruppel · Kairós</span><span class="wm" style="font-size: 24px; color: var(--navy);"></span></div>
+</section>
+
+<!-- =====================================================================
+     STORIES (9:16)
+====================================================================== -->
+
+<!-- Story 1 · gancho · base: 5e0aa731 ("Still Stuck in the Offline Era?": ícone pixelado + título com marca-texto) -->
+<section class="story paper" id="l2-story1-so-pelo-direct">
+  <div class="safe" style="top: 0; height: 250px;"><span style="bottom: 16px;">zona do topo do Instagram (sem texto)</span></div>
+    <svg id="pixel" class="abs" style="left: 240px; top: 470px;" width="600" height="300" viewBox="0 0 600 300"></svg>
+  <div class="abs c h" style="top: 830px; font-size: 76px; line-height: 1.05;">Ainda vendendo<br><span style="background: linear-gradient(transparent 12%, #D8E4FF 12%, #D8E4FF 92%, transparent 92%); padding: 0 12px;">só pelo Direct?</span></div>
+  <div class="abs c sub" style="top: 1050px; font-size: 36px;">Seu cliente já está online.<br><b>Sua venda também deveria estar.</b></div>
+  <div class="stk" style="left: 190px; width: 700px; top: 1260px; height: 220px;">STICKER: ENQUETE<small>“Hoje sua venda depende de você responder?” · Sim / Não</small></div>
+  <div class="abs c" style="top: 1540px;"><span class="wm" style="font-size: 26px; color: var(--navy);"></span></div>
+  <div class="safe" style="bottom: 0; height: 300px;"><span style="top: 16px;">zona do rodapé (responder / curtir)</span></div>
+</section>
+
+<!-- Story 2 · contraste · base: 92187a10 ("HR CLINIC": duas poltronas frente a frente + display gigante embaixo) -->
+<section class="story paper" id="l2-story2-manual-x-auto">
+  <div class="safe" style="top: 0; height: 250px;"><span style="bottom: 16px;">zona do topo do Instagram (sem texto)</span></div>
+  <div class="abs c" style="top: 300px; font-size: 40px; font-weight: 600; line-height: 1.35;">Mesma loja. Mesmo produto.<br><b class="r" style="font-weight: 800;">Resultados diferentes.</b></div>
+  <!-- os dois celulares, frente a frente -->
+  <div class="abs" style="left: 80px; top: 540px; width: 400px; height: 640px; border-radius: 56px; background: #0B0E16; padding: 12px; transform: perspective(1400px) rotateY(24deg); box-shadow: 0 40px 70px rgba(11,18,34,.3);">
+    <div style="width: 100%; height: 100%; border-radius: 46px; background: #fff; padding: 70px 26px 26px; position: relative;">
+      <div style="font-weight: 800; font-size: 26px;">Direct</div>
+      <div style="margin-top: 22px; display: inline-block; padding: 16px 20px; border-radius: 22px 22px 22px 6px; background: #EEF0F4; font-size: 24px; font-weight: 600;">Tem no M? Quanto?</div>
+      <div style="margin-top: 12px; display: inline-block; padding: 16px 20px; border-radius: 22px 22px 22px 6px; background: #EEF0F4; font-size: 24px; font-weight: 600;">E o frete?</div>
+      <div style="margin-top: 12px; display: inline-block; padding: 16px 20px; border-radius: 22px 22px 22px 6px; background: #EEF0F4; font-size: 24px; font-weight: 600;">??</div>
+      <div style="position: absolute; left: 26px; bottom: 30px; display: flex; align-items: center; gap: 8px; color: var(--red); font-size: 24px; font-weight: 800;"><svg width="28" height="28"><use href="#clock" /></svg>visto há 2 h</div>
+    </div>
+  </div>
+  <div class="abs" style="right: 80px; top: 540px; width: 400px; height: 640px; border-radius: 56px; background: #0B0E16; padding: 12px; transform: perspective(1400px) rotateY(-24deg); box-shadow: 0 40px 70px rgba(11,18,34,.3);">
+    <div style="width: 100%; height: 100%; border-radius: 46px; background: #fff; padding: 60px 22px 22px; position: relative;">
+      <div style="height: 250px; border-radius: 22px; overflow: hidden; background: #000;"><img src="img/tee-pink-halo.webp" alt="" style="width: 100%; height: 100%; object-fit: cover;"></div>
+      <div style="margin-top: 14px; font-size: 24px; font-weight: 800;">Baby Tee · R$ 65,00</div>
+      <div style="margin-top: 14px; padding: 18px; border-radius: 18px; background: #10B981; color: #fff; text-align: center; font-weight: 800; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 10px;"><svg width="24" height="24"><use href="#pix" /></svg>Comprar com Pix</div>
+      <div style="position: absolute; left: 22px; bottom: 30px; display: flex; align-items: center; gap: 8px; color: #0E9F6E; font-size: 24px; font-weight: 800;"><svg width="28" height="28"><use href="#check" /></svg>pago em 12 s</div>
+    </div>
+  </div>
+  <div class="abs c" style="top: 820px;"><span class="ico" style="display: inline-flex; width: 110px; height: 110px; background: var(--royal); color: #fff; font-weight: 800; font-size: 34px; box-shadow: 0 16px 34px rgba(31,91,255,.4); border: 6px solid #fff;">vs</span></div>
+  <div class="abs c disp" style="top: 1260px; font-size: 128px; line-height: .92; color: var(--royal);">Manual<br><span style="color: var(--ink);">× auto</span></div>
+  <div class="stk" style="left: 290px; width: 500px; top: 1510px; height: 110px; font-size: 22px;">STICKER: QUIZ (opcional)<small>“Qual vende às 3h?” · Manual / Auto</small></div>
+  <div class="safe" style="bottom: 0; height: 300px;"><span style="top: 16px;">zona do rodapé (responder / curtir)</span></div>
+</section>
+
+<!-- Story 3 · prova · base: e1ccda26 (rolo de papel em perspectiva no verde + título grande à direita) -->
+<section class="story" id="l2-story3-madrugada" style="background: radial-gradient(80% 60% at 30% 35%, #34D399 0%, #10B981 35%, #047857 100%);">
+  <div class="safe" style="top: 0; height: 250px;"><span style="bottom: 16px; color: #fff;">zona do topo do Instagram (sem texto)</span></div>
+  <!-- comprovante desenrolando -->
+  <div class="abs" style="left: 80px; top: 330px; width: 470px; transform: rotate(-4deg); filter: drop-shadow(0 40px 50px rgba(0,40,20,.45));">
+    <div style="height: 70px; border-radius: 35px; background: linear-gradient(180deg, #FFFFFF, #DADDE2); margin: 0 -20px;"></div>
+    <div class="mono" style="background: #FBFBF8; padding: 34px 34px 50px; font-size: 26px; color: #1D2418; line-height: 1.9; clip-path: polygon(0 0, 100% 0, 100% 97%, 92% 100%, 84% 97%, 76% 100%, 68% 97%, 60% 100%, 52% 97%, 44% 100%, 36% 97%, 28% 100%, 20% 97%, 12% 100%, 4% 97%, 0 100%);">
+      <div style="font-size: 22px; letter-spacing: .1em;">VENDAS · MADRUGADA</div>
+      <div style="border-top: 2px dashed #9AA1AD; margin: 14px 0;"></div>
+      <div style="display: flex; justify-content: space-between;"><span>23:58</span><span>R$ 65,00</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>01:14</span><span>R$ 80,00</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>03:12</span><span>R$ 189,90</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>05:40</span><span>R$ 65,00</span></div>
+      <div style="border-top: 2px dashed #9AA1AD; margin: 14px 0;"></div>
+      <div style="display: flex; justify-content: space-between;"><span>TOTAL</span><span>R$ 399,90</span></div>
+      <div style="display: flex; justify-content: space-between; color: #047857;"><span>PIX</span><span>APROVADO</span></div>
+      <div style="display: flex; justify-content: space-between;"><span>RESPOSTAS</span><span>0</span></div>
+    </div>
+  </div>
+  <div class="abs" style="left: 600px; top: 420px; color: #fff;">
+    <div style="font-size: 30px; font-weight: 600; opacity: .85;">[ Madrugada ]</div>
+    <div class="h" style="margin-top: 16px; font-size: 78px; line-height: .95;">4<br>vendas.</div>
+    <div class="h" style="margin-top: 26px; font-size: 78px; line-height: .95; color: #0B2E22;">0<br>respostas.</div>
+  </div>
+  <div class="abs" style="left: 80px; right: 80px; top: 1270px; color: #fff; font-size: 36px; font-weight: 600; line-height: 1.35;">Enquanto você dormia, o site <b>respondeu, cobrou e vendeu.</b></div>
+  <div class="stk" style="left: 190px; width: 700px; top: 1420px; height: 180px; color: #fff; border-color: #fff; background: rgba(255,255,255,.1);">STICKER: CAIXA DE PERGUNTAS<small style="color: #fff;">“Que horas você mais perde venda?”</small></div>
+  <div class="abs c" style="top: 1640px; color: #fff;"><span class="wm" style="font-size: 24px;"></span></div>
+  <div class="safe" style="bottom: 0; height: 300px;"><span style="top: 16px; color: #fff;">zona do rodapé (responder / curtir)</span></div>
+</section>
+
+<!-- Story 4 · CTA · base: 8e97ec04 (plateia azul desfocada + um único objeto em destaque no centro + chips de data/hora) -->
+<section class="story" id="l2-story4-cta" style="background: #1546D6; overflow: hidden;">
+  <div class="safe" style="top: 0; height: 250px;"><span style="bottom: 16px; color: #fff;">zona do topo do Instagram (sem texto)</span></div>
+  <div id="seats" class="abs" style="inset: 0;"></div>
+  <div class="abs" style="left: 290px; top: 560px; width: 500px; height: 1000px; background: radial-gradient(50% 60% at 50% 30%, rgba(255,255,255,.35), rgba(255,255,255,0) 70%); filter: blur(10px);"></div>
+  <div class="abs c" style="top: 300px;"><span class="pill" style="padding: 10px 24px; background: rgba(255,255,255,.18); color: #fff; font-size: 24px; font-weight: 700;">sua vez</span></div>
+  <div class="abs c h" style="top: 380px; font-size: 88px; color: #fff;">Manda SITE<br>no Direct.</div>
+  <!-- o botão "enviar" em 3D, em destaque -->
+  <div class="abs" style="left: 365px; top: 760px; width: 350px; height: 350px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FFFFFF 0%, #EEF2FF 45%, #C9D5FF 100%); box-shadow: 0 60px 90px rgba(0,10,60,.5), inset 0 -18px 30px rgba(31,91,255,.25); display: flex; align-items: center; justify-content: center; color: var(--royal);">
+    <svg width="170" height="170"><use href="#plane" /></svg>
+  </div>
+  <div class="abs" style="left: 395px; top: 1150px; width: 290px; height: 40px; border-radius: 50%; background: rgba(0,10,60,.45); filter: blur(14px);"></div>
+  <div class="abs" style="left: 90px; top: 1060px; color: #fff;"><div class="pill" style="padding: 12px 22px; background: #fff; color: var(--royal); font-size: 24px;"><svg width="24" height="24"><use href="#clock" /></svg>Hoje</div><div style="margin-top: 8px; font-size: 22px; font-weight: 600; opacity: .85;">resposta no mesmo dia</div></div>
+  <div class="abs" style="right: 90px; top: 760px; color: #fff; text-align: right;"><div class="pill" style="padding: 12px 22px; background: #fff; color: var(--royal); font-size: 24px;"><svg width="24" height="24"><use href="#globe" /></svg>Site + sistema</div><div style="margin-top: 8px; font-size: 22px; font-weight: 600; opacity: .85;">sob medida</div></div>
+  <div class="abs c" style="top: 1250px; color: #fff; font-size: 34px; font-weight: 600;">A gente te mostra <b>como fica o seu.</b></div>
+  <div class="stk" style="left: 240px; width: 600px; top: 1370px; height: 150px; z-index: 5; background: rgba(255,240,247,.94);">STICKER: LINK<small>ig.me/m/&lt;seu perfil&gt; · texto: “Quero meu site”</small></div>
+  <div class="stk" style="left: 140px; width: 800px; top: 640px; height: 90px; font-size: 22px; z-index: 5; background: rgba(255,240,247,.94);">GATILHO NO DIRECT: responder este story com “SITE” dispara a resposta automática</div>
+  <div class="abs c" style="top: 1560px; color: #fff;"><span class="wm" style="font-size: 24px;"></span></div>
+  <div class="safe" style="bottom: 0; height: 300px;"><span style="top: 16px; color: #fff;">zona do rodapé (responder / curtir)</span></div>
+</section>
+
+<script>
+  // pilha de notificações recuando em perspectiva (post 2)
+  (() => {
+    const box = document.getElementById("stack");
+    const rows = [["Pix recebido · R$ 65,00", "23:58"], ["Pedido #1040 · enviado", "00:21"], ["Pix recebido · R$ 80,00", "01:14"], ["Estoque atualizado · −1", "01:15"], ["Pedido #1042 · aprovado", "02:37"], ["Pix recebido · R$ 65,00", "02:51"]];
+    rows.forEach(([t, h], i) => {
+      const k = rows.length - i;              // 1 = mais perto
+      const el = document.createElement("div");
+      el.style.cssText = `position:absolute;left:0;right:0;top:${520 - k * 74}px;height:84px;border-radius:42px;background:#fff;display:flex;align-items:center;gap:16px;padding:0 28px;box-shadow:0 10px 24px rgba(11,18,34,.08);transform:translateZ(${-k * 60}px);opacity:${1 - k * 0.11};font-size:24px;font-weight:700;color:#3B4250`;
+      el.innerHTML = `<span style="width:40px;height:40px;border-radius:50%;background:#DDF7EA;color:#0E9F6E;display:flex;align-items:center;justify-content:center"><svg width="22" height="22"><use href="#pix"/></svg></span><span style="flex:1">${t}</span><span style="color:#9AA1AD">${h}</span>`;
+      box.appendChild(el);
+    });
+  })();
+  // linha tracejada contínua do carrossel (panorama de 5 × 1080px, cada slide mostra o seu trecho)
+  (() => {
+    const D = "M -40 1010 C 260 1150, 520 860, 760 980 S 1180 1180, 1440 1040 S 1860 820, 2140 960 S 2560 1180, 2820 1030 S 3240 830, 3500 960 S 3940 1170, 4200 1040 S 4640 860, 4880 980 S 5260 1100, 5460 1060";
+    const DOTS = [[540, 925], [1620, 980], [2700, 1080], [3780, 1060], [4860, 975]];
+    document.querySelectorAll("svg.flow").forEach((svg) => {
+      const i = +svg.dataset.i;
+      svg.setAttribute("viewBox", `${i * 1080} 0 1080 1350`);
+      svg.innerHTML = `<path d="${D}" fill="none" stroke="#0B1222" stroke-width="4" stroke-dasharray="3 16" stroke-linecap="round"/>` +
+        DOTS.map(([x, y], k) => `<circle cx="${x}" cy="${y}" r="${k === i ? 16 : 11}" fill="${k <= i ? "#1F5BFF" : "#C9CDD3"}"/>` + (k === i ? `<circle cx="${x}" cy="${y}" r="30" fill="none" stroke="#1F5BFF" stroke-width="3" opacity=".35"/>` : "")).join("");
+    });
+  })();
+  // ícones pixelados (story 1): balão de conversa com "..." e ampulheta sobre a linha do chão
+  (() => {
+    const svg = document.getElementById("pixel"), P = 14;
+    const bubble = ["..XXXXXXXXXX..", ".XXXXXXXXXXXX.", "XXXXXXXXXXXXXX", "XXX.XX..XX.XXX".replace(/\./g, "o"), "XXXXXXXXXXXXXX", ".XXXXXXXXXXXX.", "..XXX.........", "..XX..........", "..X..........."];
+    const glass = ["XXXXXXX", ".X...X.", "..X.X..", "...X...", "..X.X..", ".XXXXX.", "XXXXXXX"];
+    let h = "";
+    const draw = (m, ox, oy, c) => m.forEach((row, y) => [...row].forEach((ch, x) => { if (ch === "X") h += `<rect x="${ox + x * P}" y="${oy + y * P}" width="${P}" height="${P}" fill="${c}"/>`; }));
+    draw(bubble, 40, 60, "#1F5BFF");
+    draw(glass, 420, 130, "#1F5BFF");
+    h += `<rect x="0" y="262" width="600" height="6" fill="#1F5BFF"/>`;
+    for (let x = 30; x < 600; x += 70) h += `<rect x="${x}" y="280" width="${20 + (x % 3) * 8}" height="5" fill="#1F5BFF" opacity=".6"/>`;
+    svg.innerHTML = h;
+  })();
+  // plateia de poltronas azuis desfocadas (story 4)
+  (() => {
+    const box = document.getElementById("seats");
+    for (let r = 0; r < 7; r++) for (let c = 0; c < 6; c++) {
+      const y = 240 + r * 240, x = -60 + c * 210 + (r % 2) * 100;
+      if (y > 600 && y < 1300 && x > 250 && x < 700) continue;
+      const s = document.createElement("div");
+      s.style.cssText = `position:absolute;left:${x}px;top:${y}px;width:180px;height:190px;border-radius:60px 60px 30px 30px;background:linear-gradient(180deg,#3E74FF,#1D4FE0);box-shadow:inset 0 -30px 40px rgba(0,20,90,.35);filter:blur(${6 + Math.abs(3 - c) * 2}px);opacity:.8`;
+      box.appendChild(s);
+    }
+  })();
+</script>
+</body>
+</html>

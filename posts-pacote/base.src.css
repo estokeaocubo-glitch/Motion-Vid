@@ -1,0 +1,53 @@
+/* Design system do pacote (tokens, papel, tipografia, cards, notificação, stickers), compartilhado pelos lotes.
+   build.py injeta o logotipo oficial no lugar de WM e grava base.css. */
+  @font-face { font-family: "Open Sauce Sans"; font-weight: 600; src: url(../posts-saas/fonts/open-sauce-sans-latin-600-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Open Sauce Sans"; font-weight: 700; src: url(../posts-saas/fonts/open-sauce-sans-latin-700-normal.woff2) format("woff2"); }
+  @font-face { font-family: "Open Sauce Sans"; font-weight: 800; src: url(../posts-saas/fonts/open-sauce-sans-latin-800-normal.woff2) format("woff2"); }
+  @font-face { font-family: "EAC Display"; src: url(../posts-saas/fonts/eac-display.woff2) format("woff2"); }
+  @font-face { font-family: "Space Mono"; font-weight: 700; src: url(../posts-saas/fonts/space-mono-700.woff2) format("woff2"); }
+  @font-face { font-family: "Caveat"; font-weight: 600; src: url(../posts-saas/fonts/caveat-600.woff2) format("woff2"); }
+  :root {
+    --ink: #0B1222; --navy: #002450; --royal: #1F5BFF; --royal2: #0A3BD8; --blue: #008ACC; --cyan: #2FD4FF;
+    --paper: #F3F2EE; --slate: #5B6475; --mute: #9AA1AD; --green: #22C55E; --red: #FF3B30;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #6b6b6b; font-family: "Open Sauce Sans", system-ui, sans-serif; color: var(--ink); display: flex; flex-direction: column; align-items: center; gap: 40px; padding: 40px 0; }
+  .post, .story { position: relative; overflow: hidden; flex: none; background: var(--paper); }
+  .post { width: 1080px; height: 1350px; }
+  .story { width: 1080px; height: 1920px; }
+  /* papel: leve luz no centro + grão */
+  .paper::before { content: ""; position: absolute; inset: 0; background: radial-gradient(80% 60% at 50% 42%, rgba(255,255,255,.85), rgba(255,255,255,0) 70%); pointer-events: none; }
+  .paper::after { content: ""; position: absolute; inset: 0; opacity: .05; pointer-events: none; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>"); }
+  .abs { position: absolute; }
+  .c { left: 0; right: 0; text-align: center; }
+  .eyebrow { font-weight: 600; letter-spacing: .2em; text-transform: uppercase; line-height: 1.55; }
+  .h { font-weight: 800; letter-spacing: -0.04em; line-height: .98; }
+  .sub { font-weight: 600; color: var(--slate); line-height: 1.35; }
+  .sub b { color: var(--ink); font-weight: 800; }
+  .r { color: var(--royal); }
+  .disp { font-family: "EAC Display", "Open Sauce Sans", sans-serif; text-transform: uppercase; }
+  .mono { font-family: "Space Mono", monospace; font-weight: 700; }
+  .hand { font-family: "Caveat", cursive; font-weight: 600; }
+  .pill { display: inline-flex; align-items: center; gap: 12px; border-radius: 999px; font-weight: 800; }
+  .pager { position: absolute; top: 64px; right: 70px; font-weight: 700; font-size: 24px; color: var(--mute); letter-spacing: .08em; }
+  .swipe { position: absolute; right: 70px; bottom: 70px; padding: 14px 26px; background: #fff; color: var(--ink); font-size: 24px; box-shadow: 0 10px 24px rgba(0,0,0,.08); }
+  .foot { position: absolute; left: 70px; right: 70px; bottom: 64px; display: flex; align-items: center; justify-content: space-between; font-size: 20px; font-weight: 600; color: var(--slate); }
+  /* logotipo oficial ESTOKE / AO CUBO (vetor do manual), na cor do texto */
+  /*WM*/
+  /* stickers: zonas de posicionamento (só na versão "guia") */
+  .stk { position: absolute; display: none; border: 4px dashed #FF2D87; border-radius: 34px; background: rgba(255,45,135,.07); color: #FF2D87; font-weight: 800; font-size: 26px; text-align: center; padding: 22px; line-height: 1.3; align-items: center; justify-content: center; flex-direction: column; gap: 8px; }
+  .stk small { font-weight: 600; font-size: 22px; color: #C2185B; }
+  body.guide .stk { display: flex; }
+  .safe { position: absolute; left: 0; right: 0; display: none; background: repeating-linear-gradient(45deg, rgba(255,45,135,.08) 0 14px, rgba(255,45,135,0) 14px 28px); border-color: rgba(255,45,135,.5); }
+  body.guide .safe { display: block; }
+  .safe span { position: absolute; left: 24px; font-size: 20px; font-weight: 700; color: #C2185B; }
+
+  /* ---------- peças compartilhadas ---------- */
+  .notif { display: flex; align-items: center; gap: 26px; padding: 0 46px 0 30px; background: #141518; color: #fff; border-radius: 120px; box-shadow: 0 50px 90px rgba(0,0,0,.28), 0 12px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.08); }
+  .ico { flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .igrad { background: radial-gradient(circle at 30% 110%, #FFD776 0%, #F77737 25%, #E1306C 50%, #C13584 70%, #5851DB 100%); }
+  .card { background: #fff; border-radius: 30px; box-shadow: 0 40px 80px rgba(11,18,34,.12), 0 8px 20px rgba(11,18,34,.06); }
+  .glass { background: rgba(255,255,255,.78); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,.9); border-radius: 26px; box-shadow: 0 24px 50px rgba(11,18,34,.14); }
+  .chip { display: inline-flex; align-items: center; gap: 12px; padding: 16px 24px; border-radius: 20px; font-weight: 800; font-size: 26px; }
+  .person { width: 40px; height: 90px; }
