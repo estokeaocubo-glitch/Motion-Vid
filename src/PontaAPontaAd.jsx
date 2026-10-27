@@ -86,9 +86,15 @@ function Background({ t, W, H }) {
         const e = easeInOut(p);
         const x = lerp(o.from[0], o.to[0], e), y = lerp(o.from[1], o.to[1], e) + Math.sin(t * 1.3 + i) * 10;
         return (
-          <div key={i} style={{ position: "absolute", left: x - o.r, top: y - o.r, width: o.r * 2, height: o.r * 2, borderRadius: "50%", opacity: 0.9,
-            background: `radial-gradient(circle at 32% 28%, #FFFFFF 0%, #CFF3FF 18%, ${C.cyan} 48%, ${C.blue} 82%, ${C.deep} 100%)`,
-            boxShadow: `0 ${o.r * 0.5}px ${o.r * 0.9}px rgba(0,57,111,.22), inset -${o.r * 0.12}px -${o.r * 0.16}px ${o.r * 0.4}px rgba(0,36,80,.25)` }} />
+          <div key={i} style={{ position: "absolute", left: x - o.r, top: y - o.r, width: o.r * 2, height: o.r * 2, borderRadius: "50%", overflow: "hidden",
+            // vidro: translúcido, desfoca e satura o que está atrás, com borda de luz e brilho especular
+            background: "radial-gradient(circle at 30% 25%, rgba(255,255,255,.42) 0%, rgba(255,255,255,.06) 38%, rgba(47,212,255,.08) 62%, rgba(0,138,204,.2) 100%)",
+            backdropFilter: "blur(5px) saturate(170%) brightness(1.08)", WebkitBackdropFilter: "blur(5px) saturate(170%) brightness(1.08)",
+            border: "1px solid rgba(255,255,255,.65)",
+            boxShadow: `inset 0 0 ${o.r * 0.28}px rgba(255,255,255,.6), inset -${o.r * 0.1}px -${o.r * 0.2}px ${o.r * 0.4}px rgba(0,138,204,.22), 0 ${o.r * 0.45}px ${o.r * 0.9}px rgba(0,57,111,.12)` }}>
+            <div style={{ position: "absolute", left: "16%", top: "10%", width: "42%", height: "26%", borderRadius: "50%", background: "radial-gradient(closest-side, rgba(255,255,255,.95), rgba(255,255,255,0))", transform: "rotate(-28deg)" }} />
+            <div style={{ position: "absolute", left: "22%", bottom: "6%", width: "60%", height: "20%", borderRadius: "50%", background: "radial-gradient(closest-side, rgba(143,227,255,.7), rgba(143,227,255,0))" }} />
+          </div>
         );
       })}
       {/* véu claro no centro para o texto respirar */}

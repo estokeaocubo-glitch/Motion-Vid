@@ -118,7 +118,7 @@ A narração fica por cima de tudo. A trilha é "Minimal Emotion", da Mixkit (te
 
 Promo vertical (9:16, 1080×1920, 60 fps, 24s) de sistemas sob medida, no estilo de apresentação de produto UI/UX. A narração é a "provocativa" da ElevenLabs (`VO - Ponta a ponta provocativo (ElevenLabs).mp3`, 21,9s). Ela entra em 0,4s, e as cenas seguem as frases dela.
 
-- **Visual:** fundo off-white com esferas de degradê da marca que abrem do centro e flutuam, mais esferas de vidro nítidas, com sombra, que entram e saem pelas bordas. Os textos são cinéticos: fade com um blur que se dissipa e palavras-chave deslizando nos eixos X e Y. Cards e mockups entram com `cubic-bezier(0.22, 1, 0.36, 1)`, sem quique.
+- **Visual:** fundo off-white com esferas de degradê da marca que abrem do centro e flutuam, mais esferas de vidro translúcidas (glass: desfocam e saturam o que está atrás, com borda de luz e brilho especular) que entram e saem pelas bordas. Os textos são cinéticos: fade com um blur que se dissipa e palavras-chave deslizando nos eixos X e Y. Cards e mockups entram com `cubic-bezier(0.22, 1, 0.36, 1)`, sem quique.
 - **Fonte:** Open Sauce, a fonte de texto da marca. Ela é geométrica, e a Plus Jakarta Sans fica como alternativa.
 
 | Tempo | Cena |
