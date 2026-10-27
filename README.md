@@ -114,6 +114,29 @@ Campanha de novembro (estruturar) para dezembro (lucrar), sobre a narração `VO
 
 A narração fica por cima de tudo. A trilha é "Minimal Emotion", da Mixkit (techno minimalista, 129 BPM, licença livre para uso comercial): séria, mas com batida constante. A pausa da própria faixa cai no fim do gancho e o drop entra cravado em 6,12s. A música fica baixa e tem ducking automático: abaixa ~8 dB enquanto a narração fala (a partir dos tempos de cada palavra da legenda) e volta nas pausas. Ela silencia na quebra do vidro. Os efeitos de vidro e fogo vêm da Mixkit e são gerados por `scripts/build-audio-assets.py` em `src/audio/sfxDez.js`.
 
+## "Me manda um Direct" (DirectAd)
+
+Promo vertical (9:16, 1080×1920, 60 fps, 22s) em UI/UX escuro (`#0A0F1D`). A narração é a "provocativa O" da ElevenLabs (`VO - Me manda um Direct provocativo (ElevenLabs).mp3`, 21,2s). Tudo segue a voz. O "AGORA!" cai em 20,36s, e não em 19s como no roteiro, por isso o vídeo tem 22s: assim cabe a reverberação final de ~1,5s depois do impacto.
+
+- **Visual:** as esferas de luz do fundo mudam de cor com a história: azul/violeta no gancho, vermelho/laranja no atrito do Direct e verde-esmeralda/ciano na solução e no CTA.
+- **Tipografia:** os títulos de impacto ficam em caixa alta, na fonte de títulos da marca.
+- **Movimento:** cards e mockups entram com `cubic-bezier(0.22, 1, 0.36, 1)`.
+- **Ícones:** todos são desenhos próprios em SVG, sem emojis genéricos.
+
+| Tempo | Cena |
+|---|---|
+| 0–5,3s | Pins de localização e celulares convergem para o centro. "ONDE ESTÃO SEUS CLIENTES?" entra com impacto, e um slide rápido leva a "ONDE É MAIS FÁCIL COMPRAR?" (3,55s, no "mas") |
+| 5,3–9,35s | Card do Direct com "Oi! Tem disponível? Qual o valor?" e "E o frete pra minha cidade?". Relógio girando com "Visto há 2 horas...", a barra de paciência esvazia até ficar vermelha e o carimbo "DIFÍCIL E LENTO" entra em 8,75s |
+| 9,35–13s | Whoosh empurra o chat para fora, e entra o site do concorrente com cronômetro. Toque no produto, toque em "Comprar com Pix" (no "pagar no PIX") e o check gigante "Compra fechada em 30s" |
+| 13–16,2s | Zoom-out. "O CLIENTE COMPRA DE QUEM FACILITA." e o site do lojista recebendo "Pix recebido • R$ 189,90" e "Venda no automático" |
+| 16,2–18,45s | "SIMPLIFIQUE O CAMINHO ATÉ O SEU CAIXA.": a linha acende Produto → Pix → Caixa |
+| 18,45–22s | Logo no topo e card do Direct com o avião de papel brilhando. A frase "Quero meu site!" é digitada e o cursor clica em "Enviar". No "AGORA!", "MUDE ISSO AGORA." entra com scale-up, glow verde neon e tremida, junto do botão pulsante "ME MANDA UM DIRECT" |
+
+**Som:**
+- **Trilha:** "Deep Urban", da Mixkit (124 BPM, licença livre para uso comercial). O build fica por baixo do gancho e do Direct, e o drop entra no "site do concorrente" (9,35s). A música fica baixa e abaixa mais sob a voz.
+- **Efeitos:** pop de notificação nas mensagens, relógio, carimbo com golpe grave, whooshes nas trocas, bubble nos toques verdes, "cha-ching" na compra e no Pix, sino na venda automática, 2 ou 3 teclas e clique no "Enviar".
+- **Final:** no "AGORA!" entram sub-drop + impacto, e a música é cortada a seco logo depois. Sobra só a reverberação até o fim.
+
 ## "Controle de ponta a ponta" (PontaAPontaAd)
 
 Promo vertical (9:16, 1080×1920, 60 fps, 24s) de sistemas sob medida, no estilo de apresentação de produto UI/UX. A narração é a "provocativa" da ElevenLabs (`VO - Ponta a ponta provocativo (ElevenLabs).mp3`, 21,4s). Ela entra em 0,4s, e as cenas seguem as frases dela.

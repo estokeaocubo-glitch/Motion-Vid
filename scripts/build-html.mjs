@@ -24,6 +24,7 @@ const ENTRIES = [
   { src: "src/AutoPilotAd.jsx", name: "AutoPilotAd", slug: "whatsapp-automatico-opcao2", title: "WhatsApp no Automático · Opção 2", alias: { "./autopilot/variant": "src/autopilot/v2.js" } },
   { src: "src/AutoPilotAd.jsx", name: "AutoPilotAd", slug: "whatsapp-automatico-opcao3", title: "WhatsApp no Automático · Opção 3", alias: { "./autopilot/variant": "src/autopilot/v3.js" } },
   { src: "src/DezembroAd.jsx", name: "DezembroAd", slug: "preparar-dezembro", title: "Preparar agora para vender mais" },
+  { src: "src/DirectAd.jsx", name: "DirectAd", slug: "me-manda-um-direct", title: "Me manda um Direct" },
   { src: "src/PontaAPontaAd.jsx", name: "PontaAPontaAd", slug: "ponta-a-ponta", title: "Controle de ponta a ponta" },
   { src: "src/CincoSegundosAd.jsx", name: "CincoSegundosAd", slug: "em-5-segundos", title: "Em 5 segundos" },
   { src: "src/CoverflowAd.jsx", name: "CoverflowAd", slug: "carrossel-sites", title: "Carrossel de sites" },
