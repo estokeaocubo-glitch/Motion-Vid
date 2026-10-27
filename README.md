@@ -118,7 +118,7 @@ A narração fica por cima de tudo. A trilha é "Minimal Emotion", da Mixkit (te
 
 Promo vertical (9:16, 1080×1920, 60 fps, 24s) de sistemas sob medida, no estilo de apresentação de produto UI/UX. A narração é a "provocativa" da ElevenLabs (`VO - Ponta a ponta provocativo (ElevenLabs).mp3`, 21,4s). Ela entra em 0,4s, e as cenas seguem as frases dela.
 
-- **Visual:** fundo off-white com esferas de degradê da marca que abrem do centro e flutuam, mais esferas de vidro translúcidas (glass: desfocam e saturam o que está atrás, com borda de luz e brilho especular) que entram e saem pelas bordas. Os textos são cinéticos: fade com um blur que se dissipa e palavras-chave deslizando nos eixos X e Y. Cards e mockups entram com `cubic-bezier(0.22, 1, 0.36, 1)`, sem quique.
+- **Visual:** fundo off-white com esferas de degradê da marca que abrem do centro e flutuam, mais esferas de vidro bem sutis, sem borda (só uma luz de vidro passando, que desfoca levemente o que está atrás), entrando e saindo pelas bordas. Os textos são cinéticos: fade com um blur que se dissipa e palavras-chave deslizando nos eixos X e Y. Cards e mockups entram com `cubic-bezier(0.22, 1, 0.36, 1)`, sem quique.
 - **Fonte:** Open Sauce, a fonte de texto da marca. Ela é geométrica, e a Plus Jakarta Sans fica como alternativa.
 
 | Tempo | Cena |
@@ -127,7 +127,7 @@ Promo vertical (9:16, 1080×1920, 60 fps, 24s) de sistemas sob medida, no estilo
 | 6–9,6s | Card escuro do sistema sobe em perspectiva; o cursor clica em "Entrada de Insumos" (ripple verde, 7s) e a "Ordem de Produção #402" vai a 100% → "Concluído" |
 | 9,6–12,1s | Zoom-out; "Estoque" (topo esq.), "Caixa" (centro) e "Integrados" (baixo dir.) surgem e se alinham ao centro |
 | 12,1–14,9s | Baixa automática (-15 un. matéria-prima → +15 un. produto final) e o caixa subindo em tempo real |
-| 14,9–18,6s | O card vira um iPhone com o catálogo; o toque verde em "Comprar Agora" (16,1s) abre "Pagamento Aprovado · Pedido enviado para expedição" |
+| 14,9–18,6s | O card vira um iPhone com o catálogo (Baby Tee Dizzy Bullet, da Dizzy House Shop); o toque verde em "Comprar Agora" (16,1s) abre "Pagamento Aprovado · Pedido enviado para expedição" |
 | 18,6–24s | "Sistemas" + "Reais" se fundem e dão lugar a "Sua operação completa em um só lugar", à assinatura e ao botão pulsante "+ Seguir agora" com "e receba uma versão de testes" ("pra quem me seguir agora, eu te mando uma versão de testes") |
 
 **Som:**
