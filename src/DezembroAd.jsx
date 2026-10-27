@@ -2,7 +2,7 @@ import React from "react";
 import { FONT, DISPLAY_FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer, tone, Wordmark } from "./motionKit";
 import { CAPTIONS } from "./dezembro/captions";
 import { VO_DEZ } from "./audio/voDez";
-import { MUSIC_SAAS } from "./audio/miamiSaas";
+import { MUSIC_SERIO } from "./audio/silentDescent";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 import { SFXV, SFXV_PEAK } from "./audio/sfxVo";
 import { SFXD, SFXD_PEAK } from "./audio/sfxDez";
@@ -310,11 +310,11 @@ function Frame({ t }) {
 }
 
 /* =============================================================================
-   Som — narração por cima; "Miami" baixa com o drop na quebra de padrão (6,12s), silêncio de
+   Som — narração por cima; trilha de cinema "Silent Descent" (Mixkit) com a entrada forte na quebra de padrão (6,12s), silêncio de
    0,2s antes da explosão; SFX em cada ação (ver tabela no README).
 ============================================================================= */
-const MUSIC_OFF = 8.96 - T.hookEnd;
-const SAMPLES = { vo: VO_DEZ.voDez, music: MUSIC_SAAS.miamiSaas, ...SFX, ...SFXV, ...SFXD, ...TAPE };
+const MUSIC_OFF = 0; // o trecho já começa 6,12s antes da entrada forte da "Silent Descent"
+const SAMPLES = { vo: VO_DEZ.voDez, music: MUSIC_SERIO.silentDescent, ...SFX, ...SFXV, ...SFXD, ...TAPE };
 const PEAK = { ...SFX_PEAK, ...SFXV_PEAK, ...SFXD_PEAK, ...TAPE_PEAK };
 const SFX_PLAN = [
   // [tempo, efeito, ganho, opções] — o tempo é o do GOLPE (o pico do som cai exatamente aqui)
@@ -361,7 +361,7 @@ function buildEvents() {
     env: [[0, 1], [3.38, 1], [3.42, 0.55], [3.85, 0.55], [4.1, 1], [19.15, 1], [19.2, 0.75], [19.6, 1], [20.35, 1], [20.4, 0.75], [20.8, 1], [27.64, 1]] }) });
   // sub-drop: senoide de 95 → 32 Hz cravada no quadro da quebra
   ev.push({ t: 3.42, fn: (A, w) => tone(A, w, { type: "sine", f: 95, f2: 32, glide: 0.7, dur: 0.9, v: 0.55, a: 0.005 }) });
-  ev.push({ t: 0, dur: DURATION, fn: (A, w, off = 0) => A.sample("music", w, { off: MUSIC_OFF + off, dur: DURATION - off, gain: 0.16, fadeIn: 0.1,
+  ev.push({ t: 0, dur: DURATION, fn: (A, w, off = 0) => A.sample("music", w, { off: MUSIC_OFF + off, dur: DURATION - off, gain: 0.42, fadeIn: 0.3,
     env: [[0, 0.7], [3.15, 0.9], [3.2, 0.0], [3.6, 0.0], [3.9, 0.9], [6.05, 0.6], [6.12, 1.2], [19.1, 1.2], [19.2, 0.7], [20.8, 1.2], [21.55, 1.0], [21.6, 1.35], [24.0, 1.0], [DURATION - 0.6, 1.0], [DURATION, 0]] }) });
   SFX_PLAN.forEach(([at, n, g, o]) => fx(at, n, g, o));
   return ev;

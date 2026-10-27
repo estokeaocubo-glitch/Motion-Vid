@@ -10,6 +10,7 @@
   src/audio/wordsRef.js   música do vídeo de referência "we don't just edit" para o "Venda 24h" (MUSIC_WORDS)
   src/audio/autoPilotRef.js música do vídeo de referência "Auto Pilot" para o "WhatsApp no automático" (MUSIC_AUTOPILOT)
   src/audio/voDez.js      narração "foco dezembro" do vídeo "Preparar agora para vender mais" (VO_DEZ)
+  src/audio/silentDescent.js trilha séria (Mixkit "Silent Descent") do "Preparar agora para vender mais" (MUSIC_SERIO)
   src/audio/sfxDez.js     efeitos do vídeo "Preparar agora para vender mais" (SFXD, SFXD_PEAK)
   src/audio/sfxVo.js      efeitos extras do anúncio "Site é oxigênio" (SFXV, SFXV_PEAK)
   src/audio/tape.js       efeitos analógicos do repositório (TAPE, TAPE_PEAK)
@@ -92,6 +93,10 @@ SFX = {
 }
 
 # Efeitos extras só do anúncio "Site é oxigênio" (módulo separado para não pesar nos outros motions)
+# Trilhas da Mixkit (Stock Music Free License, uso comercial sem atribuição): id → (Mixkit, constante, início, duração)
+MUSIC_MIXKIT = {
+    "silentDescent": (614, "MUSIC_SERIO", 63.73, 30.0),  # "Silent Descent" (film score): a entrada forte (69,85s da faixa) cai em 6,12s do trecho
+}
 # Efeitos do vídeo "Preparar agora para vender mais" (campanha de dezembro): id → (Mixkit, início, duração)
 SFX_DEZ = {
     "glassBreak": (2826, 0.9, 3.6),      # Glass break — a bomboniere explodindo
@@ -188,6 +193,12 @@ def main():
             peaks[k] = encode(src, s, d, p, "128k", normalize=True)
             files[k] = p
         module(os.path.join(out, "sfxVo.js"), "SFXV", files, peaks)
+        for k, (num, const, st, d) in MUSIC_MIXKIT.items():
+            src = os.path.join(tmp, f"mixkit-music-{num}.mp3")
+            urllib.request.urlretrieve(f"https://assets.mixkit.co/music/{num}/{num}.mp3", src)
+            p = os.path.join(tmp, k + ".mp3")
+            encode(src, st, d, p, "160k", normalize=False)
+            module(os.path.join(out, k + ".js"), const, {k: p})
         files, peaks = {}, {}
         for k, (num, st, d) in SFX_DEZ.items():
             src = os.path.join(tmp, f"mixkit-{num}.wav")

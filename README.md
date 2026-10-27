@@ -112,7 +112,7 @@ Campanha de novembro (estruturar) para dezembro (lucrar), sobre a narração `VO
 | 26,4s | logo impact | marca |
 | 27,1s | sparkle | fecho |
 
-A narração fica por cima de tudo. A trilha ("Miami") toca baixa, com o drop na virada de 6,12s e um reforço no payoff. Os efeitos de vidro e fogo vêm da Mixkit e são gerados por `scripts/build-audio-assets.py` em `src/audio/sfxDez.js`.
+A narração fica por cima de tudo. A trilha é de cinema, mais séria: "Silent Descent", da Mixkit, com licença livre para uso comercial. Ela começa contida no gancho, silencia na quebra do vidro e tem a entrada forte cravada na virada de 6,12s, com um reforço no payoff. Os efeitos de vidro e fogo vêm da Mixkit e são gerados por `scripts/build-audio-assets.py` em `src/audio/sfxDez.js`.
 
 ## "Em 5 segundos" (CincoSegundosAd)
 
