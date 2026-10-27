@@ -10,7 +10,7 @@
   src/audio/wordsRef.js   música do vídeo de referência "we don't just edit" para o "Venda 24h" (MUSIC_WORDS)
   src/audio/autoPilotRef.js música do vídeo de referência "Auto Pilot" para o "WhatsApp no automático" (MUSIC_AUTOPILOT)
   src/audio/voDez.js      narração "foco dezembro" do vídeo "Preparar agora para vender mais" (VO_DEZ)
-  src/audio/silentDescent.js trilha séria (Mixkit "Silent Descent") do "Preparar agora para vender mais" (MUSIC_SERIO)
+  src/audio/minimalEmotion.js trilha séria com batida (Mixkit "Minimal Emotion") do "Preparar agora para vender mais" (MUSIC_SERIO)
   src/audio/sfxDez.js     efeitos do vídeo "Preparar agora para vender mais" (SFXD, SFXD_PEAK)
   src/audio/sfxVo.js      efeitos extras do anúncio "Site é oxigênio" (SFXV, SFXV_PEAK)
   src/audio/tape.js       efeitos analógicos do repositório (TAPE, TAPE_PEAK)
@@ -95,7 +95,7 @@ SFX = {
 # Efeitos extras só do anúncio "Site é oxigênio" (módulo separado para não pesar nos outros motions)
 # Trilhas da Mixkit (Stock Music Free License, uso comercial sem atribuição): id → (Mixkit, constante, início, duração)
 MUSIC_MIXKIT = {
-    "silentDescent": (614, "MUSIC_SERIO", 63.73, 30.0),  # "Silent Descent" (film score): a entrada forte (69,85s da faixa) cai em 6,12s do trecho
+    "minimalEmotion": (160, "MUSIC_SERIO", 23.93, 30.0),  # "Minimal Emotion" (techno minimalista, 129 BPM): pausa em 4,1s e drop (30,05s da faixa) em 6,12s do trecho
 }
 # Efeitos do vídeo "Preparar agora para vender mais" (campanha de dezembro): id → (Mixkit, início, duração)
 SFX_DEZ = {
