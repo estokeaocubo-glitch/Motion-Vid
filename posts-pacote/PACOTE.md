@@ -44,13 +44,13 @@ Tema: perda de vendas por demora no Direct.
 - **Paginação e "arrasta →":** em todos os slides.
 
 **Legenda:**
-> Ela perguntou o preço às 21:47. Você viu às 9h. Ela já tinha comprado. 🕘
+> Ela perguntou o preço às 21:47. Você viu às 9h. Ela já tinha comprado.
 >
 > Quem chama no Direct está pronto pra comprar, mas só por alguns minutos. Se a resposta demora, o cliente não espera: ele abre o site do concorrente, vê o preço, calcula o frete e paga no Pix em segundos.
 >
 > Um site bem feito responde por você: preço, estoque, frete e pagamento, a qualquer hora, inclusive às 3h da manhã. E o pedido cai direto no seu painel.
 >
-> 👉 Manda **SITE** no nosso Direct que a gente te mostra como tirar seu atendimento da fila.
+>→ Manda **SITE** no nosso Direct que a gente te mostra como tirar seu atendimento da fila.
 >
 > #sitequevende #lojavirtual #vendasonline #ecommerce #estokeaocubo
 
@@ -63,13 +63,13 @@ Tema: perda de vendas por demora no Direct.
 **Execução visual:** calculadora 3D grande no azul royal, com o logotipo oficial no lugar da marca da calculadora. O visor de LCD fica em Space Mono, e as teclas (MC MR M− M+ ÷ / AC 1 2 + =) têm sombra de profundidade. O Emoji Primordial (sorriso maroto) espia por cima, como o bonequinho da referência. A calculadora sangra pela borda de baixo.
 
 **Legenda:**
-> Fizemos as contas: dezembro é o mês que mais vende no ano, e quem está pronto em novembro sai na frente. 📈
+> Fizemos as contas: dezembro é o mês que mais vende no ano, e quem está pronto em novembro sai na frente.
 >
 > Site no ar, catálogo organizado, Pix e frete automáticos, testado antes da correria. Deixar pra dezembro é montar a loja com o cliente já na porta.
 >
 > Ainda dá tempo de preparar a sua.
 >
-> 👉 Manda **DEZEMBRO** no Direct e a gente te passa o prazo pra colocar seu site no ar antes do pico.
+>→ Manda **DEZEMBRO** no Direct e a gente te passa o prazo pra colocar seu site no ar antes do pico.
 >
 > #dezembro #blackfriday #natal #lojavirtual #estokeaocubo
 
@@ -85,13 +85,13 @@ Tema: perda de vendas por demora no Direct.
 - Ao longo da seta, três chips de vidro contam a jornada: produção → estoque → cliente.
 
 **Legenda:**
-> Quanto do seu dia vai pra conferir planilha, contar estoque e perguntar "esse pedido saiu?" 🤯
+> Quanto do seu dia vai pra conferir planilha, contar estoque e perguntar "esse pedido saiu?"
 >
 > A gente desenvolve sistemas sob medida que ligam tudo: a ordem de produção fecha, o estoque atualiza sozinho, o caixa soma e o pedido chega no cliente, sem retrabalho e sem caderninho.
 >
 > Controle de verdade, do início ao fim, no formato da sua operação (não num sistema genérico).
 >
-> 👉 Manda **CONTROLE** no Direct e conta como funciona hoje. A gente te mostra como fica no sistema.
+>→ Manda **CONTROLE** no Direct e conta como funciona hoje. A gente te mostra como fica no sistema.
 >
 > #gestão #controledeestoque #sistemasobmedida #pequenasempresas #estokeaocubo
 
