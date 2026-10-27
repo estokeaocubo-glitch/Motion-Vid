@@ -9,6 +9,8 @@
   src/audio/voSite.js     narração (ElevenLabs) e trilha de fundo do anúncio "Site é oxigênio" (VO_SITE, MUSIC_OXI)
   src/audio/wordsRef.js   música do vídeo de referência "we don't just edit" para o "Venda 24h" (MUSIC_WORDS)
   src/audio/autoPilotRef.js música do vídeo de referência "Auto Pilot" para o "WhatsApp no automático" (MUSIC_AUTOPILOT)
+  src/audio/voPonta.js    narração do "Controle de ponta a ponta" (VO_PONTA)
+  src/audio/deepHouse.js  trilha (Mixkit "Deep House") do "Controle de ponta a ponta" (MUSIC_PONTA)
   src/audio/voDez.js      narração "foco dezembro" do vídeo "Preparar agora para vender mais" (VO_DEZ)
   src/audio/minimalEmotion.js trilha séria com batida (Mixkit "Minimal Emotion") do "Preparar agora para vender mais" (MUSIC_SERIO)
   src/audio/sfxDez.js     efeitos do vídeo "Preparar agora para vender mais" (SFXD, SFXD_PEAK)
@@ -32,6 +34,7 @@ BAILAR = os.path.join(ROOT, "[FREE] Latin Trap x Mexican Type Beat - ''BAILAR'' 
 TOOLS_REF = os.path.join(ROOT, "dev-tools-site (audio original).m4a")
 VO_SITE = os.path.join(ROOT, "VO - Voce gasta horas gravando Reels (ElevenLabs).mp3")
 VO_DEZ = os.path.join(ROOT, "VO - Narracao foco dezembro (ElevenLabs).mp3")
+VO_PONTA = os.path.join(ROOT, "VO - Ponta a ponta provocativo (ElevenLabs).mp3")
 DISTANCE = os.path.join(ROOT, "TRAP TYPE BEAT - _DISTANCE_ _ FREESTYLE BEAT _ HARD TYPE BEAT _ FREE RAP INSTRUMENTAL 2026 [zuHucgfzkoA].mp3")
 WORDS_REF = os.path.join(ROOT, "venda-24h (audio original).m4a")
 AUTOPILOT_REF = os.path.join(ROOT, "auto-pilot (audio original).m4a")
@@ -46,6 +49,7 @@ MUSIC = {
     "toolsRef": (TOOLS_REF, "MUSIC_TOOLS", 0.0, None),
     "voSite": (VO_SITE, "VO_SITE", 0.0, None),               # narração inteira (55,07s)
     "voDez": (VO_DEZ, "VO_DEZ", 0.0, None),                   # narração "foco dezembro" inteira (27,64s)
+    "voPonta": (VO_PONTA, "VO_PONTA", 0.0, None),             # narração "de ponta a ponta" inteira (21,89s)
     "oxiMusic": (DISTANCE, "MUSIC_OXI", 67.29, 56.0),        # "DISTANCE" a partir da volta do beat, por baixo da voz
     "wordsRef": (WORDS_REF, "MUSIC_WORDS", 0.0, None),       # inteira (9,52s), com os cortes da referência
     "autoPilotRef": (AUTOPILOT_REF, "MUSIC_AUTOPILOT", 0.0, None),  # inteira (9,22s), com os cortes da referência
@@ -96,6 +100,7 @@ SFX = {
 # Trilhas da Mixkit (Stock Music Free License, uso comercial sem atribuição): id → (Mixkit, constante, início, duração)
 MUSIC_MIXKIT = {
     "minimalEmotion": (160, "MUSIC_SERIO", 23.93, 30.0),  # "Minimal Emotion" (techno minimalista, 129 BPM): pausa em 4,1s e drop (30,05s da faixa) em 6,12s do trecho
+    "deepHouse": (196, "MUSIC_PONTA", 9.47, 25.0),  # "Deep House" (124 BPM): só o bumbo no começo e o baixo (15,47s da faixa) entra em 6,0s do trecho
 }
 # Efeitos do vídeo "Preparar agora para vender mais" (campanha de dezembro): id → (Mixkit, início, duração)
 SFX_DEZ = {

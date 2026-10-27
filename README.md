@@ -114,6 +114,26 @@ Campanha de novembro (estruturar) para dezembro (lucrar), sobre a narração `VO
 
 A narração fica por cima de tudo. A trilha é "Minimal Emotion", da Mixkit (techno minimalista, 129 BPM, licença livre para uso comercial): séria, mas com batida constante. A pausa da própria faixa cai no fim do gancho e o drop entra cravado em 6,12s. A música fica baixa e tem ducking automático: abaixa ~8 dB enquanto a narração fala (a partir dos tempos de cada palavra da legenda) e volta nas pausas. Ela silencia na quebra do vidro. Os efeitos de vidro e fogo vêm da Mixkit e são gerados por `scripts/build-audio-assets.py` em `src/audio/sfxDez.js`.
 
+## "Controle de ponta a ponta" (PontaAPontaAd)
+
+Promo vertical (9:16, 1080×1920, 60 fps, 24s) de sistemas sob medida, no estilo de apresentação de produto UI/UX. A narração é a "provocativa" da ElevenLabs (`VO - Ponta a ponta provocativo (ElevenLabs).mp3`, 21,9s). Ela entra em 0,4s, e as cenas seguem as frases dela.
+
+- **Visual:** fundo off-white com esferas de degradê da marca que abrem do centro e flutuam, mais esferas de vidro nítidas, com sombra, que entram e saem pelas bordas. Os textos são cinéticos: fade com um blur que se dissipa e palavras-chave deslizando nos eixos X e Y. Cards e mockups entram com `cubic-bezier(0.22, 1, 0.36, 1)`, sem quique.
+- **Fonte:** Open Sauce, a fonte de texto da marca. Ela é geométrica, e a Plus Jakarta Sans fica como alternativa.
+
+| Tempo | Cena |
+|---|---|
+| 0–6s | Esferas abrem → "Da matéria-prima / ao clique do cliente." → "Controle." "De ponta" "a ponta." + assinatura da marca |
+| 6–9,6s | Card escuro do sistema sobe em perspectiva; o cursor clica em "Entrada de Insumos" (ripple verde, 7s) e a "Ordem de Produção #402" vai a 100% → "Concluído" |
+| 9,6–12,1s | Zoom-out; "Estoque" (topo esq.), "Caixa" (centro) e "Integrados" (baixo dir.) surgem e se alinham ao centro |
+| 12,1–14,9s | Baixa automática (-15 un. matéria-prima → +15 un. produto final) e o caixa subindo em tempo real |
+| 14,9–18,6s | O card vira um iPhone com o catálogo; o toque verde em "Comprar Agora" (16,1s) abre "Pagamento Aprovado · Pedido enviado para expedição" |
+| 18,6–24s | "Sistemas" + "Reais" se fundem e dão lugar a "Sua operação completa em um só lugar", à assinatura e ao botão pulsante "Quero meu sistema" com a seta para baixo ("toque aqui embaixo") |
+
+**Som:**
+- **Trilha:** "Deep House", da Mixkit (124 BPM, licença livre para uso comercial). Na abertura é só o bumbo, e o baixo entra junto com o primeiro card (6,0s). Ela fica baixa e abaixa mais enquanto a narração fala (ducking pelas frases).
+- **Efeitos:** whooshes curtos e graves (tocados mais lentos) nas entradas, pop/bubble nos dois toques verdes e confirmação suave no "Concluído" e no "Pagamento Aprovado".
+
 ## "Em 5 segundos" (CincoSegundosAd)
 
 Segue o formato da referência de retenção: a tela de um notebook filmada no escuro, com câmera na mão, vinheta, grão e brilho no texto. No centro, um player com cronômetro no topo, e a legenda fixa "Em 5 segundos alguém compra no seu site sem você sequer cansar". Os valores são ilustrativos.
