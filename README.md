@@ -249,6 +249,19 @@ Cada ação tem o seu efeito sonoro. As fontes Caveat e Space Mono (OFL) ficam e
   - **Recorte:** cada quadro passa pelo recorte limpo dos posts, então não aparece borda branca.
   - **Sincronia:** o motion toca esse vídeo sincronizado com a linha do tempo.
 
+## Pacote Instagram "sites e sistemas sob medida" (`posts-pacote/`)
+
+São 3 posts de feed em 4:5 e 4 stories em 9:16, na direção de arte da pasta `novas referencias/`: papel off-white, um único azul royal de destaque, título grotesco em dois tons, caps espaçadas, metáforas de interface (notificação, busca, calculadora, notebook) e uma seta 3D.
+
+- **Feed 1:** carrossel "O Direct que demora" (5 slides).
+- **Feed 2:** "Pelas nossas contas, você precisa de…" (calculadora, pico de dezembro).
+- **Feed 3:** "Estoque certo. Venda rápida." (seta 3D, controle da operação).
+- **Stories:** gancho → manual vs. site → prova no painel → CTA para o Direct. Em `out/guia/` está a versão com as zonas de sticker (enquete, caixa de perguntas, link) e as áreas seguras marcadas.
+
+O mapeamento com as referências, a copy de cada arte, as legendas e onde colar os stickers estão em `posts-pacote/PACOTE.md`.
+
+Para gerar: `python3 posts-pacote/build.py && NODE_PATH=/opt/node22/lib/node_modules node posts-pacote/render.cjs` (grava em `posts-pacote/out/`).
+
 ## Posts do sistema Estoke ao Cubo (`posts-saas/`)
 
 São 3 conceitos para vender o sistema (estoque + PDV + financeiro), em 4:5 (1080×1350). A interface é desenhada em HTML/CSS e os valores são ilustrativos.
