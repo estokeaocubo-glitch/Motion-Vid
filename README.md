@@ -34,6 +34,25 @@ Trailer da Temporada 1 em HyperFrames ("Perder um cliente e nem perceber"): ver 
 
 `src/motionKit.js` reúne o que o carrossel usa: molas e easings, tokens e fontes da marca, grão e feixes de luz, síntese de áudio, render offline da trilha e o player com troca de formato. (O promo ainda tem suas próprias cópias dessas peças.)
 
+## Marca: uso oficial (`assets/brand/`)
+
+O manual da marca está em `assets/brand/Manual Estoke Ao Cubo.pdf`. `python3 scripts/build-brand-assets.py` extrai dele:
+
+| Arquivo | O que é |
+|---|---|
+| `assets/brand/wordmark.svg` | O logotipo oficial **ESTOKE / AO CUBO** em vetor, com os contornos da Monument Extended Bold do próprio manual |
+| `assets/brand/cube.png` | O cubo de vidro em alta resolução |
+| `assets/brand/beam.jpg` | O feixe de luz azul → noite da capa |
+| `src/brandMark.js` | O mesmo logotipo e o cubo, para os motions |
+
+**Regras:**
+- **Logotipo:** sempre em duas linhas (ESTOKE / AO CUBO), em branco sobre noite ou em navy sobre branco. Nunca reescrito em outra fonte, em minúsculas ou numa linha só.
+- **Nos motions:** `BrandWordmark` (só o logotipo) e `Wordmark` (cubo + logotipo, a assinatura), em `src/motionKit.js`.
+- **Nos posts:** a classe `.wm`, que desenha o logotipo na cor do texto.
+- **Cores:** azul `#008ACC`, ciano `#2FD4FF`, noite `#000A1E` e navy `#002450`.
+- **Tipografia:** Monument Extended para títulos em caixa alta e Open Sauce para o texto corrido. Nos motions, os títulos usam a Archivo expandida (`DISPLAY_FONT`) como substituta aberta da Monument, que é licenciada à parte. A fonte não é extraída do manual, só o desenho do logotipo.
+- **Cubo:** sempre o vidro oficial (`CubeLogo`). Pode ganhar brilho (glow), mas nunca outra cor.
+
 ## "Preparar agora para vender mais" (DezembroAd)
 
 Campanha de novembro (estruturar) para dezembro (lucrar), sobre a narração `VO - Narracao foco dezembro (ElevenLabs).mp3`. As legendas entram palavra por palavra, a partir da transcrição com tempo por palavra (`src/dezembro/captions.js`).

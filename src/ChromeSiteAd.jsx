@@ -1,5 +1,5 @@
 import React from "react";
-import { FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer } from "./motionKit";
+import { FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer, Wordmark } from "./motionKit";
 import { MUSIC_AD } from "./audio/bailarAd";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 import { SFXV, SFXV_PEAK } from "./audio/sfxVo";
@@ -256,14 +256,14 @@ function Outro({ t, W, H, u }) {
     <div style={{ position: "absolute", inset: 0, background: "#000" }}>
       <div style={{ position: "absolute", inset: 0, opacity: 1 - toCta, transform: `scale(${1 - toCta * 0.1})` }}>
         <img src="media/chrome/lcs-logo.webp" alt="" style={{ position: "absolute", left: W / 2 - 60 * u, top: H / 2 - 120 * u, width: 120 * u, transform: `scale(${Math.min(p, 1.1)})` }} />
-        <div style={{ position: "absolute", left: 0, right: 0, top: H / 2 + 76 * u, display: "flex", justifyContent: "center", alignItems: "center", gap: 10 * u, opacity: clamp(q * 2) }}>
-          <CubeLogo size={24 * u} />
-          <span style={{ color: "#fff", fontWeight: 700, fontSize: 18 * u }}>site por estoke ao cubo</span>
+        <div style={{ position: "absolute", left: 0, right: 0, top: H / 2 + 70 * u, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 * u, opacity: clamp(q * 2) }}>
+          <span style={{ color: "rgba(255,255,255,.7)", fontWeight: 600, fontSize: 12 * u, letterSpacing: "0.14em", textTransform: "uppercase" }}>site por</span>
+          <Wordmark size={11 * u} color="#FFFFFF" />
         </div>
       </div>
       {t >= T.cta && (
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 * u }}>
-          <div style={{ transform: `scale(${Math.min(c1, 1.1)}) rotate(${(1 - Math.min(c1, 1)) * -50}deg)` }}><CubeLogo size={70 * u} glow={1.2} /></div>
+          <div style={{ transform: `scale(${Math.min(c1, 1.1)})` }}><Wordmark size={15 * u} color="#FFFFFF" glow={1} /></div>
           <div style={{ color: "#fff", fontWeight: 800, fontSize: 36 * u, letterSpacing: "-0.04em", textAlign: "center", lineHeight: 1.05, opacity: clamp(c2 * 2), transform: `translateY(${(1 - Math.min(c2, 1)) * 14 * u}px)` }}>quer o seu site assim?</div>
           <div style={{ padding: `${12 * u}px ${24 * u}px`, borderRadius: 40 * u, background: PAL.yellow, color: "#111", fontWeight: 800, fontSize: 20 * u, transform: `scale(${Math.min(c3, 1.1)})` }}>orçamento no direct →</div>
         </div>

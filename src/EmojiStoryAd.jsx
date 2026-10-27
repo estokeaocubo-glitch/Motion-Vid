@@ -1,5 +1,5 @@
 import React from "react";
-import { C, FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer } from "./motionKit";
+import { C, FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer, Wordmark } from "./motionKit";
 import { SITE_PRINT } from "./emojiStory/sitePrint";
 import { MUSIC_AD } from "./audio/bailarAd";
 import { SFX, SFX_PEAK } from "./audio/sfx";
@@ -132,7 +132,7 @@ function Props({ t }) {
       {/* ideia: chip da Estoke ao Cubo */}
       {t >= BAR(4) + 0.3 && t < BAR(5) && (() => {
         const p = clamp(spring(t - BAR(4) - 0.3, { stiffness: 300, damping: 16 }), 0, 1.1);
-        return <div style={{ position: "absolute", left: 225 - 110, top: 684, width: 220, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "12px 0", borderRadius: 40, background: "#fff", boxShadow: "0 12px 26px rgba(31,107,255,.3)", transform: `scale(${p})`, fontWeight: 800, fontSize: 18, color: INK }}><CubeLogo size={26} />estoke ao cubo</div>;
+        return <div style={{ position: "absolute", left: 225 - 110, top: 684, width: 220, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "12px 0", borderRadius: 40, background: "#fff", boxShadow: "0 12px 26px rgba(31,107,255,.3)", transform: `scale(${p})` }}><Wordmark size={9} color={INK} /></div>;
       })()}
       {/* site no ar: navegador com a loja */}
       {t >= BAR(5) + 0.15 && t < BAR(6) && (() => {
@@ -169,10 +169,9 @@ function EndCard({ t }) {
       <div style={{ position: "absolute", left: 30, right: 30, top: 650, textAlign: "center", transform: `scale(${lerp(0.6, 1, p)})`, opacity: clamp(p * 2) }}>
         <div style={{ fontSize: 38, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.05, color: INK }}>site que vende <span style={{ color: BLUE }}>24h</span>.</div>
       </div>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 726, display: "flex", justifyContent: "center", alignItems: "center", gap: 10, opacity: clamp(q * 2), transform: `translateY(${(1 - q) * 14}px)` }}>
-        <CubeLogo size={30} />
-        <div style={{ fontSize: 20, fontWeight: 800, color: INK }}>estoke ao cubo</div>
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#5B6577" }}>· orçamento no direct</div>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 712, display: "flex", justifyContent: "center", alignItems: "center", gap: 14, opacity: clamp(q * 2), transform: `translateY(${(1 - q) * 14}px)` }}>
+        <Wordmark size={10} color={INK} />
+        <div style={{ fontSize: 15, fontWeight: 700, color: "#5B6577" }}>orçamento<br />no direct</div>
       </div>
     </>
   );

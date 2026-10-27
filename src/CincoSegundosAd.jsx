@@ -1,5 +1,5 @@
 import React from "react";
-import { FONT, DISPLAY_FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, renderEventsWav, MotionPlayer } from "./motionKit";
+import { FONT, DISPLAY_FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, renderEventsWav, MotionPlayer, Wordmark } from "./motionKit";
 import { MUSIC_SAAS } from "./audio/miamiSaas";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 import { SFXV, SFXV_PEAK } from "./audio/sfxVo";
@@ -190,7 +190,7 @@ function Fim({ t }) {
           <div style={{ padding: "11px 20px", borderRadius: 30, background: OR, color: "#fff", fontWeight: 800, fontSize: 15, boxShadow: "0 0 26px rgba(255,106,19,.6)", transform: `scale(${Math.min(pop(t, T.fim + 1.5, 300, 13), 1.1)})` }}>manda SITE no direct ↗</div>
         </div>
       )}
-      {t >= T.fim + 1.9 && <div style={{ position: "absolute", left: 0, right: 0, top: 226, display: "flex", justifyContent: "center", alignItems: "center", gap: 7, color: "#fff", fontWeight: 800, fontSize: 13, opacity: clamp((t - T.fim - 1.9) * 4) }}><CubeLogo size={18} />estoke ao cubo</div>}
+      {t >= T.fim + 1.9 && <div style={{ position: "absolute", left: 0, right: 0, top: 218, display: "flex", justifyContent: "center", opacity: clamp((t - T.fim - 1.9) * 4) }}><Wordmark size={8} color="#FFFFFF" /></div>}
     </>
   );
 }

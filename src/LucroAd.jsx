@@ -1,5 +1,5 @@
 import React from "react";
-import { FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, renderEventsWav, MotionPlayer } from "./motionKit";
+import { FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, renderEventsWav, MotionPlayer, BrandWordmark } from "./motionKit";
 import { LUCRO_FONT_CSS } from "./lucro/fonts";
 import { MUSIC_SAAS } from "./audio/miamiSaas";
 import { SFX, SFX_PEAK } from "./audio/sfx";
@@ -263,9 +263,9 @@ function EndCard({ t }) {
   const r = pop(t, T.end + 0.9, 300, 14);
   return (
     <>
-      <div style={{ position: "absolute", left: 225 - 60, top: 230, transform: `scale(${Math.min(p, 1.1)}) rotate(${(1 - Math.min(p, 1)) * -60}deg)` }}><CubeLogo size={120} glow={1.3} /></div>
-      <div style={{ position: "absolute", left: 0, right: 0, top: 390, textAlign: "center", opacity: clamp(q * 2), transform: `translateY(${(1 - Math.min(q, 1)) * 14}px)` }}>
-        <div style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.04em", color: "#fff" }}>estoke ao cubo</div>
+      <div style={{ position: "absolute", left: 225 - 60, top: 200, transform: `scale(${Math.min(p, 1.1)}) rotate(${(1 - Math.min(p, 1)) * -60}deg)` }}><CubeLogo size={120} glow={1.3} /></div>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 350, textAlign: "center", opacity: clamp(q * 2), transform: `translateY(${(1 - Math.min(q, 1)) * 14}px)` }}>
+        <div style={{ display: "flex", justifyContent: "center" }}><BrandWordmark height={58} color="#FFFFFF" /></div>
         <div style={{ marginTop: 10, fontSize: 19, fontWeight: 700, color: "#A9BBD4", padding: "0 40px", lineHeight: 1.35 }}>estoque, caixa e financeiro num sistema só.</div>
       </div>
       <div style={{ position: "absolute", left: 0, right: 0, top: 540, display: "flex", justifyContent: "center", transform: `scale(${Math.min(r, 1.1)})`, opacity: clamp(r * 2) }}>

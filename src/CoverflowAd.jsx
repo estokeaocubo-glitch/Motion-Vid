@@ -1,5 +1,5 @@
 import React from "react";
-import { FONT, clamp, lerp, prog, spring, easeInOut, easeOut, Grain, CubeLogo, renderEventsWav, MotionPlayer } from "./motionKit";
+import { FONT, clamp, lerp, prog, spring, easeInOut, easeOut, Grain, CubeLogo, renderEventsWav, MotionPlayer, Wordmark } from "./motionKit";
 import { MUSIC_REACH } from "./audio/alexaReach";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 
@@ -44,7 +44,7 @@ function TitleCard({ w, h, colored }) {
       <div style={{ position: "absolute", left: w * 0.12, right: w * 0.12, bottom: h * 0.11, textAlign: "center", color: "rgba(255,255,255,.82)", fontWeight: 600, fontSize: w * 0.045, lineHeight: 1.4 }}>
         Sob medida, rápidos no celular e com o caminho certo até o WhatsApp.
       </div>
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: h * 0.035, display: "flex", justifyContent: "center", alignItems: "center", gap: 6, color: "#fff", fontWeight: 800, fontSize: w * 0.042 }}><CubeLogo size={w * 0.06} />estoke ao cubo</div>
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: h * 0.04, display: "flex", justifyContent: "center" }}><Wordmark size={w * 0.034} color="#FFFFFF" /></div>
     </div>
   );
 }

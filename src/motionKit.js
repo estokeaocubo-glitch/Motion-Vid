@@ -7,6 +7,7 @@
 ============================================================================= */
 import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
 import { BRAND_FONT_CSS, CUBE_LOGO_SRC } from "./brandAssets";
+import { WORDMARK_PATH, WORDMARK_VIEWBOX, CUBE_HI, CUBE_HI_RATIO } from "./brandMark";
 
 /* ---------- Marca ---------- */
 export const C = {
@@ -111,23 +112,35 @@ export function MaskWord({ s, style, children }) {
 }
 
 /* ---------- Visual da marca ---------- */
+// Cubo de vidro oficial (manual da marca, alta resolução)
 export function CubeLogo({ size = 48, glow = 0, style }) {
   return (
-    <img src={CUBE_LOGO_SRC} alt="" width={size * 0.908} height={size} draggable={false}
+    <img src={CUBE_HI || CUBE_LOGO_SRC} alt="" width={size * CUBE_HI_RATIO} height={size} draggable={false}
       style={{
-        display: "block", width: size * 0.908, height: size, userSelect: "none",
+        display: "block", width: size * CUBE_HI_RATIO, height: size, userSelect: "none",
         filter: glow ? `drop-shadow(0 0 ${12 * glow}px ${hexA(C.cyan, 0.55 * Math.min(glow, 1.6))}) drop-shadow(0 ${10 * glow}px ${24 * glow}px ${hexA(C.blue, 0.45 * Math.min(glow, 1.6))})` : "none",
         ...style,
       }} />
   );
 }
-export function Wordmark({ size = 20, color = C.ink, inline = false }) {
+// Logotipo oficial "ESTOKE / AO CUBO" em vetor (os contornos da Monument Extended Bold do manual).
+// Nunca recriar em outra fonte, em minúsculas ou numa linha só: usar este componente.
+export function BrandWordmark({ height = 40, color = "#FFFFFF", style }) {
+  const [w, h] = WORDMARK_VIEWBOX;
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: size * 0.5 }}>
-      <CubeLogo size={inline ? size * 1.5 : size * 2.3} />
-      <div style={{ ...DISP, fontSize: size, lineHeight: 0.95, color, whiteSpace: "nowrap" }}>
-        {inline ? "Estoke ao Cubo" : <>Estoke<br />ao Cubo</>}
-      </div>
+    <svg viewBox={`0 0 ${w} ${h}`} width={(height * w) / h} height={height} style={{ display: "block", color, flex: "none", ...style }}>
+      <path fill="currentColor" d={WORDMARK_PATH} />
+    </svg>
+  );
+}
+// Assinatura: cubo à esquerda + logotipo empilhado, alinhados pela altura (como no manual).
+// size = altura do logotipo; o cubo fica ~1,25× essa altura.
+export function Wordmark({ size = 20, color = C.ink, glow = 0, inline = false, style }) {
+  const h = inline ? size * 1.7 : size * 2.1;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: h * 0.32, ...style }}>
+      <CubeLogo size={h * 1.25} glow={glow} />
+      <BrandWordmark height={h} color={color} />
     </div>
   );
 }

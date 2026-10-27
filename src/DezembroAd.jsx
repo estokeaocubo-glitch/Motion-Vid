@@ -1,5 +1,5 @@
 import React from "react";
-import { FONT, DISPLAY_FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer, tone } from "./motionKit";
+import { FONT, DISPLAY_FONT, clamp, lerp, prog, spring, easeOut, easeInOut, Grain, CubeLogo, SyncedVideo, renderEventsWav, MotionPlayer, tone, Wordmark } from "./motionKit";
 import { CAPTIONS } from "./dezembro/captions";
 import { VO_DEZ } from "./audio/voDez";
 import { MUSIC_SAAS } from "./audio/miamiSaas";
@@ -271,7 +271,7 @@ function Cta({ t }) {
   const ring = clamp((t - CLICK) / 0.6);
   return (
     <>
-      {t >= 26.2 && <div style={{ position: "absolute", left: 0, right: 0, top: 70, display: "flex", justifyContent: "center", alignItems: "center", gap: 10, color: "#fff", fontWeight: 800, fontSize: 22, transform: `scale(${Math.min(r, 1.1)})` }}><CubeLogo size={34} glow={1} />estoke ao cubo</div>}
+      {t >= 26.2 && <div style={{ position: "absolute", left: 0, right: 0, top: 62, display: "flex", justifyContent: "center", transform: `scale(${Math.min(r, 1.1)})` }}><Wordmark size={13} color="#FFFFFF" glow={1} /></div>}
       <div style={{ position: "absolute", left: 0, right: 0, top: 150, textAlign: "center", ...D({ fontSize: 30, color: "#fff" }), opacity: clamp(p * 2) }}>seu site pronto<br /><span style={{ color: GOLD }}>ainda em novembro</span></div>
       {t >= 24.3 && (
         <div style={{ position: "absolute", left: 0, right: 0, top: 270, display: "flex", justifyContent: "center" }}>
@@ -322,7 +322,7 @@ const SFX_PLAN = [
   [0.1, "dryPop", 0.12, {}],                 // letreiro "sua loja em dezembro"
   [1.98, "glassImpact", 0.16, {}],           // tampa fecha
   [2.1, "tick", 0.1, { dur: 0.75, rate: 1.6 }], // relógio disparando no speed ramp
-  [3.42, "glassBreak", 0.85, {}],            // EXPLOSÃO (no "NÃO dá conta"): vidro seco e alto
+  [3.42, "glassBreak", 0.85, { dur: 0.78, fadeOut: 0.16 }], // EXPLOSÃO: só o ataque do vidro (0,46s depois do golpe); a cauda "líquida" é cortada antes dos 4s
   [3.42, "glassImpact", 0.6, {}],            // estalo do primeiro quadro
   [3.42, "deepHit", 0.5, {}],
   [3.44, "zoomImpact", 0.3, {}],

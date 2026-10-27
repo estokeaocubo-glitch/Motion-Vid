@@ -1,5 +1,5 @@
 import React from "react";
-import { C, FONT, clamp, lerp, prog, spring, easeInOut, easeOut, fitSize, Grain, CubeLogo, renderEventsWav, MotionPlayer } from "./motionKit";
+import { C, FONT, clamp, lerp, prog, spring, easeInOut, easeOut, fitSize, Grain, CubeLogo, renderEventsWav, MotionPlayer, Wordmark } from "./motionKit";
 import { SCRIPT } from "./autopilot/variant";
 import { MUSIC_AUTOPILOT } from "./audio/autoPilotRef";
 
@@ -344,9 +344,8 @@ function Finale({ t, F }) {
         <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: "0.12em", color: "#0B8F4A" }}>ON</div>
       </div>
       <div style={{ maxWidth: F.w - 60, textAlign: "center", fontSize: size, fontWeight: 700, letterSpacing: "-0.03em", lineHeight: 1.1, color: INK, opacity: q, transform: `translateY(${(1 - q) * 16}px)` }}>{line}</div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6, opacity: clamp((t - T.out - 0.55) * 4) }}>
-        <CubeLogo size={26} />
-        <div style={{ fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.01em" }}>estoke ao cubo</div>
+      <div style={{ marginTop: 10, opacity: clamp((t - T.out - 0.55) * 4) }}>
+        <Wordmark size={11} color={C.ink} />
       </div>
     </div>
   );
