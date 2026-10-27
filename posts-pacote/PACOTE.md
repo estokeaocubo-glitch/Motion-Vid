@@ -50,7 +50,7 @@ Tema: perda de vendas por demora no Direct.
 >
 > Um site bem feito responde por você: preço, estoque, frete e pagamento, a qualquer hora, inclusive às 3h da manhã. E o pedido cai direto no seu painel.
 >
->→ Manda **SITE** no nosso Direct que a gente te mostra como tirar seu atendimento da fila.
+> → Manda **SITE** no nosso Direct que a gente te mostra como tirar seu atendimento da fila.
 >
 > #sitequevende #lojavirtual #vendasonline #ecommerce #estokeaocubo
 
@@ -69,7 +69,7 @@ Tema: perda de vendas por demora no Direct.
 >
 > Ainda dá tempo de preparar a sua.
 >
->→ Manda **DEZEMBRO** no Direct e a gente te passa o prazo pra colocar seu site no ar antes do pico.
+> → Manda **DEZEMBRO** no Direct e a gente te passa o prazo pra colocar seu site no ar antes do pico.
 >
 > #dezembro #blackfriday #natal #lojavirtual #estokeaocubo
 
@@ -91,7 +91,7 @@ Tema: perda de vendas por demora no Direct.
 >
 > Controle de verdade, do início ao fim, no formato da sua operação (não num sistema genérico).
 >
->→ Manda **CONTROLE** no Direct e conta como funciona hoje. A gente te mostra como fica no sistema.
+> → Manda **CONTROLE** no Direct e conta como funciona hoje. A gente te mostra como fica no sistema.
 >
 > #gestão #controledeestoque #sistemasobmedida #pequenasempresas #estokeaocubo
 
