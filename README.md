@@ -116,7 +116,7 @@ A narração fica por cima de tudo. A trilha é "Minimal Emotion", da Mixkit (te
 
 ## "Controle de ponta a ponta" (PontaAPontaAd)
 
-Promo vertical (9:16, 1080×1920, 60 fps, 24s) de sistemas sob medida, no estilo de apresentação de produto UI/UX. A narração é a "provocativa" da ElevenLabs (`VO - Ponta a ponta provocativo (ElevenLabs).mp3`, 21,9s). Ela entra em 0,4s, e as cenas seguem as frases dela.
+Promo vertical (9:16, 1080×1920, 60 fps, 24s) de sistemas sob medida, no estilo de apresentação de produto UI/UX. A narração é a "provocativa" da ElevenLabs (`VO - Ponta a ponta provocativo (ElevenLabs).mp3`, 21,4s). Ela entra em 0,4s, e as cenas seguem as frases dela.
 
 - **Visual:** fundo off-white com esferas de degradê da marca que abrem do centro e flutuam, mais esferas de vidro translúcidas (glass: desfocam e saturam o que está atrás, com borda de luz e brilho especular) que entram e saem pelas bordas. Os textos são cinéticos: fade com um blur que se dissipa e palavras-chave deslizando nos eixos X e Y. Cards e mockups entram com `cubic-bezier(0.22, 1, 0.36, 1)`, sem quique.
 - **Fonte:** Open Sauce, a fonte de texto da marca. Ela é geométrica, e a Plus Jakarta Sans fica como alternativa.
@@ -128,11 +128,11 @@ Promo vertical (9:16, 1080×1920, 60 fps, 24s) de sistemas sob medida, no estilo
 | 9,6–12,1s | Zoom-out; "Estoque" (topo esq.), "Caixa" (centro) e "Integrados" (baixo dir.) surgem e se alinham ao centro |
 | 12,1–14,9s | Baixa automática (-15 un. matéria-prima → +15 un. produto final) e o caixa subindo em tempo real |
 | 14,9–18,6s | O card vira um iPhone com o catálogo; o toque verde em "Comprar Agora" (16,1s) abre "Pagamento Aprovado · Pedido enviado para expedição" |
-| 18,6–24s | "Sistemas" + "Reais" se fundem e dão lugar a "Sua operação completa em um só lugar", à assinatura e ao botão pulsante "Quero meu sistema" com a seta para baixo ("toque aqui embaixo") |
+| 18,6–24s | "Sistemas" + "Reais" se fundem e dão lugar a "Sua operação completa em um só lugar", à assinatura e ao botão pulsante "+ Seguir agora" com "e receba uma versão de testes" ("pra quem me seguir agora, eu te mando uma versão de testes") |
 
 **Som:**
-- **Trilha:** "Deep House", da Mixkit (124 BPM, licença livre para uso comercial). Na abertura é só o bumbo, e o baixo entra junto com o primeiro card (6,0s). Ela fica baixa e abaixa mais enquanto a narração fala (ducking pelas frases).
-- **Efeitos:** whooshes curtos e graves (tocados mais lentos) nas entradas, pop/bubble nos dois toques verdes e confirmação suave no "Concluído" e no "Pagamento Aprovado".
+- Sem trilha: só a voz e os efeitos de interface.
+- Whooshes curtos e graves (tocados mais lentos) nas entradas, pop/bubble nos dois toques verdes e confirmação suave no "Concluído" e no "Pagamento Aprovado".
 
 ## "Em 5 segundos" (CincoSegundosAd)
 

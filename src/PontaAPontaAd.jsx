@@ -1,7 +1,7 @@
 import React from "react";
 import { FONT, C, clamp, lerp, prog, spring, easeInOut, Grain, renderEventsWav, MotionPlayer, Wordmark } from "./motionKit";
 import { VO_PONTA } from "./audio/voPonta";
-import { MUSIC_PONTA } from "./audio/deepHouse";
+import { DIZZY_TEE } from "./pontaAPonta/dizzyTee";
 import { SFX, SFX_PEAK } from "./audio/sfx";
 
 /* =============================================================================
@@ -9,19 +9,14 @@ import { SFX, SFX_PEAK } from "./audio/sfx";
    Promo de produto no estilo UI/UX minimalista: fundo off-white com esferas de degradê que
    flutuam e entram/saem pelas bordas, tipografia cinética (fade + blur que se dissipa) e cards
    de interface que entram com a curva cubic-bezier(0.22, 1, 0.36, 1), sem quique.
-   A jornada segue a narração ("provocativo", ElevenLabs, 21,9s): produção → estoque e caixa
-   integrados → venda no celular do cliente → CTA.
+   A jornada segue a narração ("provocativo", ElevenLabs, 21,4s): produção → estoque e caixa
+   integrados → venda no celular do cliente → CTA (siga e receba uma versão de testes).
 ============================================================================= */
 const DURATION = 24.0;
 const FORMATS = { "9x16": { w: 450, h: 800, label: "9:16" } };
 const VO_AT = 0.4; // a narração entra 0,4s depois do primeiro quadro (as esferas abrem antes)
-const VO_LEN = 21.89;
-const T = { open: 0, prod: 6.0, click: 7.0, done: 8.85, words: 9.6, align: 11.3, stock: 12.1, phone: 14.9, tap: 16.1, approved: 16.35, cta: 18.6, merge: 19.35, final: 19.75, logo: 20.4 };
-
-// Palavras da narração (faster-whisper), em segundos do áudio; usadas para o ducking da trilha
-const WORDS = [
-  [0.0, 2.56], [2.56, 4.84], [5.04, 7.6], [8.06, 11.24], [11.72, 15.58], [16.1, 18.04], [18.48, 21.58],
-];
+const VO_LEN = 21.39;
+const T = { open: 0, prod: 6.0, click: 7.0, done: 8.85, words: 9.6, align: 11.3, stock: 12.1, phone: 14.9, tap: 16.1, approved: 16.35, cta: 18.6, merge: 19.35, final: 19.75, logo: 20.4, teste: 20.45 };
 
 /* ---------- curva da marca: cubic-bezier(0.22, 1, 0.36, 1) ---------- */
 function bezier(x1, y1, x2, y2) {
@@ -87,13 +82,12 @@ function Background({ t, W, H }) {
         const x = lerp(o.from[0], o.to[0], e), y = lerp(o.from[1], o.to[1], e) + Math.sin(t * 1.3 + i) * 10;
         return (
           <div key={i} style={{ position: "absolute", left: x - o.r, top: y - o.r, width: o.r * 2, height: o.r * 2, borderRadius: "50%", overflow: "hidden",
-            // vidro: translúcido, desfoca e satura o que está atrás, com borda de luz e brilho especular
-            background: "radial-gradient(circle at 30% 25%, rgba(255,255,255,.42) 0%, rgba(255,255,255,.06) 38%, rgba(47,212,255,.08) 62%, rgba(0,138,204,.2) 100%)",
-            backdropFilter: "blur(5px) saturate(170%) brightness(1.08)", WebkitBackdropFilter: "blur(5px) saturate(170%) brightness(1.08)",
-            border: "1px solid rgba(255,255,255,.65)",
-            boxShadow: `inset 0 0 ${o.r * 0.28}px rgba(255,255,255,.6), inset -${o.r * 0.1}px -${o.r * 0.2}px ${o.r * 0.4}px rgba(0,138,204,.22), 0 ${o.r * 0.45}px ${o.r * 0.9}px rgba(0,57,111,.12)` }}>
-            <div style={{ position: "absolute", left: "16%", top: "10%", width: "42%", height: "26%", borderRadius: "50%", background: "radial-gradient(closest-side, rgba(255,255,255,.95), rgba(255,255,255,0))", transform: "rotate(-28deg)" }} />
-            <div style={{ position: "absolute", left: "22%", bottom: "6%", width: "60%", height: "20%", borderRadius: "50%", background: "radial-gradient(closest-side, rgba(143,227,255,.7), rgba(143,227,255,0))" }} />
+            // vidro: só uma luz passando, sem borda; desfoca levemente o que está atrás
+            background: "radial-gradient(circle at 32% 26%, rgba(255,255,255,.22) 0%, rgba(255,255,255,.03) 45%, rgba(47,212,255,.04) 75%, rgba(255,255,255,.1) 100%)",
+            backdropFilter: "blur(4px) saturate(140%) brightness(1.05)", WebkitBackdropFilter: "blur(4px) saturate(140%) brightness(1.05)",
+            boxShadow: `inset 0 0 ${o.r * 0.35}px rgba(255,255,255,.22)`, opacity: 0.75 }}>
+            <div style={{ position: "absolute", left: "16%", top: "10%", width: "42%", height: "26%", borderRadius: "50%", background: "radial-gradient(closest-side, rgba(255,255,255,.55), rgba(255,255,255,0))", transform: "rotate(-28deg)" }} />
+            <div style={{ position: "absolute", left: "22%", bottom: "6%", width: "60%", height: "20%", borderRadius: "50%", background: "radial-gradient(closest-side, rgba(143,227,255,.3), rgba(143,227,255,0))" }} />
           </div>
         );
       })}
@@ -319,15 +313,15 @@ function Phone({ t, W }) {
           <div style={{ display: "flex", justifyContent: "space-between", padding: "12px 18px 0", fontSize: 10, fontWeight: 700 }}><span>9:41</span><span>●●●</span></div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 16px 10px" }}>
             <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: "-0.02em" }}>Catálogo</span>
-            <span style={{ fontSize: 10, fontWeight: 700, padding: "4px 8px", borderRadius: 10, background: "#EEF3F9", color: MUTED }}>🛍 1</span>
+            <span style={{ fontSize: 10, fontWeight: 700, padding: "4px 8px", borderRadius: 10, background: "#EEF3F9", color: MUTED, display: "flex", alignItems: "center", gap: 4 }}><svg width="10" height="11" viewBox="0 0 10 11"><path d="M1.5 3.5h7l-.6 6.5H2.1z M3.3 3.5V2.6a1.7 1.7 0 0 1 3.4 0v.9" fill="none" stroke={MUTED} strokeWidth="1.2" strokeLinejoin="round" /></svg>1</span>
           </div>
-          <div style={{ margin: "0 14px", height: 200, borderRadius: 18, overflow: "hidden", background: "#E9EEF5" }}>
-            <img src="media/coverflow/ruppel.webp" alt="" decoding="sync" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "38% 80%" }} />
+          <div style={{ margin: "0 14px", height: 200, borderRadius: 18, overflow: "hidden", background: "#000" }}>
+            <img src={DIZZY_TEE} alt="" decoding="sync" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <div style={{ padding: "12px 16px 0" }}>
-            <div style={{ fontSize: 13.5, fontWeight: 800 }}>Camiseta Ruppel 240g</div>
+            <div style={{ fontSize: 13.5, fontWeight: 800 }}>Baby Tee Dizzy Bullet</div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
-              <span style={{ fontSize: 17, fontWeight: 800 }}>R$ 129,90</span>
+              <span style={{ fontSize: 17, fontWeight: 800 }}>R$ 65,00</span>
               <span style={{ fontSize: 10, fontWeight: 700, color: MUTED }}>em estoque: 55</span>
             </div>
             <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
@@ -367,7 +361,7 @@ function Closing({ t, W }) {
   const a = ein(t, T.cta, 0.6), b = ein(t, T.cta + 0.15, 0.6);
   const word = (s, p, side, grad) => (
     <span style={{ display: "inline-block", ...(grad ? GRAD_TEXT : {}), opacity: clamp(p * 1.6) * (1 - gone), filter: `blur(${(1 - p) * 10 + gone * 12}px)`,
-      transform: `translateX(${(1 - p) * side * 120 + side * lerp(10, -2, merge)}px) scale(${lerp(1, 1.12, merge)})` }}>{s}</span>
+      transform: `translateX(${(1 - p) * side * 120 + side * lerp(10, 4, merge)}px) scale(${lerp(1, 1.04, merge)})` }}>{s}</span>
   );
   const btnIn = soft(t, T.cta + 0.3);
   const pulse = t > T.cta + 0.9 ? 1 + 0.035 * Math.max(0, Math.sin((t - T.cta) * 6.5)) : 1;
@@ -387,7 +381,7 @@ function Closing({ t, W }) {
       <div style={{ position: "absolute", left: 0, right: 0, top: 452, display: "flex", justifyContent: "center", opacity: ein(t, T.logo, 0.8), filter: `blur(${(1 - ein(t, T.logo, 0.8)) * 8}px)`, transform: `translateY(${(1 - ein(t, T.logo, 0.8)) * 14}px)` }}>
         <Wordmark size={15} color={INK} />
       </div>
-      {/* CTA: "toque aqui embaixo" */}
+      {/* CTA: "pra quem me seguir agora, eu te mando uma versão de testes" */}
       <div style={{ position: "absolute", left: 0, right: 0, top: 560, display: "flex", flexDirection: "column", alignItems: "center", opacity: btnIn, transform: `translateY(${(1 - btnIn) * 40}px)` }}>
         <svg width="22" height="26" viewBox="0 0 22 26" style={{ transform: `translateY(${arrowY}px)`, marginBottom: 10 }}>
           <path d="M11 2 V22 M3 14 L11 22 L19 14" fill="none" stroke={C.blue} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
@@ -395,10 +389,10 @@ function Closing({ t, W }) {
         <div style={{ position: "relative" }}>
           {t > T.cta + 0.9 && <div style={{ position: "absolute", inset: -4, borderRadius: 34, border: `2px solid ${C.cyan}`, opacity: 0.7 * (1 - ring), transform: `scale(${1 + ring * 0.18})` }} />}
           <div style={{ padding: "17px 34px", borderRadius: 30, background: `linear-gradient(95deg, ${C.deep}, ${C.blue} 55%, ${C.cyan})`, color: "#fff", fontFamily: FONT, fontWeight: 800, fontSize: 17, letterSpacing: "-0.01em", boxShadow: "0 18px 36px rgba(0,138,204,.35)", transform: `scale(${pulse})` }}>
-            Quero meu sistema →
+            + Seguir agora
           </div>
         </div>
-        <div style={{ marginTop: 12, fontFamily: FONT, fontSize: 12.5, fontWeight: 600, color: MUTED }}>Toque aqui e fale com a gente</div>
+        <div style={{ marginTop: 12, fontFamily: FONT, fontSize: 12.5, fontWeight: 600, color: MUTED, opacity: ein(t, T.teste, 0.6), transform: `translateY(${(1 - ein(t, T.teste, 0.6)) * 8}px)` }}>e receba uma <b style={{ color: INK }}>versão de testes</b></div>
       </div>
     </>
   );
@@ -445,21 +439,9 @@ function Frame({ t, format = "9x16" }) {
 /* =============================================================================
    Som — sons orgânicos de interface: whooshes curtos e graves (rate < 1) nas entradas,
    pop/bubble no toque verde, confirmação no "Concluído" e no "Pagamento Aprovado".
-   Trilha: "Deep House" (Mixkit, 124 BPM), só o bumbo na abertura e o baixo entra com o
-   primeiro card (6,0s); fica baixa e abaixa mais sob a voz (ducking pelas frases).
+   Sem trilha: só a voz e os efeitos.
 ============================================================================= */
-const DUCK = 0.42;
-function musicEnv() {
-  const env = [[0, 0.75]];
-  WORDS.forEach(([a, b]) => {
-    const s = a + VO_AT, e = b + VO_AT;
-    env.push([Math.max(0.01, s - 0.15), env.length === 1 ? 0.75 : 1], [s, DUCK], [e, DUCK], [e + 0.15, 1]);
-  });
-  env.push([DURATION - 1.2, 1], [DURATION, 0]);
-  return env.sort((x, y) => x[0] - y[0]);
-}
-const MUSIC_ENV = musicEnv();
-const SAMPLES = { vo: VO_PONTA.voPonta, music: MUSIC_PONTA.deepHouse, ...SFX };
+const SAMPLES = { vo: VO_PONTA.voPonta, ...SFX };
 const SFX_PLAN = [
   [0.05, "airWhoosh", 0.1, { rate: 0.75 }],
   [0.4, "shortWind", 0.05, { rate: 0.8 }], [1.42, "shortWind", 0.05, { rate: 0.85 }],
@@ -478,13 +460,12 @@ const SFX_PLAN = [
   [T.cta, "shortWind", 0.06, { rate: 0.8 }], [T.cta + 0.15, "shortWind", 0.06, { rate: 0.9 }],
   [T.cta + 0.3, "lightPop", 0.06],
   [T.merge, "smallSweep", 0.06, { rate: 0.8 }],
-  [T.logo, "sparkleTouch", 0.06],
+  [T.logo, "sparkleTouch", 0.06], [T.teste, "lightPop", 0.05],
 ];
 function buildEvents() {
   const ev = [];
   const fx = (at, name, gain, opts = {}) => ev.push({ t: Math.max(0, at - (SFX_PEAK[name] || 0) / (opts.rate || 1)), fn: (A, w) => A.sample(name, w, { gain, ...opts }) });
   ev.push({ t: VO_AT, dur: VO_LEN, fn: (A, w, off = 0) => A.sample("vo", w, { off, dur: VO_LEN - off, gain: 1.1 }) });
-  ev.push({ t: 0, dur: DURATION, fn: (A, w, off = 0) => A.sample("music", w, { off, dur: DURATION - off, gain: 0.2, fadeIn: 0.25, env: MUSIC_ENV }) });
   SFX_PLAN.forEach(([at, n, g, o]) => fx(at, n, g, o));
   return ev;
 }
